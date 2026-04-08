@@ -1,9 +1,0 @@
-{
-  "miniprogramRoot": "./",
-  "projectname": "blended-taro-component-vue3",
-  "appid": "testAppId",
-  "setting": {
-    "es6": false,
-    "minified": false
-  }
-}

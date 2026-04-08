@@ -1,5 +1,0 @@
-{
-  "presets": ["@babel/preset-react", "power-assert"],
-  "plugins": ["@babel/plugin-transform-class-properties", "@babel/plugin-proposal-object-rest-spread"],
-  "babelrcRoots": ["./h5/*"]
-}
