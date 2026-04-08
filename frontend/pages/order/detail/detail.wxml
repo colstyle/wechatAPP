@@ -1,0 +1,77 @@
+<!-- pages/order/detail/detail.wxml -->
+<view class="page">
+  <view class="section" wx:if="{{order}}">
+    <view class="section-title">订单信息</view>
+    <view class="info-row">
+      <text class="label">订单号：</text>
+      <text class="value">{{order.order_no}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">订单状态：</text>
+      <text class="value status">{{order.statusText}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">租赁方式：</text>
+      <text class="value">{{order.rentalTypeText}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.start_date}}">
+      <text class="label">开始日期：</text>
+      <text class="value">{{order.start_date}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.expected_return_time}}">
+      <text class="label">预期归还：</text>
+      <text class="value">{{order.expected_return_time}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.pickup_time}}">
+      <text class="label">取衣时间：</text>
+      <text class="value">{{order.pickup_time}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.door_lock_password}}">
+      <text class="label">门锁密码：</text>
+      <text class="value">{{order.door_lock_password}}</text>
+    </view>
+    <view class="info-row" wx:if="{{order.overdue_duration}}">
+      <text class="label">已逾期：</text>
+      <text class="value">{{order.overdue_duration}}小时</text>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{order}}">
+    <view class="section-title">商品信息</view>
+    <view class="order-item" wx:for="{{order.items}}" wx:key="id">
+      <image class="item-img" src="{{item.product_image}}" mode="aspectFill"></image>
+      <view class="item-meta">
+        <text class="item-name">{{item.product_name}}</text>
+        <text class="item-spec">{{item.size}} / {{item.color}}</text>
+        <text class="item-price">租金: ¥{{item.rent_price}} × {{item.quantity}}</text>
+        <text class="item-price">押金: ¥{{item.deposit}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{order}}">
+    <view class="section-title">费用明细</view>
+    <view class="info-row">
+      <text class="label">租金总额：</text>
+      <text class="value">¥{{order.total_rent}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">押金总额：</text>
+      <text class="value">¥{{order.total_deposit}}</text>
+    </view>
+    <view class="info-row">
+      <text class="label">订单总额：</text>
+      <text class="value">¥{{order.total_amount}}</text>
+    </view>
+  </view>
+
+  <view class="section bottom-actions" wx:if="{{order}}">
+    <button class="btn btn-primary" wx:if="{{order.status === 1}}" bindtap="onPickupTap">我已取衣</button>
+    <button class="btn btn-primary" wx:if="{{order.status === 2}}" bindtap="onReturnTap">我已还衣</button>
+    <button class="btn btn-danger" wx:if="{{order.status === 0 || order.status === 1}}" bindtap="onCancelTap">取消订单</button>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

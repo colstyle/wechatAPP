@@ -1,0 +1,380 @@
+/* pages/index/index.wxss */
+.page {
+  background: #f8f9fa;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 搜索栏 */
+.search-bar {
+  padding: 30rpx 30rpx 20rpx;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.search-input {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 40rpx;
+  padding: 20rpx 32rpx;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+.search-icon {
+  margin-right: 16rpx;
+  font-size: 32rpx;
+}
+
+/* 轮播图 */
+.banner-container {
+  background: #fff;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.banner {
+  width: 100%;
+  height: 360rpx;
+}
+
+.banner-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.banner-1 {
+  background: linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 100%);
+}
+
+.banner-2 {
+  background: linear-gradient(135deg, #e8e8e8 0%, #d4d4d4 100%);
+}
+
+.banner-3 {
+  background: linear-gradient(135deg, #a8d8c4 0%, #8bc4a8 100%);
+}
+
+.banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx;
+}
+
+.banner-title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+  letter-spacing: 4rpx;
+}
+
+.banner-subtitle {
+  font-size: 28rpx;
+  color: #666;
+  opacity: 0.8;
+}
+
+/* 分类导航 */
+.category-nav {
+  background: #fff;
+  padding: 40rpx 20rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-around;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.category-icon-wrap {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.category-icon-wrap:active {
+  transform: scale(0.95);
+}
+
+.category-emoji {
+  font-size: 48rpx;
+}
+
+.category-name {
+  font-size: 24rpx;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* 区域 */
+.section {
+  background: #fff;
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #212529;
+  position: relative;
+  padding-left: 24rpx;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8rpx;
+  height: 32rpx;
+  background: linear-gradient(180deg, #ff6b6b, #ff8787);
+  border-radius: 4rpx;
+}
+
+.section-more {
+  font-size: 24rpx;
+  color: #adb5bd;
+}
+
+/* 热门商品横向滚动 */
+.product-scroll {
+  white-space: nowrap;
+}
+
+.product-card-small {
+  display: inline-block;
+  width: 200rpx;
+  margin-right: 20rpx;
+  vertical-align: top;
+}
+
+.product-card-small:last-child {
+  margin-right: 0;
+}
+
+.product-img-placeholder {
+  width: 200rpx;
+  height: 260rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+}
+
+.product-img-placeholder.large {
+  width: 100%;
+  height: 360rpx;
+}
+
+.placeholder-text {
+  font-size: 64rpx;
+  opacity: 0.5;
+}
+
+.product-card-small .product-name {
+  display: block;
+  font-size: 24rpx;
+  color: #212529;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.product-price {
+  font-size: 32rpx;
+  color: #ff6348;
+  font-weight: 600;
+}
+
+.product-unit {
+  font-size: 22rpx;
+  color: #adb5bd;
+  margin-left: 4rpx;
+}
+
+/* 新品网格 */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.product-card {
+  overflow: hidden;
+  border-radius: 20rpx;
+  background: #fff;
+}
+
+.product-info {
+  padding: 20rpx;
+}
+
+.product-card .product-name {
+  display: block;
+  font-size: 28rpx;
+  color: #212529;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 16rpx;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 16rpx;
+}
+
+.tag {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  margin-right: 12rpx;
+  font-weight: 500;
+}
+
+.tag-hot {
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  color: #fff;
+}
+
+.tag-new {
+  background: linear-gradient(135deg, #51cf66, #69db7c);
+  color: #fff;
+}
+
+.product-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-single {
+  font-size: 22rpx;
+  color: #adb5bd;
+}
+
+/* 搭配推荐 */
+.outfit-scroll {
+  white-space: nowrap;
+}
+
+.outfit-card {
+  display: inline-block;
+  width: 240rpx;
+  margin-right: 20rpx;
+  vertical-align: top;
+}
+
+.outfit-card:last-child {
+  margin-right: 0;
+}
+
+.outfit-img-placeholder {
+  width: 240rpx;
+  height: 300rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16rpx;
+}
+
+.outfit-name {
+  display: block;
+  font-size: 24rpx;
+  color: #212529;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+/* 品牌网格 */
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24rpx;
+}
+
+.brand-card {
+  text-align: center;
+}
+
+.brand-logo-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.brand-name {
+  display: block;
+  font-size: 24rpx;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* 加载更多 */
+.load-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+.no-more {
+  text-align: center;
+  padding: 40rpx;
+  color: #adb5bd;
+  font-size: 24rpx;
+}

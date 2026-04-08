@@ -1,0 +1,38 @@
+<!--pages/settings/settings.wxml-->
+<view class="page">
+  <!-- 用户信息 -->
+  <view class="section user-section">
+    <view class="user-header">
+      <image class="user-avatar" src="{{userInfo.avatar || '/images/avatar-default.png'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
+      <view class="user-info">
+        <text class="user-nickname">{{userInfo.nickname || '未登录'}}</text>
+        <text class="user-phone">{{userInfo.phone || '点击完善信息'}}</text>
+      </view>
+      <text class="iconfont icon-arrow-right" bindtap="onProfileTap"></text>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="section function-section">
+    <view class="function-item" bindtap="onProfileTap">
+      <text class="function-icon">👤</text>
+      <text class="function-text">个人信息</text>
+      <text class="iconfont icon-arrow-right"></text>
+    </view>
+    <view class="function-item" bindtap="onSizeTap">
+      <text class="function-icon">📏</text>
+      <text class="function-text">我的尺码</text>
+      <text class="iconfont icon-arrow-right"></text>
+    </view>
+    <view class="function-item" bindtap="onAboutTap">
+      <text class="function-icon">ℹ️</text>
+      <text class="function-text">关于我们</text>
+      <text class="iconfont icon-arrow-right"></text>
+    </view>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-section">
+    <text class="version-text">版本号: 1.0.0</text>
+  </view>
+</view>

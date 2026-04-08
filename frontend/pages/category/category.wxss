@@ -1,0 +1,151 @@
+/* pages/category/category.wxss */
+.page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 搜索框 */
+.search-bar {
+  padding: 24rpx;
+  background: #fff;
+}
+
+.search-input {
+  background: #f8f9fa;
+  border-radius: 32rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+}
+
+/* 分类容器 */
+.category-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* 侧边栏 */
+.category-sidebar {
+  width: 200rpx;
+  background: #f8f9fa;
+  overflow-y: auto;
+}
+
+.category-item {
+  padding: 32rpx 24rpx;
+  font-size: 28rpx;
+  color: #495057;
+  border-left: 4rpx solid transparent;
+  transition: all 0.3s;
+}
+
+.category-item.active {
+  background: #fff;
+  color: #ff6b6b;
+  border-left-color: #ff6b6b;
+}
+
+/* 内容区域 */
+.category-content {
+  flex: 1;
+  background: #fff;
+  overflow-y: auto;
+}
+
+/* 子分类列表 */
+.sub-category-list {
+  padding: 24rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+}
+
+.sub-category-item {
+  text-align: center;
+  padding: 24rpx;
+}
+
+.sub-category-icon {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 8rpx;
+  background: #f8f9fa;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.sub-category-name {
+  font-size: 24rpx;
+  color: #495057;
+}
+
+/* 商品列表 */
+.product-list {
+  padding: 24rpx;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.product-card {
+  border-radius: 8rpx;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.1);
+}
+
+.product-img {
+  width: 100%;
+  height: 360rpx;
+  display: block;
+}
+
+.product-info {
+  padding: 16rpx;
+}
+
+.product-name {
+  display: block;
+  font-size: 28rpx;
+  color: #212529;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+  line-height: 1.4;
+}
+
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.product-price {
+  font-size: 32rpx;
+  color: #ff6348;
+  font-weight: 500;
+}
+
+.product-unit {
+  font-size: 24rpx;
+  color: #adb5bd;
+  margin-left: 8rpx;
+}
+
+/* 空状态 */
+.empty {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+/* 加载中 */
+.loading {
+  padding: 48rpx;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 28rpx;
+}

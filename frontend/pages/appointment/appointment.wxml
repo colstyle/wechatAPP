@@ -1,0 +1,61 @@
+<!--pages/appointment/appointment.wxml-->
+<view class="page">
+  <!-- 选择商品 -->
+  <view class="section">
+    <view class="section-title">选择商品</view>
+    <view class="product-select" bindtap="onProductSelect">
+      <text class="select-value">{{selectedProduct ? selectedProduct.name : '请选择商品'}}</text>
+      <text class="iconfont icon-arrow-right"></text>
+    </view>
+  </view>
+
+  <!-- 选择日期 -->
+  <view class="section" wx:if="{{selectedProduct}}">
+    <view class="section-title">选择日期</view>
+    <view class="date-scroll">
+      <view
+        class="date-item {{selectedDate === item ? 'active' : ''}}"
+        wx:for="{{dates}}"
+        wx:key="*this"
+        bindtap="onDateTap"
+        data-date="{{item}}">
+        <text class="date-day">{{item.day}}</text>
+        <text class="date-month">{{item.month}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选择时间 -->
+  <view class="section" wx:if="{{selectedDate}}">
+    <view class="section-title">选择时间</view>
+    <view class="time-grid">
+      <view
+        class="time-item {{selectedTime === item ? 'active' : ''}}"
+        wx:for="{{times}}"
+        wx:key="*this"
+        bindtap="onTimeTap"
+        data-time="{{item}}">
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="section" wx:if="{{selectedTime}}">
+    <view class="section-title">备注</view>
+    <textarea
+      class="remark-input"
+      placeholder="请输入备注信息（选填）"
+      value="{{remark}}"
+      bindinput="onRemarkInput"
+      maxlength="200"
+    ></textarea>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer" wx:if="{{selectedTime}}">
+    <button class="btn btn-primary footer-btn" bindtap="onSubmit">
+      提交预约
+    </button>
+  </view>
+</view>

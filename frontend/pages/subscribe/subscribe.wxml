@@ -1,0 +1,62 @@
+<!--pages/subscribe/subscribe.wxml-->
+<view class="page">
+  <!-- 我的订阅 -->
+  <view class="section" wx:if="{{activeSubscription}}">
+    <view class="section-title">当前订阅</view>
+    <view class="subscription-card active">
+      <view class="subscription-header">
+        <text class="subscription-name">{{activeSubscription.package_name}}</text>
+        <text class="subscription-badge">激活中</text>
+      </view>
+      <view class="subscription-body">
+        <view class="subscription-info">
+          <text class="info-label">开始日期:</text>
+          <text class="info-value">{{activeSubscription.start_date}}</text>
+        </view>
+        <view class="subscription-info">
+          <text class="info-label">结束日期:</text>
+          <text class="info-value">{{activeSubscription.end_date}}</text>
+        </view>
+        <view class="subscription-info">
+          <text class="info-label">剩余次数:</text>
+          <text class="info-value highlight">{{activeSubscription.remaining_times || '无限次'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 订阅套餐 -->
+  <view class="section">
+    <view class="section-title">订阅套餐</view>
+    <view class="packages-list">
+      <view
+        class="package-card {{selectedPackage === item.id ? 'active' : ''}}"
+        wx:for="{{packages}}"
+        wx:key="id"
+        bindtap="onPackageTap"
+        data-id="{{item.id}}">
+        <view class="package-header">
+          <text class="package-name">{{item.name}}</text>
+          <text class="package-price">¥{{item.price}}</text>
+        </view>
+        <view class="package-body">
+          <text class="package-desc">{{item.description}}</text>
+          <view class="package-features">
+            <text class="feature">有效期: {{item.days}}天</text>
+            <text class="feature">{{item.max_times > 0 ? item.max_times + '次' : '无限次'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部占位 -->
+  <view class="bottom-placeholder"></view>
+
+  <!-- 底部按钮 -->
+  <view class="footer" wx:if="{{selectedPackage}}">
+    <button class="btn btn-primary footer-btn" bindtap="onSubscribe">
+      立即订阅 ¥{{getPackagePrice()}}
+    </button>
+  </view>
+</view>

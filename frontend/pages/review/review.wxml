@@ -1,0 +1,109 @@
+<!--pages/review/review.wxml-->
+<view class="page">
+  <!-- 我的评价列表 -->
+  <view class="review-list" wx:if="{{type === 'my'}}">
+    <view
+      class="review-card"
+      wx:for="{{reviews}}"
+      wx:key="id"
+      bindtap="onReviewTap"
+      data-id="{{item.id}}">
+      <view class="review-header">
+        <image class="product-img" src="{{item.product_image}}" mode="aspectFill"></image>
+        <text class="review-rating">{{item.ratingStars}}</text>
+      </view>
+      <view class="review-content">
+        <text class="review-text">{{item.content}}</text>
+        <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
+          <image
+            class="review-img"
+            wx:for="{{item.images}}"
+            wx:for-item="img"
+            wx:key="index"
+            src="{{img}}"
+            mode="aspectFill"
+            bindtap="onImageTap"
+            data-images="{{item.images}}"
+            data-index="{{index}}"></image>
+        </view>
+        <text class="review-time">{{item.created_at}}</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{reviews.length === 0 && !loading}}">
+      <text>暂无评价</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <!-- 商品评价表单 -->
+  <view class="review-form" wx:if="{{type !== 'my' && product}}">
+    <view class="section-title">发表评价</view>
+    <view class="form-section">
+      <view class="form-item">
+        <text class="form-label">评分</text>
+        <view class="rating-stars">
+          <text
+            class="star {{starIndex <= rating ? 'active' : ''}}"
+            wx:for="{{[1,2,3,4,5]}}"
+            wx:for-index="starIndex"
+            wx:key="*this"
+            bindtap="onRatingTap"
+            data-rating="{{starIndex}}">
+            ⭐
+          </text>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">评价内容</text>
+        <textarea
+          class="form-textarea"
+          placeholder="请输入评价内容"
+          value="{{content}}"
+          bindinput="onContentInput"
+          maxlength="500"
+        ></textarea>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">上传图片</text>
+        <view class="image-upload">
+          <view
+            class="upload-btn"
+            wx:for="{{[0,1,2,3,4,5,6,7,8]}}"
+            wx:key="*this"
+            bindtap="onImageUpload"
+            data-index="{{index}}">
+            <image
+              class="upload-img"
+              wx:if="{{images[index]}}"
+              src="{{images[index]}}"
+              mode="aspectFill"
+              bindtap="onRemoveImage"
+              data-index="{{index}}"
+              catchtap="true"></image>
+            <text class="upload-plus" wx:else>+</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-item checkbox-item">
+        <checkbox checked="{{isAnonymous}}" bindtap="onAnonymousTap">
+          <text class="checkbox-label">匿名评价</text>
+        </checkbox>
+      </view>
+    </view>
+
+    <view class="footer">
+      <button class="btn btn-primary footer-btn" bindtap="onSubmit" disabled="{{!rating || !content}}">
+        提交评价
+      </button>
+    </view>
+  </view>
+</view>

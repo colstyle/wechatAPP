@@ -1,0 +1,25 @@
+# 核心依赖
+fastapi
+uvicorn[standard]
+
+# 数据库
+pymysql
+SQLAlchemy
+
+# 配置管理
+pydantic
+pydantic-settings
+python-dotenv
+
+# 安全
+python-jose[cryptography]
+passlib[bcrypt]
+
+# 表单处理
+python-multipart
+
+# 数据库迁移
+alembic
+
+# 调试
+python-json-logger

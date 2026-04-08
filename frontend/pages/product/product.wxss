@@ -1,0 +1,135 @@
+/* pages/product/product.wxss */
+.page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* 搜索框 */
+.search-bar {
+  padding: 24rpx;
+  background: #fff;
+}
+
+.search-input {
+  background: #f8f9fa;
+  border-radius: 32rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+}
+
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  border-bottom: 1rpx solid #dee2e6;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #495057;
+  margin-right: 32rpx;
+}
+
+.filter-item .icon-arrow-down {
+  margin-left: 8rpx;
+  font-size: 20rpx;
+}
+
+/* 商品列表 */
+.product-list {
+  padding: 24rpx;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 8rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.1);
+}
+
+.product-img {
+  width: 100%;
+  height: 360rpx;
+  display: block;
+}
+
+.product-info {
+  padding: 16rpx;
+}
+
+.product-name {
+  display: block;
+  font-size: 28rpx;
+  color: #212529;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+  line-height: 1.4;
+}
+
+.product-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+}
+
+.product-price {
+  font-size: 32rpx;
+  color: #ff6348;
+  font-weight: 500;
+}
+
+.product-unit {
+  font-size: 24rpx;
+  color: #adb5bd;
+  margin-left: 8rpx;
+}
+
+.product-stock {
+  font-size: 24rpx;
+  color: #adb5bd;
+}
+
+/* 空状态 */
+.empty {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+/* 加载中 */
+.loading {
+  padding: 48rpx;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+/* 加载更多 */
+.load-more {
+  text-align: center;
+  padding: 32rpx;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+.no-more {
+  text-align: center;
+  padding: 32rpx;
+  color: #adb5bd;
+  font-size: 24rpx;
+}

@@ -1,0 +1,63 @@
+<!--pages/address/address.wxml-->
+<view class="page">
+  <!-- 地址列表 -->
+  <view class="address-list">
+    <view
+      class="address-card"
+      wx:for="{{addresses}}"
+      wx:key="id"
+      bindtap="onAddressTap"
+      data-id="{{item.id}}">
+      <view class="address-header">
+        <text class="address-name">{{item.receiver_name}}</text>
+        <text class="address-phone">{{item.receiver_phone}}</text>
+        <text class="default-badge" wx:if="{{item.is_default}}">默认</text>
+      </view>
+      <view class="address-content">
+        <text class="address-region">{{item.province}}{{item.city}}{{item.district}}</text>
+        <text class="address-detail">{{item.detail_address}}</text>
+      </view>
+      <view class="address-footer">
+        <button
+          class="btn btn-sm btn-outline"
+          bindtap="onSetDefault"
+          data-id="{{item.id}}"
+          catchtap="true"
+          wx:if="{{!item.is_default}}">
+          设为默认
+        </button>
+        <button
+          class="btn btn-sm btn-primary"
+          bindtap="onEdit"
+          data-id="{{item.id}}"
+          catchtap="true">
+          编辑
+        </button>
+        <button
+          class="btn btn-sm btn-danger"
+          bindtap="onDelete"
+          data-id="{{item.id}}"
+          catchtap="true">
+          删除
+        </button>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty" wx:if="{{addresses.length === 0 && !loading}}">
+      <text>暂无收货地址</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <!-- 底部添加按钮 -->
+  <view class="footer">
+    <button class="btn btn-primary footer-btn" bindtap="onAdd">
+      + 添加地址
+    </button>
+  </view>
+</view>

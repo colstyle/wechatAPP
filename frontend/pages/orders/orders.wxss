@@ -1,0 +1,202 @@
+/* pages/orders/orders.wxss */
+.page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* 订单列表 */
+.order-list {
+  padding: 24rpx;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 8rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+}
+
+/* 订单头部 */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #dee2e6;
+}
+
+.order-no {
+  font-size: 24rpx;
+  color: #6c757d;
+}
+
+.order-status {
+  font-size: 24rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 4rpx;
+}
+
+.order-status.status-0 {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.order-status.status-1 {
+  background: #cff4fc;
+  color: #0f5132;
+}
+
+.order-status.status-2 {
+  background: #d1e7dd;
+  color: #fff;
+}
+
+.order-status.status-3 {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.order-status.status-4 {
+  background: #d4edda;
+  color: #155724;
+}
+
+.order-status.status-5 {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.order-status.status-6 {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* 订单商品 */
+.order-items {
+  padding: 16rpx 24rpx;
+}
+
+.order-item-mini {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.order-item-mini:last-child {
+  margin-bottom: 0;
+}
+
+.item-img {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 8rpx;
+  margin-right: 16rpx;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  display: block;
+  font-size: 28rpx;
+  color: #212529;
+  margin-bottom: 8rpx;
+}
+
+.item-spec {
+  font-size: 24rpx;
+  color: #adb5bd;
+}
+
+.item-price {
+  text-align: right;
+}
+
+.item-price .price {
+  font-size: 28rpx;
+  color: #ff6348;
+  font-weight: 500;
+}
+
+/* 订单底部 */
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 24rpx 24rpx;
+  background: #f8f9fa;
+}
+
+.order-time {
+  font-size: 24rpx;
+  color: #adb5bd;
+}
+
+.order-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  border: none;
+  background: none;
+}
+
+.btn-primary {
+  background: #ff6b6b;
+  color: #fff;
+}
+
+.btn-outline {
+  border: 1rpx solid #ff6b6b;
+  color: #ff6b6b;
+  background: #fff;
+}
+
+.btn-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn-sm {
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+}
+
+/* 空状态 */
+.empty {
+  padding: 120rpx 0;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+/* 加载中 */
+.loading {
+  padding: 48rpx;
+  text-align: center;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+/* 加载更多 */
+.load-more {
+  text-align: center;
+  padding: 32rpx;
+  color: #adb5bd;
+  font-size: 28rpx;
+}
+
+/* 底部占位 */
+.bottom-placeholder {
+  height: 120rpx;
+}

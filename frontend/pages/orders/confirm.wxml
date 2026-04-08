@@ -1,0 +1,92 @@
+<!--pages/orders/confirm.wxml-->
+<view class="page">
+  <!-- 商品信息 -->
+  <view class="section">
+    <view class="section-title">商品信息</view>
+    <view class="product-info-card">
+      <image class="product-img" src="{{product.cover_image}}" mode="aspectFill"></image>
+      <view class="product-detail">
+        <text class="product-name">{{product.name}}</text>
+        <text class="product-spec">尺码: {{selectedSize}} | 颜色: {{selectedColor}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 租赁信息 -->
+  <view class="section">
+    <view class="section-title">租赁信息</view>
+    <view class="rental-info">
+      <view class="info-row">
+        <text class="label">租赁类型:</text>
+        <text class="value">{{rentalTypeText}}</text>
+      </view>
+      <view class="info-row" wx:if="{{rentalType === 1 || rentalType === 2}}">
+        <text class="label">使用日期:</text>
+        <picker mode="date" start="{{todayDate}}" value="{{startDate}}" bindchange="onDateChange">
+          <view class="value">{{startDate || '请选择日期'}}</view>
+        </picker>
+      </view>
+      <view class="info-row" wx:if="{{rentalType === 1}}">
+        <text class="label">租赁天数:</text>
+        <text class="value">{{rentDays}}天</text>
+      </view>
+      <view class="info-row">
+        <text class="label">租金:</text>
+        <text class="value price">¥{{calculatedRent}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">押金:</text>
+        <text class="value price">¥{{product.deposit}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="section">
+    <view class="section-title flex justify-between">
+      <text>收货地址</text>
+      <text class="change-btn" bindtap="onAddressTap">更换</text>
+    </view>
+    <view class="address-card" wx:if="{{selectedAddress}}">
+      <view class="address-header">
+        <text class="address-name">{{selectedAddress.receiver_name}}</text>
+        <text class="address-phone">{{selectedAddress.receiver_phone}}</text>
+        <text class="default-badge" wx:if="{{selectedAddress.is_default}}">默认</text>
+      </view>
+      <view class="address-content">
+        <text class="address-region">{{selectedAddress.province}}{{selectedAddress.city}}{{selectedAddress.district}}</text>
+        <text class="address-detail">{{selectedAddress.detail_address}}</text>
+      </view>
+    </view>
+    <view class="no-address" wx:else bindtap="onAddressTap">
+      <text>请选择收货地址</text>
+      <text class="iconfont icon-arrow-right"></text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="section">
+    <view class="section-title">备注</view>
+    <textarea
+      class="remark-input"
+      placeholder="选填，请输入备注信息"
+      value="{{remark}}"
+      bindinput="onRemarkInput"
+      maxlength="200"
+    ></textarea>
+  </view>
+
+  <!-- 底部占位 -->
+  <view class="bottom-placeholder"></view>
+
+  <!-- 底部提交栏 -->
+  <view class="footer">
+    <view class="footer-left">
+      <text class="total-label">应付金额</text>
+      <text class="total-price">¥{{calculatedTotal}}</text>
+    </view>
+    <button class="btn btn-primary footer-btn" bindtap="onSubmit" disabled="{{!selectedAddress}}">
+      提交订单
+    </button>
+  </view>
+</view>

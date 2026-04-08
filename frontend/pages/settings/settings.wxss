@@ -1,0 +1,89 @@
+/* pages/settings/settings.wxss */
+.page {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* 用户区域 */
+.section {
+  background: #fff;
+  margin-bottom: 16rpx;
+}
+
+.user-section {
+  padding: 32rpx 24rpx;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #f8f9fa;
+  margin-right: 24rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-nickname {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #212529;
+  margin-bottom: 8rpx;
+}
+
+.user-phone {
+  display: block;
+  font-size: 26rpx;
+  color: #adb5bd;
+}
+
+/* 功能区域 */
+.function-section {
+  padding: 0 24rpx;
+}
+
+.function-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 0;
+  border-bottom: 1rpx solid #dee2e6;
+}
+
+.function-item:last-child {
+  border-bottom: none;
+}
+
+.function-icon {
+  font-size: 40rpx;
+  margin-right: 24rpx;
+}
+
+.function-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #495057;
+}
+
+.function-item .icon-arrow-right {
+  color: #adb5bd;
+  font-size: 24rpx;
+}
+
+/* 版本信息 */
+.version-section {
+  text-align: center;
+  padding: 48rpx;
+}
+
+.version-text {
+  font-size: 24rpx;
+  color: #adb5bd;
+}

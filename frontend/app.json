@@ -1,0 +1,59 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/category/category",
+    "pages/product/product",
+    "pages/detail/detail",
+    "pages/order/order",
+    "pages/order/detail/detail",
+    "pages/orders/orders",
+    "pages/pay/pay",
+    "pages/subscribe/subscribe",
+    "pages/appointment/appointment",
+    "pages/address/address",
+    "pages/profile/profile",
+    "pages/settings/settings",
+    "pages/orders/confirm",
+    "pages/review/review"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "小时光租衣舍",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#ff6b6b",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/category/category",
+        "iconPath": "images/tab-category.png",
+        "selectedIconPath": "images/tab-category-active.png",
+        "text": "分类"
+      },
+      {
+        "pagePath": "pages/order/order",
+        "iconPath": "images/tab-order.png",
+        "selectedIconPath": "images/tab-order-active.png",
+        "text": "订单"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "iconPath": "images/tab-profile.png",
+        "selectedIconPath": "images/tab-profile-active.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
