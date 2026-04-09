@@ -70,20 +70,10 @@ Page({
       })
   },
 
-  // 加载默认地址
+  // 加载默认地址 (MVP: 跳过地址选择)
   loadDefaultAddress() {
-    const userApi = require('../../utils/api').userApi
-    userApi.getAddresses()
-      .then(res => {
-        const defaultAddress = res.data.find(addr => addr.is_default)
-        if (defaultAddress) {
-          this.setData({ selectedAddress: defaultAddress })
-          this.calculatePrice()
-        }
-      })
-      .catch(err => {
-        console.error('获取地址失败', err)
-      })
+    // MVP: 不再需要地址
+    this.calculatePrice()
   },
 
   // 计算价格
@@ -116,13 +106,6 @@ Page({
     this.setData({ startDate: e.detail.value })
   },
 
-  // 地址选择
-  onAddressTap() {
-    wx.navigateTo({
-      url: `/pages/address/address?select=1`
-    })
-  },
-
   // 备注输入
   onRemarkInput(e) {
     this.setData({ remark: e.detail.value })
@@ -130,11 +113,6 @@ Page({
 
   // 提交订单
   onSubmit() {
-    if (!this.data.selectedAddress) {
-      wx.showToast({ title: '请选择收货地址', icon: 'none' })
-      return
-    }
-
     if ([1, 2].includes(this.data.rentalType) && !this.data.startDate) {
       wx.showToast({ title: '请选择使用日期', icon: 'none' })
       return
@@ -155,7 +133,6 @@ Page({
               color: this.data.color,
               quantity: 1
             }],
-            address_id: this.data.selectedAddress.id,
             remark: this.data.remark
           }
 

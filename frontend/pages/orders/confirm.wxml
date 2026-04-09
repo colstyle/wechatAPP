@@ -41,29 +41,6 @@
     </view>
   </view>
 
-  <!-- 收货地址 -->
-  <view class="section">
-    <view class="section-title flex justify-between">
-      <text>收货地址</text>
-      <text class="change-btn" bindtap="onAddressTap">更换</text>
-    </view>
-    <view class="address-card" wx:if="{{selectedAddress}}">
-      <view class="address-header">
-        <text class="address-name">{{selectedAddress.receiver_name}}</text>
-        <text class="address-phone">{{selectedAddress.receiver_phone}}</text>
-        <text class="default-badge" wx:if="{{selectedAddress.is_default}}">默认</text>
-      </view>
-      <view class="address-content">
-        <text class="address-region">{{selectedAddress.province}}{{selectedAddress.city}}{{selectedAddress.district}}</text>
-        <text class="address-detail">{{selectedAddress.detail_address}}</text>
-      </view>
-    </view>
-    <view class="no-address" wx:else bindtap="onAddressTap">
-      <text>请选择收货地址</text>
-      <text class="iconfont icon-arrow-right"></text>
-    </view>
-  </view>
-
   <!-- 备注 -->
   <view class="section">
     <view class="section-title">备注</view>
@@ -85,7 +62,7 @@
       <text class="total-label">应付金额</text>
       <text class="total-price">¥{{calculatedTotal}}</text>
     </view>
-    <button class="btn btn-primary footer-btn" bindtap="onSubmit" disabled="{{!selectedAddress}}">
+    <button class="btn btn-primary footer-btn" bindtap="onSubmit">
       提交订单
     </button>
   </view>

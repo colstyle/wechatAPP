@@ -23,7 +23,7 @@ class CreateOrderRequest(BaseModel):
     items: List[dict]  # 商品列表 [{"product_id": 1, "size": "M", "color": "白色", "quantity": 1}]
     rent_days: Optional[int] = None  # 租赁天数(按天模式需要)
     start_date: Optional[str] = None  # 开始日期 (租赁模式需要)
-    address_id: int
+    address_id: Optional[int] = None
     remark: Optional[str] = None
 
 
@@ -70,7 +70,7 @@ class OrderResponse(BaseModel):
     start_date: str
     end_date: str
     status: int
-    address: dict
+    address: Optional[dict]
     items: list
 
 
@@ -92,14 +92,6 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
     """
     # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1  # 模拟
-
-    # 检查地址是否存在且属于该用户
-    address = db.execute_one(
-        "SELECT * FROM addresses WHERE id = %s AND user_id = %s",
-        (request.address_id, user_id)
-    )
-    if not address:
-        raise HTTPException(status_code=404, detail="地址不存在")
 
     # 核心规则：必须有开始日期
     if not request.start_date:
@@ -169,10 +161,10 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
     try:
         order_id = db.execute_insert(
             """INSERT INTO orders (order_no, user_id, rental_type, total_rent, total_deposit, total_amount,
-               rent_days, start_date, end_date, address_id, status, remark, created_at)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+               rent_days, start_date, end_date, status, remark, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
             (order_no, user_id, request.rental_type, total_rent, total_deposit, total_amount,
-             1, start_date, end_date, request.address_id, 0, request.remark)
+             1, start_date, end_date, 0, request.remark)
         )
 
         for item in order_items:
