@@ -399,7 +399,7 @@ async def get_orders(
 
 
 @router.get("/orders/{order_id}")
-async def get_order(order_id: int, token: str):
+async def get_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     获取订单详情
     """
@@ -489,7 +489,7 @@ async def get_order(order_id: int, token: str):
 
 
 @router.post("/orders/{order_id}/pay")
-async def pay_order(order_id: int, token: str):
+async def pay_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     支付订单
     """
@@ -554,7 +554,7 @@ async def pay_order(order_id: int, token: str):
 
 
 @router.post("/orders/{order_id}/cancel")
-async def cancel_order(order_id: int, token: str):
+async def cancel_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     取消订单
     """
@@ -581,17 +581,7 @@ async def cancel_order(order_id: int, token: str):
             (order_id,)
         )
 
-        # 恢复库存或释放预订
-        items = db.execute_query("SELECT product_id, quantity FROM order_items WHERE order_id = %s", (order_id,))
-        if order['rental_type'] in [2, 4, 5]:
-            # 释放日期预订
-            db.execute_delete("DELETE FROM reservations WHERE order_id = %s", (order_id,))
-        else:
-            for item in items:
-                db.execute_update(
-                    "UPDATE products SET stock = stock + %s WHERE id = %s",
-                    (item['quantity'], item['product_id'])
-                )
+        db.execute_delete("DELETE FROM reservations WHERE order_id = %s", (order_id,))
 
         db.commit()
     except Exception as e:
@@ -605,7 +595,7 @@ async def cancel_order(order_id: int, token: str):
 
 
 @router.post("/orders/{order_id}/ship")
-async def ship_order(order_id: int, token: str):
+async def ship_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     发货（管理员接口）
     """
@@ -635,7 +625,7 @@ async def ship_order(order_id: int, token: str):
 
 
 @router.post("/orders/{order_id}/receive")
-async def receive_order(order_id: int, token: str):
+async def receive_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     确认收货
     """
@@ -666,75 +656,6 @@ async def receive_order(order_id: int, token: str):
         "message": "确认收货成功"
     }
 
-
-@router.post("/orders/{order_id}/pickup")
-async def pickup_order(order_id: int, request: PickupOrderRequest, token: str):
-    """
-    取衣确认
-    """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
-
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
-        (order_id, user_id)
-    )
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order['status'] != 1 or order['rental_type'] not in [2, 4, 5]:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
-
-    # 更新订单状态
-    db.execute_update(
-        """UPDATE orders SET status = 2, pickup_time = NOW(), remark = CONCAT(COALESCE(remark, ''), '\n', %s)
-           WHERE id = %s""",
-        (request.remark or "用户已取衣", order_id)
-    )
-
-    return {
-        "code": 0,
-        "message": "取衣确认成功"
-    }
-
-
-@router.post("/orders/{order_id}/return")
-async def return_order(order_id: int, request: ReturnOrderRequest, token: str):
-    """
-    用户点击「我已还衣」：等待店主核验
-    """
-    # TODO: 验证token
-    user_id = 1
-
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
-        (order_id, user_id)
-    )
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-    
-    if order['status'] not in [2, 3]: # 2: 租赁中, 3: 已逾期
-        raise HTTPException(status_code=400, detail="当前订单状态不可执行还衣操作")
-
-    now = datetime.now()
-
-    db.execute_update(
-        """UPDATE orders SET 
-           status = 4, 
-           return_time = %s, 
-           remark = %s
-           WHERE id = %s""",
-        (now, request.remark or "用户已还衣，待店主核验", order_id)
-    )
-
-    return {
-        "code": 0,
-        "message": "还衣申请已提交，请等待店主核验"
-    }
-
-# ============ 店主管理 API (Admin) ============
 
 @router.post("/admin/orders/{order_id}/confirm-return")
 async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = None):
@@ -774,36 +695,11 @@ async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = N
         "code": 0,
         "message": "确认还衣成功，押金已原路退回",
         "data": {"refund_amount": float(final_refund)}
-    }# TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
-
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
-        (order_id, user_id)
-    )
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order['status'] != 2:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
-
-    # 更新订单状态
-    db.execute_update(
-        """UPDATE orders SET status = 3, remark = CONCAT(COALESCE(remark, ''), '\n', %s)
-           WHERE id = %s""",
-        (request.remark or "用户已还衣", order_id)
-    )
-
-    return {
-        "code": 0,
-        "message": "申请归还成功"
     }
 
 
 @router.post("/orders/{order_id}/refund")
-async def refund_order(order_id: int, token: str):
+async def refund_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     退款押金（管理员接口）
     """
@@ -835,16 +731,7 @@ async def refund_order(order_id: int, token: str):
             (refund_amount, order_id)
         )
 
-        # 恢复库存或释放预订
-        items = db.execute_query("SELECT product_id, quantity FROM order_items WHERE order_id = %s", (order_id,))
-        if order['rental_type'] in [2, 4, 5]:
-            db.execute_delete("DELETE FROM reservations WHERE order_id = %s", (order_id,))
-        else:
-            for item in items:
-                db.execute_update(
-                    "UPDATE products SET stock = stock + %s WHERE id = %s",
-                    (item['quantity'], item['product_id'])
-                )
+        db.execute_delete("DELETE FROM reservations WHERE order_id = %s", (order_id,))
 
         db.commit()
     except Exception as e:
@@ -855,36 +742,6 @@ async def refund_order(order_id: int, token: str):
         "code": 0,
         "message": "退款成功",
         "data": {"refund_amount": float(refund_amount)}
-    }
-
-
-@router.post("/admin/orders/{order_id}/confirm-return")
-async def admin_confirm_return(order_id: int):
-    """
-    管理员确认还衣
-    """
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s",
-        (order_id,)
-    )
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order['status'] != 3:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
-
-    # 更新订单状态
-    db.execute_update(
-        """UPDATE orders SET status = 4, return_time = NOW()
-           WHERE id = %s""",
-        (order_id,)
-    )
-
-    return {
-        "code": 0,
-        "message": "确认还衣成功"
     }
 
 
