@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, date, timedelta
 from database import db
+from app.utils.auth import get_current_user, require_admin
 
 router = APIRouter()
 
@@ -35,8 +36,8 @@ async def create_appointment(request: CreateAppointmentRequest, authorization: O
     """
     创建预约
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查商品是否存在
     product = db.execute_one(
@@ -99,8 +100,8 @@ async def get_appointments(
     """
     获取预约列表
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 构建查询条件
     conditions = ["a.user_id = %s"]
@@ -159,12 +160,12 @@ async def get_appointments(
 
 
 @router.get("/appointments/{appointment_id}")
-async def get_appointment(appointment_id: int, token: str):
+async def get_appointment(appointment_id: int, authorization: Optional[str] = Header(None)):
     """
     获取预约详情
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询预约
     appointment = db.execute_one(
@@ -218,13 +219,13 @@ async def get_appointment(appointment_id: int, token: str):
 async def update_appointment(
     appointment_id: int,
     request: UpdateAppointmentRequest,
-    token: str
+    authorization: Optional[str] = Header(None)
 ):
     """
     更新预约
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询预约
     appointment = db.execute_one(
@@ -278,12 +279,12 @@ async def update_appointment(
 
 
 @router.delete("/appointments/{appointment_id}")
-async def cancel_appointment(appointment_id: int, token: str):
+async def cancel_appointment(appointment_id: int, authorization: Optional[str] = Header(None)):
     """
     取消预约
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询预约
     appointment = db.execute_one(
@@ -358,10 +359,11 @@ async def get_available_times(
 
 
 @router.post("/appointments/{appointment_id}/confirm")
-async def confirm_appointment(appointment_id: int, token: str):
+async def confirm_appointment(appointment_id: int, authorization: Optional[str] = Header(None)):
     """
     确认预约（管理员接口）
     """
+    require_admin(authorization)
     # 查询预约
     appointment = db.execute_one(
         "SELECT * FROM appointments WHERE id = %s",
@@ -387,10 +389,11 @@ async def confirm_appointment(appointment_id: int, token: str):
 
 
 @router.post("/appointments/{appointment_id}/complete")
-async def complete_appointment(appointment_id: int, token: str):
+async def complete_appointment(appointment_id: int, authorization: Optional[str] = Header(None)):
     """
     完成预约（管理员接口）
     """
+    require_admin(authorization)
     # 查询预约
     appointment = db.execute_one(
         "SELECT * FROM appointments WHERE id = %s",

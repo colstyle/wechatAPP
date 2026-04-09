@@ -90,12 +90,5 @@ Page({
     wx.navigateTo({
       url: '/pages/subscribe/subscribe'
     })
-  },
-
-  // 收货地址
-  onAddressTap() {
-    wx.navigateTo({
-      url: '/pages/address/address'
-    })
   }
 })

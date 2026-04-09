@@ -10,6 +10,7 @@ Page({
     products: [],
     selectedCategory: null,
     selectedSubCategory: null,
+    availableDate: '',
     loading: false,
     page: 1,
     page_size: 20,
@@ -24,6 +25,9 @@ Page({
     if (options.keyword) {
       this.setData({ keyword: decodeURIComponent(options.keyword) })
     }
+
+    const availableDate = app.globalData.selectedDate || ''
+    this.setData({ availableDate })
 
     this.loadCategories()
     this.loadData()
@@ -63,7 +67,8 @@ Page({
 
     const params = {
       page: this.data.page,
-      page_size: this.data.page_size
+      page_size: this.data.page_size,
+      available_date: this.data.availableDate || app.globalData.selectedDate || undefined
     }
 
     if (this.data.selectedCategory) {

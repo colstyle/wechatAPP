@@ -6,6 +6,9 @@
       <input type="text" placeholder="搜索单号/昵称" bindinput="onSearchInput" value="{{keyword}}" confirm-type="search" bindconfirm="onSearch" />
       <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
     </view>
+    <view class="admin-actions">
+      <view class="action-btn" bindtap="goToPackageManage">套餐管理</view>
+    </view>
   </view>
 
   <!-- 状态筛选 -->

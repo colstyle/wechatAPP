@@ -17,7 +17,7 @@ Page({
 
   onLoad(options) {
     const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || {}
-    if (userInfo.role !== 'admin') {
+    if (!(userInfo.role === 'admin' || userInfo.role === '2' || userInfo.role === 2)) {
       wx.showToast({ title: '无权限访问', icon: 'none' })
       setTimeout(() => {
         wx.switchTab({ url: '/pages/profile/profile' })

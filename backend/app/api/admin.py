@@ -2,13 +2,14 @@
 """
 店主后台管理 API
 """
-from fastapi import APIRouter, HTTPException, Body, Query
+from fastapi import APIRouter, HTTPException, Body, Query, Header
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
 from database import db
 from app.utils.wechat_pay import wechat_pay
+from app.utils.auth import require_admin
 import uuid
 
 router = APIRouter()
@@ -32,11 +33,13 @@ async def get_all_orders(
     status: Optional[int] = None,
     keyword: Optional[str] = None,
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100)
+    page_size: int = Query(20, ge=1, le=100),
+    authorization: Optional[str] = Header(None)
 ):
     """
     获取全量订单 (店主端)
     """
+    require_admin(authorization)
     conditions = []
     params = []
 
@@ -119,10 +122,11 @@ class UpdateOrderItemsRequest(BaseModel):
     items: List[dict] # [{"product_id": 1, "size": "M", "color": "白色"}]
 
 @router.post("/refund")
-async def refund_order(request: RefundRequest):
+async def refund_order(request: RefundRequest, authorization: Optional[str] = Header(None)):
     """
     一键退还押金 (模拟)
     """
+    require_admin(authorization)
     order = db.execute_one("SELECT * FROM orders WHERE id = %s", (request.order_id,))
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
@@ -130,7 +134,11 @@ async def refund_order(request: RefundRequest):
     if order['status'] != 4: # 4 为已归还待审核
         raise HTTPException(status_code=400, detail="当前订单状态不可退押金")
 
-    refund_amount_decimal = Decimal(str(request.amount)) if request.amount else order['total_deposit']
+    refund_amount_decimal = Decimal(str(request.amount)) if request.amount is not None else Decimal(str(order['total_deposit']))
+    if refund_amount_decimal <= 0:
+        raise HTTPException(status_code=400, detail="退款金额必须大于0")
+    if refund_amount_decimal > Decimal(str(order['total_deposit'])):
+        raise HTTPException(status_code=400, detail="退款金额不能超过总押金")
     
     # 微信支付 V3 退款框架调用
     out_refund_no = f"REF{uuid.uuid4().hex[:20].upper()}"
@@ -150,10 +158,11 @@ async def refund_order(request: RefundRequest):
     return {"code": 0, "message": "退款成功", "data": {"refund_amount": float(refund_amount_decimal)}}
 
 @router.post("/deduct")
-async def deduct_deposit(request: DeductionRequest):
+async def deduct_deposit(request: DeductionRequest, authorization: Optional[str] = Header(None)):
     """
     手动扣除押金 (逾期或损坏)
     """
+    require_admin(authorization)
     order = db.execute_one("SELECT * FROM orders WHERE id = %s", (request.order_id,))
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
@@ -161,7 +170,11 @@ async def deduct_deposit(request: DeductionRequest):
     if order['status'] not in [2, 3, 4]: # 租赁中、逾期、已归还
         raise HTTPException(status_code=400, detail="当前订单状态不可扣除押金")
 
-    if Decimal(str(request.amount)) > order['total_deposit']:
+    if Decimal(str(request.amount)) <= 0:
+        raise HTTPException(status_code=400, detail="扣除金额必须大于0")
+    if not request.reason:
+        raise HTTPException(status_code=400, detail="扣费原因必填")
+    if Decimal(str(request.amount)) > Decimal(str(order['total_deposit'])):
         raise HTTPException(status_code=400, detail="扣除金额不能超过总押金")
 
     refund_amount_decimal = order['total_deposit'] - Decimal(str(request.amount))
@@ -184,10 +197,11 @@ async def deduct_deposit(request: DeductionRequest):
     return {"code": 0, "message": "扣除成功", "data": {"refund_amount": float(refund_amount_decimal)}}
 
 @router.post("/update-items")
-async def update_order_items(request: UpdateOrderItemsRequest):
+async def update_order_items(request: UpdateOrderItemsRequest, authorization: Optional[str] = Header(None)):
     """
     手动修改订单衣物 (换款逻辑)
     """
+    require_admin(authorization)
     order = db.execute_one("SELECT * FROM orders WHERE id = %s", (request.order_id,))
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
@@ -241,3 +255,89 @@ async def update_order_items(request: UpdateOrderItemsRequest):
         raise HTTPException(status_code=500, detail=f"修改订单失败: {str(e)}")
 
     return {"code": 0, "message": "订单衣物已更新"}
+
+
+class PackageEligibleRequest(BaseModel):
+    is_package_eligible: bool
+
+
+@router.get("/package/products")
+async def get_package_products(
+    eligible: Optional[bool] = None,
+    keyword: Optional[str] = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    authorization: Optional[str] = Header(None)
+):
+    require_admin(authorization)
+    conditions = []
+    params = []
+
+    if eligible is not None:
+        conditions.append("p.is_package_eligible = %s")
+        params.append(1 if eligible else 0)
+
+    if keyword:
+        conditions.append("p.name LIKE %s")
+        params.append(f"%{keyword}%")
+
+    where_clause = ""
+    if conditions:
+        where_clause = "WHERE " + " AND ".join(conditions)
+
+    total_result = db.execute_one(
+        f"SELECT COUNT(*) as total FROM products p {where_clause}",
+        tuple(params)
+    )
+    total = total_result['total'] if total_result else 0
+
+    offset = (page - 1) * page_size
+    params.extend([page_size, offset])
+    products = db.execute_query(
+        f"""SELECT p.id, p.name, p.cover_image, p.deposit, p.is_package_eligible
+            FROM products p
+            {where_clause}
+            ORDER BY p.is_package_eligible DESC, p.id DESC
+            LIMIT %s OFFSET %s""",
+        tuple(params)
+    )
+
+    return {
+        "code": 0,
+        "message": "获取成功",
+        "data": {
+            "list": [
+                {
+                    "id": p['id'],
+                    "name": p['name'],
+                    "cover_image": p['cover_image'],
+                    "deposit": float(p['deposit']),
+                    "is_package_eligible": bool(p.get('is_package_eligible'))
+                }
+                for p in products
+            ],
+            "total": total,
+            "page": page,
+            "page_size": page_size
+        }
+    }
+
+
+@router.put("/package/products/{product_id}")
+async def set_package_product_eligible(
+    product_id: int,
+    request: PackageEligibleRequest,
+    authorization: Optional[str] = Header(None)
+):
+    require_admin(authorization)
+
+    product = db.execute_one("SELECT id FROM products WHERE id = %s", (product_id,))
+    if not product:
+        raise HTTPException(status_code=404, detail="商品不存在")
+
+    db.execute_update(
+        "UPDATE products SET is_package_eligible = %s WHERE id = %s",
+        (1 if request.is_package_eligible else 0, product_id)
+    )
+
+    return {"code": 0, "message": "更新成功", "data": {"id": product_id, "is_package_eligible": request.is_package_eligible}}

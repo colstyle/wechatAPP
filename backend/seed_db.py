@@ -58,18 +58,24 @@ def seed():
 
     # 4. 插入商品
     print("正在插入商品...")
+    try:
+        col = db.execute_one("SHOW COLUMNS FROM products LIKE %s", ("is_package_eligible",))
+        if not col:
+            db.execute_update("ALTER TABLE products ADD COLUMN is_package_eligible BOOLEAN DEFAULT FALSE")
+    except Exception:
+        pass
     products = [
-        # (name, category_id, brand_id, cover_image, deposit, daily_rent, single_rent, stock, is_hot, is_new)
-        ("赫本风小黑裙", 1, 1, "https://picsum.photos/400/600?random=21", 200, 35, 50, 5, 1, 0),
-        ("法式碎花长裙", 1, 3, "https://picsum.photos/400/600?random=22", 150, 30, 45, 8, 1, 0),
-        ("莫兰迪色针织衫", 2, 1, "https://picsum.photos/400/600?random=23", 80, 15, 25, 10, 0, 0),
-        ("简约真丝白衬衫", 2, 3, "https://picsum.photos/400/600?random=24", 120, 25, 35, 6, 0, 1),
-        ("复古高腰牛仔裤", 3, 1, "https://picsum.photos/400/600?random=25", 100, 20, 30, 7, 0, 0),
-        ("学院风百褶半身裙", 3, 2, "https://picsum.photos/400/600?random=26", 90, 18, 28, 9, 0, 0),
-        ("英伦风驼色风衣", 4, 1, "https://picsum.photos/400/600?random=27", 300, 55, 80, 4, 1, 1),
-        ("丝绒复古西装外套", 4, 3, "https://picsum.photos/400/600?random=28", 250, 45, 70, 5, 0, 0),
-        ("珍珠手工项链", 5, 1, "https://picsum.photos/400/600?random=29", 50, 10, 15, 15, 0, 0),
-        ("复古羊毛贝雷帽", 5, 2, "https://picsum.photos/400/600?random=30", 60, 10, 15, 12, 0, 0)
+        # (name, category_id, brand_id, cover_image, deposit, daily_rent, single_rent, stock, is_hot, is_new, is_package_eligible)
+        ("赫本风小黑裙", 1, 1, "https://picsum.photos/400/600?random=21", 200, 35, 50, 5, 1, 0, 1),
+        ("法式碎花长裙", 1, 3, "https://picsum.photos/400/600?random=22", 150, 30, 45, 8, 1, 0, 1),
+        ("莫兰迪色针织衫", 2, 1, "https://picsum.photos/400/600?random=23", 80, 15, 25, 10, 0, 0, 1),
+        ("简约真丝白衬衫", 2, 3, "https://picsum.photos/400/600?random=24", 120, 25, 35, 6, 0, 1, 1),
+        ("复古高腰牛仔裤", 3, 1, "https://picsum.photos/400/600?random=25", 100, 20, 30, 7, 0, 0, 0),
+        ("学院风百褶半身裙", 3, 2, "https://picsum.photos/400/600?random=26", 90, 18, 28, 9, 0, 0, 1),
+        ("英伦风驼色风衣", 4, 1, "https://picsum.photos/400/600?random=27", 300, 55, 80, 4, 1, 1, 0),
+        ("丝绒复古西装外套", 4, 3, "https://picsum.photos/400/600?random=28", 250, 45, 70, 5, 0, 0, 0),
+        ("珍珠手工项链", 5, 1, "https://picsum.photos/400/600?random=29", 50, 10, 15, 15, 0, 0, 0),
+        ("复古羊毛贝雷帽", 5, 2, "https://picsum.photos/400/600?random=30", 60, 10, 15, 12, 0, 0, 0)
     ]
     
     sizes = json.dumps(["S", "M", "L", "F"])
@@ -78,10 +84,10 @@ def seed():
     for p in products:
         db.execute_insert(
             """INSERT INTO products (name, category_id, brand_id, cover_image, images, description, 
-               deposit, daily_rent, single_rent, stock, sizes, colors, is_hot, is_new, status, created_at)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1, NOW())""",
+               deposit, daily_rent, single_rent, stock, sizes, colors, is_hot, is_new, is_package_eligible, status, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1, NOW())""",
             (p[0], p[1], p[2], p[3], json.dumps([p[3]]), f"{p[0]}的高品质展示描述内容", 
-             p[4], p[5], p[6], p[7], sizes, colors, p[8], p[9])
+             p[4], p[5], p[6], p[7], sizes, colors, p[8], p[9], p[10])
         )
 
     print("种子数据导入完成！")

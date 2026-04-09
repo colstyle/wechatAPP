@@ -26,6 +26,15 @@ class Database:
                 cursorclass=DictCursor,
                 autocommit=False
             )
+            try:
+                with cls._connection.cursor() as cursor:
+                    cursor.execute("ALTER TABLE products ADD COLUMN is_package_eligible BOOLEAN DEFAULT FALSE")
+                cls._connection.commit()
+            except Exception:
+                try:
+                    cls._connection.rollback()
+                except Exception:
+                    pass
         return cls._connection
 
     @classmethod
@@ -42,11 +51,17 @@ class Database:
             conn = cls.get_connection()
             with conn.cursor() as cursor:
                 cursor.execute(sql, params or ())
-                return cursor.fetchall()
+                result = cursor.fetchall()
+            conn.commit()
+            return result
         except Exception as e:
             print(f"Database Query Error: {str(e)}")
             print(f"SQL: {sql}")
             print(f"Params: {params}")
+            try:
+                conn.rollback()
+            except Exception:
+                pass
             raise e
 
     @classmethod
@@ -56,11 +71,17 @@ class Database:
             conn = cls.get_connection()
             with conn.cursor() as cursor:
                 cursor.execute(sql, params or ())
-                return cursor.fetchone()
+                result = cursor.fetchone()
+            conn.commit()
+            return result
         except Exception as e:
             print(f"Database Execute One Error: {str(e)}")
             print(f"SQL: {sql}")
             print(f"Params: {params}")
+            try:
+                conn.rollback()
+            except Exception:
+                pass
             raise e
 
     @classmethod

@@ -265,6 +265,15 @@ const adminApi = {
   // 修改订单商品 (换款)
   updateOrderItems: (orderId, items) => {
     return app.request('/api/admin/update-items', 'POST', { order_id: orderId, items })
+  },
+
+  // 套餐商品管理
+  getPackageProducts: (params) => {
+    return app.request('/api/admin/package/products', 'GET', params)
+  },
+
+  setPackageEligible: (productId, isPackageEligible) => {
+    return app.request(`/api/admin/package/products/${productId}`, 'PUT', { is_package_eligible: !!isPackageEligible })
   }
 }
 

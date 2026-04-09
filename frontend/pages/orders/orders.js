@@ -27,9 +27,13 @@ Page({
   },
 
   onShow() {
-    if (app.globalData.token) {
-      this.loadOrders()
-    }
+    app.ensureLogin()
+      .then(() => {
+        this.refreshOrders()
+      })
+      .catch(() => {
+        wx.showToast({ title: '请先登录', icon: 'none' })
+      })
   },
 
   // 加载订单列表
@@ -65,6 +69,7 @@ Page({
       .catch(err => {
         console.error('获取订单失败', err)
         this.setData({ loading: false })
+        wx.showToast({ title: '获取订单失败', icon: 'none' })
       })
   },
 

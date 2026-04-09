@@ -13,32 +13,31 @@ Page({
   },
 
   onLoad() {
-    this.checkLogin()
+    this.refreshUser()
   },
 
   onShow() {
-    if (app.globalData.token) {
-      this.loadUserInfo()
-      this.loadOrderStats()
-    }
+    this.refreshUser()
   },
 
-  // 检查登录
-  checkLogin() {
-    if (!app.globalData.token) {
-      this.setData({ userInfo: {} })
-    }
+  refreshUser() {
+    app.ensureLogin()
+      .then(() => {
+        const userInfo = app.globalData.userInfo || {}
+        this.setData({ userInfo })
+        this.loadOrderStats()
+        this.maybeRouteAdmin(userInfo)
+      })
+      .catch(() => {
+        this.setData({ userInfo: {} })
+      })
   },
 
-  // 加载用户信息
-  loadUserInfo() {
-    app.getUserInfo()
-      .then(res => {
-        this.setData({ userInfo: res.data })
-      })
-      .catch(err => {
-        console.error('获取用户信息失败', err)
-      })
+  maybeRouteAdmin(userInfo) {
+    if (!userInfo || !(userInfo.role === 'admin' || userInfo.role === '2' || userInfo.role === 2)) return
+    if (app.globalData._adminAutoRouted) return
+    app.globalData._adminAutoRouted = true
+    wx.navigateTo({ url: '/pages/admin/orders/orders' })
   },
 
   // 加载订单统计
@@ -66,12 +65,16 @@ Page({
 
   // 登录处理
   handleLogin() {
-    if (app.globalData.token) return
+    if (app.globalData.token) {
+      wx.navigateTo({ url: '/pages/settings/settings' })
+      return
+    }
     wx.showLoading({ title: '登录中...' })
-    app.wechatLogin()
+    app.ensureLogin(true)
       .then(() => {
         wx.hideLoading()
-        this.loadUserInfo()
+        const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || {}
+        this.setData({ userInfo })
         this.loadOrderStats()
       })
       .catch(() => {
@@ -106,6 +109,10 @@ Page({
 
   onServiceTap() {
     wx.navigateTo({ url: '/pages/chat/chat' })
+  },
+
+  onSettingsTap() {
+    wx.navigateTo({ url: '/pages/settings/settings' })
   },
 
   // 店主管理

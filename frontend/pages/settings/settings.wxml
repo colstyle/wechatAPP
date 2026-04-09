@@ -31,6 +31,39 @@
     </view>
   </view>
 
+  <view class="section function-section">
+    <view class="section-title">开发设置</view>
+    <view class="api-row">
+      <text class="api-label">后端地址</text>
+      <input
+        class="api-input"
+        value="{{apiBase}}"
+        placeholder="例如：http://192.168.1.10:8000"
+        bindinput="onApiBaseInput"
+        confirm-type="done"
+      />
+    </view>
+    <view class="api-actions">
+      <button class="api-btn api-btn-secondary" bindtap="testApiBase">测试连接</button>
+      <button class="api-btn api-btn-primary" bindtap="saveApiBase">保存</button>
+    </view>
+    <view class="api-row">
+      <text class="api-label">模拟身份</text>
+      <input
+        class="api-input"
+        value="{{mockOpenid}}"
+        placeholder="普通：user_1  管理：admin_1"
+        bindinput="onMockOpenidInput"
+        confirm-type="done"
+      />
+    </view>
+    <view class="api-actions">
+      <button class="api-btn api-btn-secondary" bindtap="useMockUser">普通用户</button>
+      <button class="api-btn api-btn-secondary" bindtap="useMockAdmin">管理员</button>
+      <button class="api-btn api-btn-primary" bindtap="reLogin">重新登录</button>
+    </view>
+  </view>
+
   <!-- 版本信息 -->
   <view class="version-section">
     <text class="version-text">版本号: 1.0.0</text>

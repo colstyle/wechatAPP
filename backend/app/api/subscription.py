@@ -10,6 +10,7 @@ from decimal import Decimal
 import time
 import random
 from database import db
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -88,12 +89,12 @@ async def get_package(package_id: int):
 # ============ 订阅API ============
 
 @router.post("/subscribe")
-async def buy_subscription(request: BuySubscriptionRequest, token: str):
+async def buy_subscription(request: BuySubscriptionRequest, authorization: Optional[str] = Header(None)):
     """
     购买订阅
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询套餐
     package = db.execute_one(
@@ -149,7 +150,7 @@ async def buy_subscription(request: BuySubscriptionRequest, token: str):
 
 @router.get("/subscriptions")
 async def get_subscriptions(
-    token: str,
+    authorization: Optional[str] = Header(None),
     status: Optional[int] = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100)
@@ -157,8 +158,8 @@ async def get_subscriptions(
     """
     获取订阅列表
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 构建查询条件
     conditions = ["user_id = %s"]
@@ -223,8 +224,8 @@ async def get_active_subscription(authorization: Optional[str] = Header(None)):
     """
     获取激活中的订阅
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     subscription = db.execute_one(
         """SELECT s.*, p.name as package_name, p.days, p.max_times, p.description
@@ -262,12 +263,12 @@ async def get_active_subscription(authorization: Optional[str] = Header(None)):
 
 
 @router.post("/subscriptions/{subscription_id}/cancel")
-async def cancel_subscription(subscription_id: int, token: str):
+async def cancel_subscription(subscription_id: int, authorization: Optional[str] = Header(None)):
     """
     取消订阅
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询订阅
     subscription = db.execute_one(
@@ -301,13 +302,13 @@ async def create_subscription_order(
     subscription_id: Optional[int] = None,
     address_id: int = None,
     remark: Optional[str] = None,
-    token: str = None
+    authorization: Optional[str] = Header(None)
 ):
     """
     使用订阅创建订单
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查是否有激活的订阅
     active_subscription = db.execute_one(

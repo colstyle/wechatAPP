@@ -8,6 +8,7 @@ from typing import Optional, List
 from datetime import datetime
 import json
 from database import db
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -166,6 +167,7 @@ async def get_products(
     brand_id: Optional[int] = None,
     keyword: Optional[str] = None,
     is_hot: Optional[bool] = None,
+    package_only: Optional[bool] = None,
     available_date: Optional[str] = None,  # YYYY-MM-DD format
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100)
@@ -193,6 +195,9 @@ async def get_products(
     if is_hot is not None:
         conditions.append("p.is_hot = %s")
         params.append(is_hot)
+
+    if package_only:
+        conditions.append("p.is_package_eligible = 1")
 
     # 如果指定日期，筛选未预订的商品 (reservations 记录必须排除)
     # 如果指定日期，筛选该日期未预订的商品
@@ -236,6 +241,7 @@ async def get_products(
                     "stock": p['stock'],
                     "is_hot": p['is_hot'],
                     "is_new": p['is_new'],
+                    "is_package_eligible": bool(p.get('is_package_eligible')),
                     "view_count": p['view_count'],
                     "rent_count": p['rent_count']
                 }
@@ -431,6 +437,7 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "colors": colors,
             "is_hot": product['is_hot'],
             "is_new": product['is_new'],
+            "is_package_eligible": bool(product.get('is_package_eligible')),
             "view_count": product['view_count'],
             "rent_count": product['rent_count'],
             "reviews": [
@@ -498,8 +505,8 @@ async def add_favorite(product_id: int, authorization: Optional[str] = Header(No
     """
     添加收藏
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查商品是否存在
     product = db.execute_one(
@@ -533,12 +540,12 @@ async def add_favorite(product_id: int, authorization: Optional[str] = Header(No
 
 
 @router.delete("/favorites/{product_id}")
-async def remove_favorite(product_id: int, token: str):
+async def remove_favorite(product_id: int, authorization: Optional[str] = Header(None)):
     """
     取消收藏
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     db.execute_update(
         "DELETE FROM favorites WHERE user_id = %s AND product_id = %s",
@@ -553,15 +560,15 @@ async def remove_favorite(product_id: int, token: str):
 
 @router.get("/favorites")
 async def get_favorites(
-    token: str,
+    authorization: Optional[str] = Header(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100)
 ):
     """
     获取收藏列表
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询总数
     count_sql = "SELECT COUNT(*) as total FROM favorites WHERE user_id = %s"

@@ -3,11 +3,11 @@
   <!-- 商品信息 -->
   <view class="section">
     <view class="section-title">商品信息</view>
-    <view class="product-info-card">
-      <image class="product-img" src="{{product.cover_image}}" mode="aspectFill"></image>
+    <view class="product-info-card" wx:for="{{displayItems}}" wx:key="index">
+      <image class="product-img" src="{{item.product.cover_image}}" mode="aspectFill"></image>
       <view class="product-detail">
-        <text class="product-name">{{product.name}}</text>
-        <text class="product-spec">尺码: {{selectedSize}} | 颜色: {{selectedColor}}</text>
+        <text class="product-name">{{item.product.name}}</text>
+        <text class="product-spec">尺码: {{item.size}} | 颜色: {{item.color}} ×{{item.quantity}}</text>
       </view>
     </view>
   </view>
@@ -36,7 +36,7 @@
       </view>
       <view class="info-row">
         <text class="label">押金:</text>
-        <text class="value price">¥{{product.deposit}}</text>
+        <text class="value price">¥{{calculatedDeposit}}</text>
       </view>
     </view>
   </view>

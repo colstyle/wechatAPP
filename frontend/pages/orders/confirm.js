@@ -5,18 +5,15 @@ const orderApi = require('../../utils/api').orderApi
 
 Page({
   data: {
-    productId: null,
-    type: 'daily',
-    rentDays: 3,
-    size: '',
-    color: '',
-    product: {},
-    selectedAddress: null,
     rentalType: 1,
     startDate: '',
     todayDate: '',
-    calculatedRent: 0,
-    calculatedTotal: 0,
+    rentDays: 1,
+    items: [],
+    displayItems: [],
+    calculatedRent: '0.00',
+    calculatedDeposit: '0.00',
+    calculatedTotal: '0.00',
     remark: ''
   },
 
@@ -27,41 +24,74 @@ Page({
     const day = String(today.getDate()).padStart(2, '0')
     const todayDate = `${year}-${month}-${day}`
 
-    if (options.product_id) {
-      this.setData({ productId: parseInt(options.product_id) })
-    }
-    if (options.type) {
-      const type = options.type
-      let rentalType = 1
-      if (type === 'daily') {
-        rentalType = 1
-      } else if (type === 'single') {
-        rentalType = 2
-      } else if (type === 'subscription') {
-        rentalType = 3
-      }
-      this.setData({ type, rentalType })
-    }
-    if (options.days) {
-      this.setData({ rentDays: parseInt(options.days) })
-    }
-    if (options.size) {
-      this.setData({ size: decodeURIComponent(options.size) })
-    }
-    if (options.color) {
-      this.setData({ color: decodeURIComponent(options.color) })
+    const checkoutOrder = app.globalData.checkoutOrder || null
+    const startDate = (checkoutOrder && checkoutOrder.start_date) ? checkoutOrder.start_date : (app.globalData.selectedDate || todayDate)
+
+    if (checkoutOrder && Array.isArray(checkoutOrder.items) && checkoutOrder.items.length > 0) {
+      const items = checkoutOrder.items.map(it => ({
+        product_id: it.product_id,
+        size: it.size || '',
+        color: it.color || '',
+        quantity: it.quantity || 1
+      }))
+      const rentDays = checkoutOrder.items[0].rental_days || this.data.rentDays
+
+      this.setData({
+        rentalType: checkoutOrder.rental_type || 1,
+        startDate,
+        todayDate,
+        rentDays,
+        items
+      })
+    } else if (options.product_id) {
+      const rentalType = options.type === 'single' ? 2 : 1
+      const rentDays = options.days ? parseInt(options.days) : 1
+      const size = options.size ? decodeURIComponent(options.size) : ''
+      const color = options.color ? decodeURIComponent(options.color) : ''
+      this.setData({
+        rentalType,
+        startDate,
+        todayDate,
+        rentDays,
+        items: [{
+          product_id: parseInt(options.product_id),
+          size,
+          color,
+          quantity: 1
+        }]
+      })
+    } else {
+      wx.showToast({ title: '订单信息缺失', icon: 'none' })
+      setTimeout(() => wx.navigateBack(), 300)
+      return
     }
 
-    this.setData({ startDate: todayDate, todayDate })
-    this.loadProduct()
-    this.loadDefaultAddress()
+    this.loadProductsForItems()
   },
 
-  // 加载商品
-  loadProduct() {
-    productApi.getProduct(this.data.productId)
-      .then(res => {
-        this.setData({ product: res.data })
+  loadProductsForItems() {
+    const items = this.data.items || []
+    if (!items.length) return
+
+    const tasks = items.map(it => productApi.getProduct(it.product_id))
+    Promise.all(tasks)
+      .then(results => {
+        const products = results.map(r => r.data)
+        const displayItems = items.map((it, idx) => ({
+          product: products[idx],
+          size: it.size,
+          color: it.color,
+          quantity: it.quantity
+        }))
+        this.setData({ displayItems })
+        if (this.data.rentalType === 5) {
+          const invalid = (displayItems || []).find(it => !(it.product && it.product.is_package_eligible))
+          if (invalid && invalid.product) {
+            wx.showToast({ title: '包含非套餐衣物', icon: 'none' })
+            setTimeout(() => wx.navigateBack(), 300)
+            return
+          }
+        }
         this.calculatePrice()
       })
       .catch(err => {
@@ -70,33 +100,34 @@ Page({
       })
   },
 
-  // 加载默认地址 (MVP: 跳过地址选择)
-  loadDefaultAddress() {
-    // MVP: 不再需要地址
-    this.calculatePrice()
-  },
-
   // 计算价格
   calculatePrice() {
-    const product = this.data.product
-    let rent = 0
+    const displayItems = this.data.displayItems || []
+    if (!displayItems.length) return
 
-    if (this.data.rentalType === 1) {
-      // 按天租赁
-      rent = parseFloat(product.daily_rent) * this.data.rentDays
-    } else if (this.data.rentalType === 2) {
-      // 单次租赁
-      rent = parseFloat(product.single_rent)
-    } else if (this.data.rentalType === 3) {
-      // 订阅租赁
-      rent = parseFloat(product.month_card_rent)
+    const rentalType = this.data.rentalType
+    const first = displayItems[0].product || {}
+
+    let rent = 0
+    if (rentalType === 5) {
+      rent = 69.90
+    } else if (rentalType === 1) {
+      rent = parseFloat(first.daily_rent || 0) * (this.data.rentDays || 1)
+    } else if (rentalType === 2) {
+      rent = parseFloat(first.single_rent || 0)
+    } else if (rentalType === 3) {
+      rent = parseFloat(first.month_card_rent || 0)
     }
 
-    const deposit = parseFloat(product.deposit || 0)
+    const deposit = displayItems.reduce((sum, it) => {
+      return sum + parseFloat((it.product && it.product.deposit) || 0) * (it.quantity || 1)
+    }, 0)
+
     const total = rent + deposit
 
     this.setData({
       calculatedRent: rent.toFixed(2),
+      calculatedDeposit: deposit.toFixed(2),
       calculatedTotal: total.toFixed(2)
     })
   },
@@ -113,8 +144,12 @@ Page({
 
   // 提交订单
   onSubmit() {
-    if ([1, 2].includes(this.data.rentalType) && !this.data.startDate) {
+    if ([1, 2, 5].includes(this.data.rentalType) && !this.data.startDate) {
       wx.showToast({ title: '请选择使用日期', icon: 'none' })
+      return
+    }
+    if (this.data.rentalType === 5 && (!this.data.items || this.data.items.length !== 3)) {
+      wx.showToast({ title: '套餐需选满3件', icon: 'none' })
       return
     }
 
@@ -124,19 +159,22 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '提交中...' })
+          const done = () => {
+            try { wx.hideLoading() } catch (e) {}
+          }
 
           const orderData = {
             rental_type: this.data.rentalType,
-            items: [{
-              product_id: this.data.productId,
-              size: this.data.size,
-              color: this.data.color,
-              quantity: 1
-            }],
+            items: (this.data.items || []).map(it => ({
+              product_id: it.product_id,
+              size: it.size,
+              color: it.color,
+              quantity: it.quantity || 1
+            })),
             remark: this.data.remark
           }
 
-          if ([1, 2].includes(this.data.rentalType)) {
+          if ([1, 2, 5].includes(this.data.rentalType)) {
             orderData.start_date = this.data.startDate
           }
           if (this.data.rentalType === 1) {
@@ -145,14 +183,14 @@ Page({
 
           orderApi.createOrder(orderData)
             .then(res => {
-              wx.hideLoading()
+              done()
               wx.navigateTo({
                 url: `/pages/pay/pay?order_id=${res.data.order_id}`
               })
             })
             .catch(err => {
-              wx.hideLoading()
-              wx.showToast({ title: '创建订单失败', icon: 'none' })
+              done()
+              wx.showToast({ title: (err && err.message) ? err.message : '创建订单失败', icon: 'none' })
             })
         }
       }
@@ -164,7 +202,8 @@ Page({
     const map = {
       1: '按天租赁',
       2: '单次租赁',
-      3: '订阅租赁'
+      3: '订阅租赁',
+      5: '3件69.9套餐'
     }
     return map[this.data.rentalType] || '未知'
   }

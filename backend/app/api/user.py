@@ -10,6 +10,8 @@ import hashlib
 import time
 import json
 from database import db
+from app.utils.auth import create_access_token, get_current_user
+from config import settings
 
 router = APIRouter()
 
@@ -19,6 +21,7 @@ router = APIRouter()
 class LoginRequest(BaseModel):
     """登录请求"""
     code: str  # 微信登录code
+    mock_openid: Optional[str] = None
 
 
 class UpdateProfileRequest(BaseModel):
@@ -105,29 +108,42 @@ async def login(request: LoginRequest):
     # 这里先用模拟的方式，实际需要请求微信服务器
     # openid = get_wechat_openid(request.code)
 
-    # 模拟openid（实际需要替换为真实微信API调用）
-    openid = hashlib.md5(request.code.encode()).hexdigest()
+    openid = None
+    if settings.DEBUG and request.mock_openid:
+        openid = request.mock_openid.strip()
+    if not openid:
+        openid = hashlib.md5(request.code.encode()).hexdigest()
 
     # 查询用户是否存在
     user = db.execute_one("SELECT * FROM users WHERE openid = %s", (openid,))
 
+    desired_role = None
+    if settings.DEBUG and openid.startswith("admin_"):
+        desired_role = "2"
+
     if user:
         # 更新最后登录时间
-        db.execute_update(
-            "UPDATE users SET updated_at = NOW() WHERE id = %s",
-            (user['id'],)
-        )
+        if desired_role and str(user.get("role")) != desired_role:
+            db.execute_update(
+                "UPDATE users SET role = %s, updated_at = NOW() WHERE id = %s",
+                (desired_role, user['id'])
+            )
+        else:
+            db.execute_update(
+                "UPDATE users SET updated_at = NOW() WHERE id = %s",
+                (user['id'],)
+            )
     else:
         # 创建新用户
+        role = desired_role or "1"
         user_id = db.execute_insert(
-            """INSERT INTO users (openid, nickname, avatar, created_at, updated_at)
-               VALUES (%s, %s, %s, NOW(), NOW())""",
-            (openid, f"用户{openid[:6]}", "")
+            """INSERT INTO users (openid, nickname, avatar, role, created_at, updated_at)
+               VALUES (%s, %s, %s, %s, NOW(), NOW())""",
+            (openid, f"用户{openid[:6]}", "", role)
         )
         user = db.execute_one("SELECT * FROM users WHERE id = %s", (user_id,))
 
-    # 生成token
-    token = generate_token(user['id'])
+    token = create_access_token(user['id'])
 
     return {
         "code": 0,
@@ -155,12 +171,7 @@ async def get_profile(authorization: Optional[str] = Header(None)):
     """
     获取用户信息
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
-
-    user = db.execute_one("SELECT * FROM users WHERE id = %s", (user_id,))
-    if not user:
-        raise HTTPException(status_code=404, detail="用户不存在")
+    user = get_current_user(authorization)
 
     # 移除敏感信息
     user.pop('id_card', None)
@@ -191,8 +202,8 @@ async def update_profile(request: UpdateProfileRequest, authorization: Optional[
     """
     更新用户信息
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 构建更新语句
     update_fields = []
@@ -245,12 +256,12 @@ async def update_profile(request: UpdateProfileRequest, authorization: Optional[
 # ============ 地址API ============
 
 @router.get("/addresses")
-async def get_addresses(token: str):
+async def get_addresses(authorization: Optional[str] = Header(None)):
     """
     获取地址列表
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     addresses = db.execute_query(
         "SELECT * FROM addresses WHERE user_id = %s ORDER BY is_default DESC, id DESC",
@@ -277,12 +288,12 @@ async def get_addresses(token: str):
 
 
 @router.post("/addresses")
-async def create_address(request: AddressCreateRequest, token: str):
+async def create_address(request: AddressCreateRequest, authorization: Optional[str] = Header(None)):
     """
     创建地址
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 如果设置为默认地址，先取消其他默认地址
     if request.is_default:
@@ -307,12 +318,12 @@ async def create_address(request: AddressCreateRequest, token: str):
 
 
 @router.put("/addresses/{address_id}")
-async def update_address(address_id: int, request: AddressUpdateRequest, token: str):
+async def update_address(address_id: int, request: AddressUpdateRequest, authorization: Optional[str] = Header(None)):
     """
     更新地址
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查地址是否属于该用户
     address = db.execute_one(
@@ -367,12 +378,12 @@ async def update_address(address_id: int, request: AddressUpdateRequest, token: 
 
 
 @router.delete("/addresses/{address_id}")
-async def delete_address(address_id: int, token: str):
+async def delete_address(address_id: int, authorization: Optional[str] = Header(None)):
     """
     删除地址
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查地址是否属于该用户
     address = db.execute_one(
@@ -392,12 +403,12 @@ async def delete_address(address_id: int, token: str):
 
 
 @router.post("/addresses/{address_id}/default")
-async def set_default_address(address_id: int, token: str):
+async def set_default_address(address_id: int, authorization: Optional[str] = Header(None)):
     """
     设置默认地址
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查地址是否属于该用户
     address = db.execute_one(

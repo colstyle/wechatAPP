@@ -14,15 +14,24 @@ Page({
   },
 
   onLoad() {
-    const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || {}
-    if (userInfo.role !== 'admin') {
-      wx.showToast({ title: '无权限访问', icon: 'none' })
-      setTimeout(() => {
-        wx.switchTab({ url: '/pages/profile/profile' })
-      }, 300)
-      return
-    }
-    this.loadOrders()
+    app.ensureLogin()
+      .then(() => {
+        const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || {}
+        if (!(userInfo.role === 'admin' || userInfo.role === '2' || userInfo.role === 2)) {
+          wx.showToast({ title: '无权限访问', icon: 'none' })
+          setTimeout(() => {
+            wx.switchTab({ url: '/pages/profile/profile' })
+          }, 300)
+          return
+        }
+        this.loadOrders()
+      })
+      .catch(() => {
+        wx.showToast({ title: '请先登录', icon: 'none' })
+        setTimeout(() => {
+          wx.switchTab({ url: '/pages/profile/profile' })
+        }, 300)
+      })
   },
 
   // 加载订单列表
@@ -123,5 +132,9 @@ Page({
     wx.navigateTo({
       url: `/pages/admin/detail/detail?id=${id}`
     })
+  },
+
+  goToPackageManage() {
+    wx.navigateTo({ url: '/pages/admin/package/package' })
   }
 })

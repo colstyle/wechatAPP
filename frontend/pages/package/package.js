@@ -35,6 +35,7 @@ Page({
 
     productApi.getProducts({
       available_date: selectedDate,
+      package_only: true,
       page: currentPage,
       page_size
     }).then(res => {

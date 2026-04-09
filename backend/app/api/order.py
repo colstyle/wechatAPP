@@ -11,6 +11,7 @@ import json
 import time
 import random
 from database import db
+from app.utils.auth import get_current_user, require_admin
 
 router = APIRouter()
 
@@ -90,8 +91,8 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
     """
     创建订单 (租赁)
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 核心规则：必须有开始日期
     if not request.start_date:
@@ -119,6 +120,8 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
         product = product_map.get(item['product_id'])
         if not product:
             raise HTTPException(status_code=404, detail=f"商品ID {item['product_id']} 不存在")
+        if request.rental_type == 5 and not bool(product.get('is_package_eligible')):
+            raise HTTPException(status_code=400, detail=f"衣物 {product['name']} 不参与套餐活动")
 
         # 检查日期锁定：同一日期同一件衣服仅支持一单
         existing = db.execute_one(
@@ -202,8 +205,8 @@ async def pickup_order(order_id: int, request: PickupOrderRequest, authorization
     """
     用户点击「我已取衣」：状态由「已预订/已支付」变为「租赁中」
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     order = db.execute_one(
         "SELECT * FROM orders WHERE id = %s AND user_id = %s",
@@ -243,8 +246,8 @@ async def return_order(order_id: int, request: ReturnOrderRequest, authorization
     """
     用户点击「我已还衣」：状态由「租赁中」或「逾期」变为「已归还待审核」
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     order = db.execute_one(
         "SELECT * FROM orders WHERE id = %s AND user_id = %s",
@@ -286,21 +289,21 @@ async def get_orders(
     """
     获取订单列表
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 构建查询条件
-    conditions = ["user_id = %s"]
+    conditions = ["o.user_id = %s"]
     params = [user_id]
 
     if status is not None:
-        conditions.append("status = %s")
+        conditions.append("o.status = %s")
         params.append(status)
 
     where_clause = " AND ".join(conditions)
 
     # 查询总数
-    count_sql = f"SELECT COUNT(*) as total FROM orders WHERE {where_clause}"
+    count_sql = f"SELECT COUNT(*) as total FROM orders o WHERE {where_clause}"
     total_result = db.execute_one(count_sql, tuple(params))
     total = total_result['total'] if total_result else 0
 
@@ -345,10 +348,10 @@ async def get_orders(
         0: '待支付',
         1: '待取衣',
         2: '租赁中',
-        3: '待归还',
-        4: '已归还',
+        3: '已逾期',
+        4: '待审核',
         5: '已取消',
-        6: '已退款',
+        6: '退款中',
         7: '已完成'
     }
 
@@ -403,8 +406,8 @@ async def get_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     获取订单详情
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询订单
     order = db.execute_one(
@@ -493,8 +496,8 @@ async def pay_order(order_id: int, authorization: Optional[str] = Header(None)):
     """
     支付订单
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询订单
     order = db.execute_one(
@@ -558,8 +561,8 @@ async def cancel_order(order_id: int, authorization: Optional[str] = Header(None
     """
     取消订单
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询订单
     order = db.execute_one(
@@ -581,7 +584,7 @@ async def cancel_order(order_id: int, authorization: Optional[str] = Header(None
             (order_id,)
         )
 
-        db.execute_delete("DELETE FROM reservations WHERE order_id = %s", (order_id,))
+        db.execute_update("DELETE FROM reservations WHERE order_id = %s", (order_id,))
 
         db.commit()
     except Exception as e:
@@ -599,29 +602,8 @@ async def ship_order(order_id: int, authorization: Optional[str] = Header(None))
     """
     发货（管理员接口）
     """
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s",
-        (order_id,)
-    )
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order['status'] != 1:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
-
-    # 更新订单状态
-    db.execute_update(
-        """UPDATE orders SET status = 2, ship_time = NOW()
-           WHERE id = %s""",
-        (order_id,)
-    )
-
-    return {
-        "code": 0,
-        "message": "发货成功"
-    }
+    require_admin(authorization)
+    raise HTTPException(status_code=400, detail="当前版本不支持发货流程")
 
 
 @router.post("/orders/{order_id}/receive")
@@ -629,39 +611,15 @@ async def receive_order(order_id: int, authorization: Optional[str] = Header(Non
     """
     确认收货
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
-
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
-        (order_id, user_id)
-    )
-
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order['status'] != 2:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
-
-    # 更新订单状态
-    db.execute_update(
-        """UPDATE orders SET status = 3, receive_time = NOW()
-           WHERE id = %s""",
-        (order_id,)
-    )
-
-    return {
-        "code": 0,
-        "message": "确认收货成功"
-    }
+    raise HTTPException(status_code=400, detail="当前版本不支持收货流程")
 
 
 @router.post("/admin/orders/{order_id}/confirm-return")
-async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = None):
+async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = None, authorization: Optional[str] = Header(None)):
     """
     店主核验无误，确认还衣：衣服自动恢复可租赁状态，一键退还押金
     """
+    require_admin(authorization)
     order = db.execute_one("SELECT * FROM orders WHERE id = %s", (order_id,))
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
@@ -671,6 +629,10 @@ async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = N
 
     # 如果未传退款金额，默认退还全部押金
     final_refund = Decimal(str(refund_amount)) if refund_amount is not None else Decimal(str(order['total_deposit']))
+    if final_refund <= 0:
+        raise HTTPException(status_code=400, detail="退款金额必须大于0")
+    if final_refund > Decimal(str(order['total_deposit'])):
+        raise HTTPException(status_code=400, detail="退款金额不能超过总押金")
 
     db.begin_transaction()
     try:
@@ -679,6 +641,7 @@ async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = N
             "UPDATE orders SET status = 7, refund_amount = %s, refund_time = NOW() WHERE id = %s",
             (final_refund, order_id)
         )
+        db.execute_update("DELETE FROM reservations WHERE order_id = %s", (order_id,))
         
         # 2. 释放日期锁定 (其实还衣后全日期开放，这里可以删除该订单相关的未来锁定，或者简单标记为已释放)
         # 根据需求：店主确认还衣后，自动恢复可租赁状态。
@@ -703,6 +666,7 @@ async def refund_order(order_id: int, authorization: Optional[str] = Header(None
     """
     退款押金（管理员接口）
     """
+    require_admin(authorization)
     # 查询订单
     order = db.execute_one(
         "SELECT * FROM orders WHERE id = %s",
@@ -731,7 +695,7 @@ async def refund_order(order_id: int, authorization: Optional[str] = Header(None
             (refund_amount, order_id)
         )
 
-        db.execute_delete("DELETE FROM reservations WHERE order_id = %s", (order_id,))
+        db.execute_update("DELETE FROM reservations WHERE order_id = %s", (order_id,))
 
         db.commit()
     except Exception as e:
@@ -746,10 +710,11 @@ async def refund_order(order_id: int, authorization: Optional[str] = Header(None
 
 
 @router.post("/admin/orders/{order_id}/resend-password")
-async def admin_resend_password(order_id: int):
+async def admin_resend_password(order_id: int, authorization: Optional[str] = Header(None)):
     """
     管理员重新发送门锁密码
     """
+    require_admin(authorization)
     # 查询订单
     order = db.execute_one(
         "SELECT * FROM orders WHERE id = %s",

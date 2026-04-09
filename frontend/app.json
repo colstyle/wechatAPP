@@ -18,7 +18,8 @@
     "pages/orders/confirm",
     "pages/review/review",
     "pages/admin/orders/orders",
-    "pages/admin/detail/detail"
+    "pages/admin/detail/detail",
+    "pages/admin/package/package"
   ],
   "window": {
     "backgroundTextStyle": "light",

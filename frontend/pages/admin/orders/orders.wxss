@@ -11,6 +11,20 @@
   background-color: #fff;
 }
 
+.admin-actions {
+  margin-top: 16rpx;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  padding: 12rpx 20rpx;
+  border-radius: 18rpx;
+  background: #ff6b6b;
+  color: #fff;
+  font-size: 24rpx;
+}
+
 .search-bar {
   display: flex;
   align-items: center;

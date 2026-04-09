@@ -8,6 +8,7 @@ from typing import Optional, List
 from datetime import datetime
 import json
 from database import db
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -31,8 +32,8 @@ async def create_review(request: CreateReviewRequest, authorization: Optional[st
     """
     创建评价
     """
-    # TODO: 从 authorization 解析 token 并获取 user_id
-    user_id = 1
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 验证评分
     if request.rating < 1 or request.rating > 5:
@@ -228,15 +229,15 @@ async def get_review(review_id: int):
 
 @router.get("/reviews/my")
 async def get_my_reviews(
-    token: str,
+    authorization: Optional[str] = Header(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100)
 ):
     """
     获取我的评价列表
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 查询总数
     count_sql = "SELECT COUNT(*) as total FROM reviews WHERE user_id = %s"
@@ -283,12 +284,12 @@ async def get_my_reviews(
 
 
 @router.delete("/reviews/{review_id}")
-async def delete_review(review_id: int, token: str):
+async def delete_review(review_id: int, authorization: Optional[str] = Header(None)):
     """
     删除评价
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    user = get_current_user(authorization)
+    user_id = user['id']
 
     # 检查评价是否存在且属于该用户
     review = db.execute_one(

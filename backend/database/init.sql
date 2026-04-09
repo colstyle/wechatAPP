@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
     bust INT COMMENT '胸围',
     waist INT COMMENT '腰围',
     hips INT COMMENT '臀围',
-    role VARCHAR(20) DEFAULT 'user' COMMENT '角色: user/admin',
+    role VARCHAR(20) DEFAULT '1' COMMENT '角色: 1/user=普通用户, 2/admin=管理员/店主',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_openid (openid)
@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS products (
     colors JSON COMMENT '可选颜色',
     is_hot BOOLEAN DEFAULT FALSE COMMENT '是否热门',
     is_new BOOLEAN DEFAULT FALSE COMMENT '是否新品',
+    is_package_eligible BOOLEAN DEFAULT FALSE COMMENT '是否参与3件套餐',
     status TINYINT DEFAULT 1 COMMENT '状态(0下架1上架)',
     view_count INT DEFAULT 0 COMMENT '浏览量',
     rent_count INT DEFAULT 0 COMMENT '租赁次数',
