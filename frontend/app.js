@@ -7,7 +7,6 @@ App({
   globalData: {
     token: null,
     userInfo: null,
-    activeSubscription: null,
     selectedDate: null, // 用户选择的租赁日期 (YYYY-MM-DD)
   },
 
@@ -22,7 +21,6 @@ App({
     if (token) {
       this.globalData.token = token
       this.getUserInfo()
-      this.getActiveSubscription()
     }
   },
 
@@ -32,17 +30,6 @@ App({
       .then(res => {
         if (res.code === 0) {
           this.globalData.userInfo = res.data
-        }
-        return res
-      })
-  },
-
-  // 获取激活中的订阅
-  getActiveSubscription() {
-    return this.request('/api/subscription/active', 'GET')
-      .then(res => {
-        if (res.code === 0) {
-          this.globalData.activeSubscription = res.data
         }
         return res
       })

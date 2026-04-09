@@ -1,227 +1,175 @@
-<!--pages/detail/detail.wxml-->
+<!-- pages/detail/detail.wxml -->
 <view class="page">
-  <!-- 商品图片轮播 -->
-  <swiper class="image-swiper" indicator-dots autoplay="{{false}}">
-    <swiper-item wx:for="{{product.images}}" wx:key="*this">
-      <image class="product-image" src="{{item}}" mode="aspectFill" bindtap="onImageTap" data-index="{{index}}"></image>
-    </swiper-item>
-  </swiper>
-
-  <!-- 商品信息 -->
-  <view class="product-info">
-    <view class="product-header">
-      <text class="product-name">{{product.name}}</text>
-      <view class="product-favorite" bindtap="onToggleFavorite">
-        <text class="iconfont {{isFavorite ? 'icon-heart-fill' : 'icon-heart'}} {{isFavorite ? 'active' : ''}}"></text>
-      </view>
-    </view>
-
-    <view class="product-tags">
-      <text class="tag tag-hot" wx:if="{{product.is_hot}}">热销</text>
-      <text class="tag tag-new" wx:if="{{product.is_new}}">新品</text>
-    </view>
-
-    <view class="product-price-box">
-      <view class="price-row">
-        <text class="price-label">日租金:</text>
-        <text class="price">¥{{product.daily_rent}}</text>
-      </view>
-      <view class="price-row">
-        <text class="price-label">单次:</text>
-        <text class="price">¥{{product.single_rent}}</text>
-      </view>
-      <view class="price-row">
-        <text class="price-label">月卡:</text>
-        <text class="price">¥{{product.month_card_rent}}</text>
-      </view>
-      <view class="price-row deposit-row">
-        <text class="price-label">押金:</text>
-        <text class="price deposit">¥{{product.deposit}}</text>
-      </view>
-    </view>
-
-    <view class="product-stats">
-      <text class="stat-item">浏览 {{product.view_count}}</text>
-      <text class="stat-divider">|</text>
-      <text class="stat-item">租赁 {{product.rent_count}}</text>
-      <text class="stat-divider">|</text>
-      <text class="stat-item">库存 {{product.stock}}</text>
-    </view>
+  <!-- 骨架屏/加载中 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-icon"></view>
+    <text class="loading-text">正在加载美衣...</text>
   </view>
 
-  <!-- 规格选择 -->
-  <view class="section" wx:if="{{product.sizes && product.sizes.length > 0}}">
-    <view class="section-title">尺码选择</view>
-    <view class="size-options">
-      <view
-        class="size-option {{selectedSize === item ? 'active' : ''}}"
-        wx:for="{{product.sizes}}"
-        wx:key="*this"
-        bindtap="onSelectSize"
-        data-size="{{item}}">
-        {{item}}
+  <block wx:else>
+    <!-- 商品图片轮播 -->
+    <swiper class="image-swiper" indicator-dots="{{product.images.length > 1}}" autoplay circular indicator-active-color="#ff6b6b">
+      <swiper-item wx:for="{{product.images}}" wx:key="*this">
+        <image src="{{item}}" class="product-image" mode="aspectFill" bindtap="previewImage" data-url="{{item}}"></image>
+      </swiper-item>
+    </swiper>
+
+    <!-- 商品基本信息 -->
+    <view class="product-info card m-3">
+      <view class="product-header">
+        <text class="product-name">{{product.name}}</text>
+      </view>
+      
+      <view class="product-tags">
+        <text wx:if="{{product.is_hot}}" class="tag tag-hot">热门爆款</text>
+        <text wx:if="{{product.is_new}}" class="tag tag-new">新品上架</text>
+        <text class="tag tag-brand" wx:if="{{product.brand_name}}">{{product.brand_name}}</text>
+      </view>
+
+      <view class="product-price-box">
+        <view class="price-row">
+          <text class="price-label">日租</text>
+          <text class="price">¥{{product.daily_rent}}</text>
+        </view>
+        <view class="price-row">
+          <text class="price-label">单次(3天)</text>
+          <text class="price">¥{{product.single_rent}}</text>
+        </view>
+        <view class="deposit-row">
+          <text class="price-label">押金</text>
+          <text class="price deposit">¥{{product.deposit}}</text>
+          <text class="text-muted text-sm ml-2">(还衣后全额退还)</text>
+        </view>
+      </view>
+
+      <view class="product-stats">
+        <text>已租 {{product.sales_count || 0}} 次</text>
+        <view class="stat-divider">|</view>
+        <text>{{product.favorite_count || 0}} 人收藏</text>
+        <view class="stat-divider">|</view>
+        <text>库存 {{product.stock}} 件</text>
       </view>
     </view>
-  </view>
 
-  <view class="section" wx:if="{{product.colors && product.colors.length > 0}}">
-    <view class="section-title">颜色选择</view>
-    <view class="color-options">
-      <view
-        class="color-option {{selectedColor === item ? 'active' : ''}}"
-        wx:for="{{product.colors}}"
-        wx:key="*this"
-        bindtap="onSelectColor"
-        data-color="{{item}}">
-        <view class="color-dot" style="background: {{item}}"></view>
-        <text class="color-name">{{item}}</text>
+    <!-- 规格选择 -->
+    <view class="section card m-3">
+      <view class="section-title">选择规格</view>
+      
+      <view class="size-section mb-3">
+        <text class="text-muted text-sm mb-2 block">尺码</text>
+        <view class="size-options">
+          <view 
+            wx:for="{{product.sizes}}" 
+            wx:key="*this" 
+            class="size-option {{selectedSize === item ? 'active' : ''}}"
+            bindtap="selectSize"
+            data-size="{{item}}"
+          >{{item}}</view>
+        </view>
       </view>
-    </view>
-  </view>
 
-  <!-- 商品描述 -->
-  <view class="section">
-    <view class="section-title">商品详情</view>
-    <view class="product-desc">{{product.description}}</view>
-  </view>
-
-  <!-- 搭配推荐 -->
-  <view class="section" wx:if="{{outfits && outfits.length > 0}}">
-    <view class="section-title">搭配推荐</view>
-    <scroll-view class="outfit-scroll" scroll-x>
-      <view
-        class="outfit-card"
-        wx:for="{{outfits}}"
-        wx:key="id"
-        bindtap="onOutfitTap"
-        data-id="{{item.id}}">
-        <image class="outfit-img" src="{{item.image}}" mode="aspectFill"></image>
-        <text class="outfit-name">{{item.name}}</text>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- 评价列表 -->
-  <view class="section">
-    <view class="section-title flex justify-between">
-      <text>用户评价 ({{reviews.total}})</text>
-      <text class="more-link" bindtap="onMoreReviews">查看全部</text>
-    </view>
-
-    <view class="review-summary" wx:if="{{reviews.summary}}">
-      <view class="rating-overview">
-        <text class="rating-score">{{reviews.summary.avg_rating}}</text>
-        <text class="rating-label">综合评分</text>
-      </view>
-      <view class="rating-bars">
-        <view class="rating-bar" wx:for="{{[5,4,3,2,1]}}" wx:key="*this">
-          <text class="bar-label">{{item}}星</text>
-          <view class="bar-track">
-            <view class="bar-fill" style="width: {{getRatingPercent(item)}}%"></view>
+      <view class="color-section">
+        <text class="text-muted text-sm mb-2 block">颜色</text>
+        <view class="color-options">
+          <view 
+            wx:for="{{product.colors}}" 
+            wx:key="*this" 
+            class="color-option {{selectedColor === item ? 'active' : ''}}"
+            bindtap="selectColor"
+            data-color="{{item}}"
+          >
+            <view class="color-dot" style="background-color: {{colorMap[item] || '#ccc'}}"></view>
+            <text class="color-name">{{item}}</text>
           </view>
-          <text class="bar-count">{{getRatingCount(item)}}</text>
         </view>
       </view>
     </view>
 
-    <view class="review-list" wx:if="{{reviews.list && reviews.list.length > 0}}">
-      <view class="review-item" wx:for="{{reviews.list}}" wx:for-item="review" wx:key="id">
-        <view class="review-user">
-          <image class="user-avatar" src="{{review.user.avatar}}" mode="aspectFill"></image>
-          <text class="user-name">{{review.user.nickname}}</text>
-        </view>
-        <view class="review-content">
-          <view class="review-rating">
-            <text class="iconfont icon-star {{starIndex < review.rating ? '' : 'empty'}}" wx:for="{{[1,2,3,4,5]}}" wx:for-index="starIndex" wx:key="*this"></text>
-          </view>
-          <text class="review-text">{{review.content}}</text>
-          <view class="review-images" wx:if="{{review.images && review.images.length > 0}}">
-            <image class="review-img" src="{{img}}" mode="aspectFill" wx:for="{{review.images}}" wx:for-item="img" wx:key="*this" bindtap="onReviewImageTap" data-images="{{review.images}}" data-index="{{index}}"></image>
-          </view>
-          <text class="review-time">{{review.created_at}}</text>
-        </view>
+    <!-- 商品详情 -->
+    <view class="section card m-3">
+      <view class="section-title">宝贝详情</view>
+      <view class="product-desc">
+        <text>{{product.description || '暂无详细描述'}}</text>
+      </view>
+      <!-- 这里可以添加更多详情图 -->
+      <view class="detail-images mt-3">
+        <image wx:for="{{product.images}}" wx:key="*this" src="{{item}}" mode="widthFix" class="w-100 mb-2" lazy-load></image>
       </view>
     </view>
 
-    <view class="no-reviews" wx:else>
-      <text>暂无评价</text>
-    </view>
-  </view>
-
-  <!-- 底部占位 -->
-  <view class="footer-placeholder"></view>
+  </block>
 
   <!-- 底部操作栏 -->
-  <view class="footer">
+  <view class="footer" wx:if="{{!loading}}">
     <view class="footer-left">
-      <view class="footer-btn" bindtap="onContact">
+      <view class="footer-btn" bindtap="goToHome">
+        <text class="iconfont icon-home"></text>
+        <text>首页</text>
+      </view>
+      <view class="footer-btn" bindtap="contactService">
         <text class="iconfont icon-service"></text>
         <text>客服</text>
       </view>
-      <view class="footer-btn" bindtap="onShare">
-        <text class="iconfont icon-share"></text>
-        <text>分享</text>
-      </view>
     </view>
     <view class="footer-right">
-      <button class="btn btn-outline footer-btn-main" bindtap="onSubscribe" wx:if="{{activeSubscription}}">
-        订阅下单
-      </button>
-      <button class="btn btn-outline footer-btn-main" bindtap="onTrial" wx:else>
-        预约试穿
-      </button>
-      <button class="btn btn-primary footer-btn-main" bindtap="onRent">
-        立即租用
-      </button>
+      <button class="footer-btn-main btn-primary" bindtap="showRentalModal">立即预定</button>
     </view>
   </view>
 
-  <!-- 租赁方式弹窗 -->
-  <view class="mask {{showRentModal ? 'show' : ''}}" bindtap="onCloseRentModal"></view>
-  <view class="rental-modal {{showRentModal ? 'show' : ''}}">
+  <!-- 租赁弹窗 -->
+  <view class="mask {{showModal ? 'show' : ''}}" bindtap="hideRentalModal"></view>
+  <view class="rental-modal {{showModal ? 'show' : ''}}">
     <view class="modal-header">
-      <text class="modal-title">选择租赁方式</text>
-      <text class="modal-close" bindtap="onCloseRentModal">×</text>
+      <text class="modal-title">选择租赁方案</text>
+      <text class="modal-close" bindtap="hideRentalModal">×</text>
     </view>
+
     <view class="modal-body">
-      <view class="rental-type {{rentalType === 1 ? 'active' : ''}}" bindtap="onSelectRentalType" data-type="1">
-        <text class="rental-title">按天租赁</text>
+      <view class="rental-type {{rentalType === 1 ? 'active' : ''}}" bindtap="selectRentalType" data-type="{{1}}">
+        <view class="rental-info">
+          <text class="rental-title">按天租赁</text>
+          <text class="text-muted text-sm block">自由选择天数，适合短期体验</text>
+        </view>
         <text class="rental-desc">¥{{product.daily_rent}}/天</text>
       </view>
-      <view class="rental-type {{rentalType === 2 ? 'active' : ''}}" bindtap="onSelectRentalType" data-type="2">
-        <text class="rental-title">单次租赁</text>
-        <text class="rental-desc">¥{{product.single_rent}}/次</text>
-      </view>
-      <view class="rental-type {{rentalType === 3 ? 'active' : ''}}" bindtap="onSelectRentalType" data-type="3">
-        <text class="rental-title">月卡租赁</text>
-        <text class="rental-desc">¥{{product.month_card_rent}}/月</text>
+
+      <view class="rental-type {{rentalType === 2 ? 'active' : ''}}" bindtap="selectRentalType" data-type="{{2}}">
+        <view class="rental-info">
+          <text class="rental-title">单次租赁 (3天)</text>
+          <text class="text-muted text-sm block">固定时长，更高性价比</text>
+        </view>
+        <text class="rental-desc">¥{{product.single_rent}}</text>
       </view>
 
-      <!-- 租赁天数选择 -->
       <view class="days-selector" wx:if="{{rentalType === 1}}">
-        <view class="days-label">选择租赁天数</view>
+        <text class="days-label">租赁天数</text>
         <view class="days-options">
-          <view class="day-option {{rentDays === item ? 'active' : ''}}" wx:for="{{[3,5,7,10,15,30]}}" wx:key="*this" bindtap="onSelectDays" data-days="{{item}}">
-            {{item}}天
-          </view>
+          <view wx:for="{{[1,2,3,5,7]}}" wx:key="*this" class="day-option {{rentalDays === item ? 'active' : ''}}" bindtap="selectDays" data-days="{{item}}">{{item}}天</view>
+          <view class="day-option {{rentalDays === 0 ? 'active' : ''}}" bindtap="selectDays" data-days="{{0}}">自定义</view>
         </view>
-        <view class="days-custom">
-          <input type="number" class="days-input" placeholder="自定义天数" bindinput="onCustomDaysInput" value="{{customDays}}"></input>
+        <view class="days-custom" wx:if="{{rentalDays === 0}}">
+          <input class="days-input" type="number" placeholder="请输入租赁天数" bindinput="onDaysInput" value="{{customDays}}" />
         </view>
       </view>
 
-      <!-- 价格计算 -->
       <view class="price-calculation">
-        <text class="calc-label">租金: </text>
-        <text class="calc-price">¥{{calculatedRent}}</text>
-        <text class="calc-label">押金: </text>
-        <text class="calc-price">¥{{product.deposit}}</text>
-        <text class="calc-label">总计: </text>
-        <text class="calc-total">¥{{calculatedTotal}}</text>
+        <view class="calc-row">
+          <text class="calc-label">租金：</text>
+          <text class="calc-price">¥{{calculatedRent}}</text>
+        </view>
+        <view class="calc-row">
+          <text class="calc-label">押金：</text>
+          <text class="calc-price">¥{{product.deposit}}</text>
+        </view>
+        <view class="calc-row mt-2">
+          <text class="calc-label">预估总额：</text>
+          <text class="calc-total">¥{{calculatedTotal}}</text>
+        </view>
       </view>
     </view>
+
     <view class="modal-footer">
-      <button class="btn btn-primary btn-block" bindtap="onConfirmRent">确认租赁</button>
+      <button class="btn btn-primary btn-block btn-lg" bindtap="submitOrder">确定预定</button>
     </view>
   </view>
 </view>

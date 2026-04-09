@@ -16,6 +16,14 @@ Page({
   },
 
   onLoad(options) {
+    const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || {}
+    if (userInfo.role !== 'admin') {
+      wx.showToast({ title: '无权限访问', icon: 'none' })
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/profile/profile' })
+      }, 300)
+      return
+    }
     if (options.id) {
       this.setData({ orderId: parseInt(options.id) })
       this.loadOrder()

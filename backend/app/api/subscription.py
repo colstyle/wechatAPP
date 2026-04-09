@@ -218,7 +218,7 @@ async def get_subscriptions(
     }
 
 
-@router.get("/subscriptions/active")
+@router.get("/active")
 async def get_active_subscription(authorization: Optional[str] = Header(None)):
     """
     获取激活中的订阅

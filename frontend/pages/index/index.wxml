@@ -11,38 +11,6 @@
     </picker>
   </view>
 
-  <!-- 搜索栏 -->
-  <view class="search-bar" bindtap="onSearch">
-    <view class="search-input">
-      <text class="search-icon">🔍</text>
-      <text>搜索商品</text>
-    </view>
-  </view>
-
-  <!-- 轮播图 -->
-  <view class="banner-container">
-    <swiper class="banner" indicator-dots autoplay circular interval="3000" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ff6b6b">
-      <swiper-item class="banner-item banner-1" bindtap="onBannerTap" data-product="1">
-        <view class="banner-content">
-          <text class="banner-title">新品上市</text>
-          <text class="banner-subtitle">春季限定租衣优惠</text>
-        </view>
-      </swiper-item>
-      <swiper-item class="banner-item banner-2" bindtap="onBannerTap" data-product="2">
-        <view class="banner-content">
-          <text class="banner-title">会员专享</text>
-          <text class="banner-subtitle">月卡会员首月半价</text>
-        </view>
-      </swiper-item>
-      <swiper-item class="banner-item banner-3" bindtap="onBannerTap" data-product="3">
-        <view class="banner-content">
-          <text class="banner-title">品牌联动</text>
-          <text class="banner-subtitle">知名设计师入驻</text>
-        </view>
-      </swiper-item>
-    </swiper>
-  </view>
-
   <!-- 分类导航 -->
   <view class="category-nav">
     <view class="category-item" wx:for="{{categories}}" wx:key="id" bindtap="onCategoryTap" data-id="{{item.id}}">
@@ -53,96 +21,36 @@
     </view>
   </view>
 
-  <!-- 热门商品 -->
+  <!-- 可租衣物列表 -->
   <view class="section">
     <view class="section-header">
-      <text class="section-title">热门推荐</text>
-      <text class="section-more" bindtap="onMoreTap" data-type="hot">更多 ></text>
-    </view>
-    <scroll-view class="product-scroll" scroll-x>
-      <view class="product-card-small" wx:for="{{hotProducts}}" wx:key="id" bindtap="onProductTap" data-id="{{item.id}}">
-        <view class="product-img-placeholder">
-          <text class="placeholder-text">{{item.placeholder || '👗'}}</text>
-        </view>
-        <text class="product-name">{{item.name}}</text>
-        <view class="product-price-row">
-          <text class="product-price">¥{{item.daily_rent}}</text>
-          <text class="product-unit">/天</text>
-        </view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- 新品推荐 -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">新品上市</text>
-      <text class="section-more" bindtap="onMoreTap" data-type="new">更多 ></text>
+      <text class="section-title">可租衣物</text>
     </view>
     <view class="product-grid">
-      <view class="product-card" wx:for="{{newProducts}}" wx:key="id" bindtap="onProductTap" data-id="{{item.id}}">
-        <view class="product-img-placeholder large">
-          <text class="placeholder-text">{{item.placeholder || '👗'}}</text>
-        </view>
+      <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="onProductTap" data-id="{{item.id}}">
+        <image class="product-cover" src="{{item.cover_image}}" mode="aspectFill"></image>
         <view class="product-info">
           <text class="product-name">{{item.name}}</text>
-          <view class="product-tags">
-            <text class="tag tag-hot" wx:if="{{item.is_hot}}">热销</text>
-            <text class="tag tag-new" wx:if="{{item.is_new}}">新品</text>
-          </view>
           <view class="product-bottom">
             <view class="product-price-row">
               <text class="product-price">¥{{item.daily_rent}}</text>
               <text class="product-unit">/天</text>
             </view>
-            <text class="product-single">¥{{item.single_rent}}/次</text>
+            <text class="product-single">押金 ¥{{item.deposit}}</text>
           </view>
         </view>
       </view>
     </view>
-  </view>
-
-  <!-- 搭配推荐 -->
-  <view class="section" wx:if="{{outfits.length > 0}}">
-    <view class="section-header">
-      <text class="section-title">搭配推荐</text>
-      <text class="section-more" bindtap="onOutfitMoreTap">更多 ></text>
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text wx:if="{{loading}}">加载中...</text>
+      <text wx:else bindtap="onLoadMore">加载更多</text>
     </view>
-    <scroll-view class="outfit-scroll" scroll-x>
-      <view class="outfit-card" wx:for="{{outfits}}" wx:key="id" bindtap="onOutfitTap" data-id="{{item.id}}">
-        <view class="outfit-img-placeholder">
-          <text class="placeholder-text">{{item.placeholder || '✨'}}</text>
-        </view>
-        <text class="outfit-name">{{item.name}}</text>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- 品牌专区 -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">品牌专区</text>
-      <text class="section-more" bindtap="onBrandMoreTap">更多 ></text>
+    <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">
+      <text>已经到底了</text>
     </view>
-    <view class="brand-grid">
-      <view class="brand-card" wx:for="{{brands}}" wx:key="id" bindtap="onBrandTap" data-id="{{item.id}}">
-        <view class="brand-logo-placeholder">
-          <text class="placeholder-text">{{item.placeholder || '🏷️'}}</text>
-        </view>
-        <text class="brand-name">{{item.name}}</text>
-      </view>
+    <view class="empty" wx:if="{{!loading && products.length === 0}}">
+      <text>该日期暂无可租衣物</text>
     </view>
-  </view>
-
-  <!-- 加载更多 -->
-  <view class="load-more" wx:if="{{hasMore}}">
-    <text wx:if="{{loading}}">加载中...</text>
-    <text wx:else bindtap="onLoadMore">加载更多</text>
-  </view>
-
-  <!-- 到底 -->
-  <view class="no-more" wx:if="{{!hasMore && newProducts.length > 0}}">
-    <text>已经到底了</text>
   </view>
 
   <!-- AI 客服悬浮按钮 -->

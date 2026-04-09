@@ -357,8 +357,8 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
     )
 
     # 如果用户已登录，记录浏览历史
-    if token:
-        # TODO: 验证token，获取user_id
+    if authorization:
+        # TODO: 从 authorization 解析 token 并获取 user_id
         user_id = 1  # 模拟
         # 检查是否已记录
         exists = db.execute_one(

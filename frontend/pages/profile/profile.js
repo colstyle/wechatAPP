@@ -1,17 +1,14 @@
 // pages/profile/profile.js
 const app = getApp()
 const orderApi = require('../../utils/api').orderApi
-const subscriptionApi = require('../../utils/api').subscriptionApi
 
 Page({
   data: {
     userInfo: {},
-    activeSubscription: null,
     orderStats: {
-      pending: 0,
-      shipping: 0,
+      pendingPickup: 0,
       renting: 0,
-      returning: 0
+      pendingAudit: 0
     }
   },
 
@@ -23,7 +20,6 @@ Page({
     if (app.globalData.token) {
       this.loadUserInfo()
       this.loadOrderStats()
-      this.loadSubscription()
     }
   },
 
@@ -54,111 +50,34 @@ Page({
     }
 
     Promise.all([
-      getStatusCount(0),
       getStatusCount(1),
       getStatusCount(2),
-      getStatusCount(3)
-    ]).then(([pending, shipping, renting, returning]) => {
+      getStatusCount(4)
+    ]).then(([pendingPickup, renting, pendingAudit]) => {
       this.setData({
         orderStats: {
-          pending,
-          shipping,
+          pendingPickup,
           renting,
-          returning
+          pendingAudit
         }
       })
     })
-  },
-
-  // 加载订阅信息
-  loadSubscription() {
-    subscriptionApi.getActiveSubscription()
-      .then(res => {
-        this.setData({ activeSubscription: res.data })
-      })
-      .catch(err => {
-        console.error('获取订阅信息失败', err)
-      })
   },
 
   // 登录处理
   handleLogin() {
-    // 已登录，跳转到设置页面
-    if (app.globalData.token) {
-      wx.navigateTo({
-        url: '/pages/settings/settings'
-      })
-      return
-    }
-
-    // 执行微信登录
+    if (app.globalData.token) return
     wx.showLoading({ title: '登录中...' })
-
-    wx.login({
-      success: (res) => {
-        if (res.code) {
-          // 调用后端登录接口
-          wx.request({
-            url: 'http://127.0.0.1:8000/api/user/login',
-            method: 'POST',
-            data: {
-              code: res.code
-            },
-            success: (loginRes) => {
-              wx.hideLoading()
-              if (loginRes.data.code === 0) {
-                const { token, user_info } = loginRes.data.data
-
-                // 保存token和用户信息
-                app.globalData.token = token
-                app.globalData.userInfo = user_info
-
-                // 保存到本地存储
-                wx.setStorageSync('token', token)
-                wx.setStorageSync('userInfo', user_info)
-
-                // 更新页面数据
-                this.setData({ userInfo: user_info })
-
-                // 加载订单和订阅信息
-                this.loadOrderStats()
-                this.loadSubscription()
-
-                wx.showToast({
-                  title: '登录成功',
-                  icon: 'success'
-                })
-              } else {
-                wx.showToast({
-                  title: loginRes.data.message || '登录失败',
-                  icon: 'none'
-                })
-              }
-            },
-            fail: () => {
-              wx.hideLoading()
-              wx.showToast({
-                title: '网络错误，请稍后重试',
-                icon: 'none'
-              })
-            }
-          })
-        } else {
-          wx.hideLoading()
-          wx.showToast({
-            title: '获取登录凭证失败',
-            icon: 'none'
-          })
-        }
-      },
-      fail: () => {
+    app.wechatLogin()
+      .then(() => {
         wx.hideLoading()
-        wx.showToast({
-          title: '登录失败，请稍后重试',
-          icon: 'none'
-        })
-      }
-    })
+        this.loadUserInfo()
+        this.loadOrderStats()
+      })
+      .catch(() => {
+        wx.hideLoading()
+        wx.showToast({ title: '登录失败', icon: 'none' })
+      })
   },
 
   // 个人信息
@@ -176,65 +95,17 @@ Page({
   onOrdersTap(e) {
     const status = e.currentTarget.dataset.status
     const statusText = {
-      0: '待付款',
-      1: '待发货',
+      1: '待取衣',
       2: '租赁中',
-      3: '待归还'
+      4: '待审核'
     }
     wx.navigateTo({
       url: `/pages/orders/orders?status=${status}&title=${statusText[status]}`
     })
   },
 
-  // 收货地址
-  onAddressTap() {
-    wx.navigateTo({
-      url: '/pages/address/address'
-    })
-  },
-
-  // 预约试穿
-  onAppointmentTap() {
-    wx.navigateTo({
-      url: '/pages/appointment/appointment'
-    })
-  },
-
-  // 订阅管理
-  onSubscribeTap() {
-    wx.navigateTo({
-      url: '/pages/subscribe/subscribe'
-    })
-  },
-
-  // 收藏列表
-  onFavoritesTap() {
-    wx.navigateTo({
-      url: '/pages/favorites/favorites'
-    })
-  },
-
-  // 评价列表
-  onReviewsTap() {
-    wx.navigateTo({
-      url: '/pages/review/review?type=my'
-    })
-  },
-
-  // 意见反馈
-  onFeedbackTap() {
-    wx.showModal({
-      title: '意见反馈',
-      content: '请通过客服电话联系我们: 400-123-4567',
-      showCancel: false
-    })
-  },
-
-  // 设置
-  onSettingsTap() {
-    wx.navigateTo({
-      url: '/pages/settings/settings'
-    })
+  onServiceTap() {
+    wx.navigateTo({ url: '/pages/chat/chat' })
   },
 
   // 店主管理
@@ -256,16 +127,13 @@ Page({
           // 清除全局数据
           app.globalData.token = null
           app.globalData.userInfo = null
-          app.globalData.activeSubscription = null
           // 更新页面
           this.setData({
             userInfo: {},
-            activeSubscription: null,
             orderStats: {
-              pending: 0,
-              shipping: 0,
+              pendingPickup: 0,
               renting: 0,
-              returning: 0
+              pendingAudit: 0
             }
           })
           wx.showToast({
