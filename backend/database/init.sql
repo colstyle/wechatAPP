@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
     bust INT COMMENT '胸围',
     waist INT COMMENT '腰围',
     hips INT COMMENT '臀围',
+    role VARCHAR(20) DEFAULT 'user' COMMENT '角色: user/admin',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_openid (openid)

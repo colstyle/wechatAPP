@@ -16,7 +16,9 @@
     "pages/profile/profile",
     "pages/settings/settings",
     "pages/orders/confirm",
-    "pages/review/review"
+    "pages/review/review",
+    "pages/admin/orders/orders",
+    "pages/admin/detail/detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

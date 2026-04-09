@@ -2,7 +2,7 @@
 """
 订阅相关API
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Header
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, date, timedelta
@@ -219,11 +219,11 @@ async def get_subscriptions(
 
 
 @router.get("/subscriptions/active")
-async def get_active_subscription(token: str):
+async def get_active_subscription(authorization: Optional[str] = Header(None)):
     """
     获取激活中的订阅
     """
-    # TODO: 验证token，获取user_id
+    # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1  # 模拟
 
     subscription = db.execute_one(

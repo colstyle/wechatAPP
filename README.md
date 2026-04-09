@@ -4,7 +4,7 @@
 
 **24小时自助租衣小程序。日期锁定、套餐优惠、AI智能客服。**
 
-![Project Status](https://img.shields.io/badge/状态-Phase%201%20完成-brightgreen?style=flat-square)
+![Project Status](https://img.shields.io/badge/状态-Phase%202%20完成-brightgreen?style=flat-square)
 ![Platform](https://img.shields.io/badge/平台-WeChat%20Mini%20Program%20%7C%20FastAPI-blue?style=flat-square)
 ![Tech Stack](https://img.shields.io/badge/技术栈-FastAPI%20%2B%20MySQL%20%2B%20DeepSeek-blueviolet?style=flat-square)
 
@@ -42,6 +42,8 @@ cd backend
 pip install -r requirements.txt
 # 复制并配置 .env 文件
 cp .env.example .env
+# 检查并初始化数据库
+python check_db.py
 # 启动服务
 python main.py
 ```
@@ -64,7 +66,18 @@ python main.py
 │   └── utils/             ← API 封装与工具类
 └── README/                 ← 项目文档与更新日志
 ```
-
+#### 3. Git 常用命令
+```bash
+# 查看状态
+git status
+# 提交代码
+git add .
+git commit -m "feat: 描述你的改动"
+# 推送至远程仓库
+git push origin main
+# 拉取最新代码
+git pull origin main
+```
 ---
 
 ## 🛠️ 技术栈清单
@@ -81,7 +94,8 @@ python main.py
 | 阶段 | 标题 | 主要功能 | 状态 |
 |---|---|---|---|
 | Phase 1 | [业务逻辑与AI基座](./README/20260409_Phase1_BusinessLogic_AI.md) | 24h计时、3件套餐、DeepSeek接入 | ✅ 完成 |
-| Phase 2 | 系统集成 (Pending) | TTLock 真实对接、微信支付 V3 | ⏳ 规划中 |
+| Phase 2 | [店主管理与支付框架](./README/20260409_Phase2_Admin_Payment.md) | 店主订单管理、微信支付V3框架 | ✅ 完成 |
+| Phase 3 | 硬件与支付对接 (Pending) | TTLock 真实对接、微信支付 V3 真实上线 | ⏳ 规划中 |
 
 ---
 

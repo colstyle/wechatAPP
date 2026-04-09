@@ -1,0 +1,50 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <icon type="search" size="14"></icon>
+      <input type="text" placeholder="搜索单号/昵称" bindinput="onSearchInput" value="{{keyword}}" confirm-type="search" bindconfirm="onSearch" />
+      <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
+    </view>
+  </view>
+
+  <!-- 状态筛选 -->
+  <scroll-view class="status-scroll" scroll-x>
+    <view class="status-tabs">
+      <view class="status-tab {{currentStatus === null ? 'active' : ''}}" bindtap="onStatusChange" data-status="{{null}}">全部</view>
+      <view class="status-tab {{currentStatus === 1 ? 'active' : ''}}" bindtap="onStatusChange" data-status="1">待取衣</view>
+      <view class="status-tab {{currentStatus === 2 ? 'active' : ''}}" bindtap="onStatusChange" data-status="2">租赁中</view>
+      <view class="status-tab {{currentStatus === 3 ? 'active' : ''}}" bindtap="onStatusChange" data-status="3">已逾期</view>
+      <view class="status-tab {{currentStatus === 4 ? 'active' : ''}}" bindtap="onStatusChange" data-status="4">待审核</view>
+      <view class="status-tab {{currentStatus === 7 ? 'active' : ''}}" bindtap="onStatusChange" data-status="7">已完成</view>
+    </view>
+  </scroll-view>
+
+  <!-- 订单列表 -->
+  <scroll-view class="order-list" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="order-card" wx:for="{{orders}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="card-header">
+        <text class="order-no">单号: {{item.order_no}}</text>
+        <text class="status-text status-{{item.status}}">{{item.status_text}}</text>
+      </view>
+      <view class="card-body">
+        <image class="user-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="order-info">
+          <text class="user-name">{{item.nickname}}</text>
+          <text class="order-time">下单时间: {{item.created_at}}</text>
+        </view>
+        <view class="order-amount">
+          <text class="amount-label">实付</text>
+          <text class="amount-value">¥{{item.total_amount}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="loading-status" wx:if="{{loading}}">加载中...</view>
+    <view class="no-more" wx:if="{{!hasMore && orders.length > 0}}">没有更多订单了</view>
+    <view class="empty-state" wx:if="{{!loading && orders.length === 0}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无相关订单</text>
+    </view>
+  </scroll-view>
+</view>

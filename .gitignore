@@ -9,3 +9,6 @@ __pycache__/
 .idea/
 *.log
 .DS_Store
+
+# Taro-main (Temporary / Reference)
+taro-main/

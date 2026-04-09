@@ -245,11 +245,35 @@ const reviewApi = {
   }
 }
 
+// 店主管理相关API
+const adminApi = {
+  // 获取全量订单
+  getOrders: (params) => {
+    return app.request('/api/admin/orders', 'GET', params)
+  },
+
+  // 退押金
+  refundOrder: (orderId, amount, reason) => {
+    return app.request('/api/admin/refund', 'POST', { order_id: orderId, amount, reason })
+  },
+
+  // 扣押金
+  deductDeposit: (orderId, amount, reason) => {
+    return app.request('/api/admin/deduct', 'POST', { order_id: orderId, amount, reason })
+  },
+
+  // 修改订单商品 (换款)
+  updateOrderItems: (orderId, items) => {
+    return app.request('/api/admin/update-items', 'POST', { order_id: orderId, items })
+  }
+}
+
 module.exports = {
   userApi,
   productApi,
   orderApi,
   subscriptionApi,
   appointmentApi,
-  reviewApi
+  reviewApi,
+  adminApi
 }

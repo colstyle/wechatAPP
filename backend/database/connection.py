@@ -38,36 +38,62 @@ class Database:
     @classmethod
     def execute_query(cls, sql, params=None):
         """执行查询"""
-        conn = cls.get_connection()
-        with conn.cursor() as cursor:
-            cursor.execute(sql, params or ())
-            return cursor.fetchall()
+        try:
+            conn = cls.get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute(sql, params or ())
+                return cursor.fetchall()
+        except Exception as e:
+            print(f"Database Query Error: {str(e)}")
+            print(f"SQL: {sql}")
+            print(f"Params: {params}")
+            raise e
 
     @classmethod
     def execute_one(cls, sql, params=None):
         """执行查询，返回单条"""
-        conn = cls.get_connection()
-        with conn.cursor() as cursor:
-            cursor.execute(sql, params or ())
-            return cursor.fetchone()
+        try:
+            conn = cls.get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute(sql, params or ())
+                return cursor.fetchone()
+        except Exception as e:
+            print(f"Database Execute One Error: {str(e)}")
+            print(f"SQL: {sql}")
+            print(f"Params: {params}")
+            raise e
 
     @classmethod
     def execute_update(cls, sql, params=None):
         """执行更新/插入/删除"""
-        conn = cls.get_connection()
-        with conn.cursor() as cursor:
-            result = cursor.execute(sql, params or ())
-            conn.commit()
-            return result
+        try:
+            conn = cls.get_connection()
+            with conn.cursor() as cursor:
+                result = cursor.execute(sql, params or ())
+                conn.commit()
+                return result
+        except Exception as e:
+            print(f"Database Update Error: {str(e)}")
+            print(f"SQL: {sql}")
+            print(f"Params: {params}")
+            conn.rollback()
+            raise e
 
     @classmethod
     def execute_insert(cls, sql, params=None):
         """执行插入，返回ID"""
-        conn = cls.get_connection()
-        with conn.cursor() as cursor:
-            cursor.execute(sql, params or ())
-            conn.commit()
-            return cursor.lastrowid
+        try:
+            conn = cls.get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute(sql, params or ())
+                conn.commit()
+                return cursor.lastrowid
+        except Exception as e:
+            print(f"Database Insert Error: {str(e)}")
+            print(f"SQL: {sql}")
+            print(f"Params: {params}")
+            conn.rollback()
+            raise e
 
     @classmethod
     def execute_many(cls, sql, params_list):

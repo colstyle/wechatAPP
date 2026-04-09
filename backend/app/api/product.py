@@ -2,7 +2,7 @@
 """
 商品相关API
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Header
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
@@ -337,10 +337,11 @@ async def get_new_products(
 
 
 @router.get("/products/{product_id}")
-async def get_product(product_id: int, token: Optional[str] = None):
+async def get_product(product_id: int, authorization: Optional[str] = Header(None)):
     """
     获取商品详情
     """
+    # TODO: 从 authorization 解析 token 并获取 user_id
     product = db.execute_one(
         "SELECT * FROM products WHERE id = %s AND status = 1",
         (product_id,)
@@ -493,11 +494,11 @@ async def get_outfits(limit: int = Query(20, ge=1, le=100)):
 # ============ 收藏API ============
 
 @router.post("/favorites/{product_id}")
-async def add_favorite(product_id: int, token: str):
+async def add_favorite(product_id: int, authorization: Optional[str] = Header(None)):
     """
     添加收藏
     """
-    # TODO: 验证token，获取user_id
+    # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1  # 模拟
 
     # 检查商品是否存在

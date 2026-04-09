@@ -2,7 +2,7 @@
 """
 评价晒图相关API
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Header
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
@@ -27,12 +27,12 @@ class CreateReviewRequest(BaseModel):
 # ============ 评价API ============
 
 @router.post("/reviews")
-async def create_review(request: CreateReviewRequest, token: str):
+async def create_review(request: CreateReviewRequest, authorization: Optional[str] = Header(None)):
     """
     创建评价
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    # TODO: 从 authorization 解析 token 并获取 user_id
+    user_id = 1
 
     # 验证评分
     if request.rating < 1 or request.rating > 5:

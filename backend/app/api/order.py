@@ -2,7 +2,7 @@
 """
 订单相关API
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Header
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, date, timedelta
@@ -86,11 +86,11 @@ def generate_order_no() -> str:
 # ============ 订单API ============
 
 @router.post("/orders")
-async def create_order(request: CreateOrderRequest, token: str):
+async def create_order(request: CreateOrderRequest, authorization: Optional[str] = Header(None)):
     """
-    创建订单
+    创建订单 (租赁)
     """
-    # TODO: 验证token，获取user_id
+    # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1  # 模拟
 
     # 检查地址是否存在且属于该用户
@@ -206,11 +206,11 @@ async def create_order(request: CreateOrderRequest, token: str):
     }
 
 @router.post("/orders/{order_id}/pickup")
-async def pickup_order(order_id: int, request: PickupOrderRequest, token: str):
+async def pickup_order(order_id: int, request: PickupOrderRequest, authorization: Optional[str] = Header(None)):
     """
-    用户点击「我已取衣」：状态由「已预定」自动变为「租赁中」，开始24小时计时
+    用户点击「我已取衣」：状态由「已预订/已支付」变为「租赁中」
     """
-    # TODO: 验证token
+    # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1
 
     order = db.execute_one(
@@ -247,11 +247,11 @@ async def pickup_order(order_id: int, request: PickupOrderRequest, token: str):
 
 
 @router.post("/orders/{order_id}/return")
-async def return_order(order_id: int, request: ReturnOrderRequest, token: str):
+async def return_order(order_id: int, request: ReturnOrderRequest, authorization: Optional[str] = Header(None)):
     """
     用户点击「我已还衣」：状态由「租赁中」或「逾期」变为「已归还待审核」
     """
-    # TODO: 验证token
+    # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1
 
     order = db.execute_one(
@@ -286,15 +286,15 @@ async def return_order(order_id: int, request: ReturnOrderRequest, token: str):
 
 @router.get("/orders")
 async def get_orders(
-    token: str,
     status: Optional[int] = None,
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100)
+    page_size: int = Query(20, ge=1, le=100),
+    authorization: Optional[str] = Header(None)
 ):
     """
     获取订单列表
     """
-    # TODO: 验证token，获取user_id
+    # TODO: 从 authorization 解析 token 并获取 user_id
     user_id = 1  # 模拟
 
     # 构建查询条件

@@ -237,6 +237,13 @@ Page({
     })
   },
 
+  // 店主管理
+  onAdminTap() {
+    wx.navigateTo({
+      url: '/pages/admin/orders/orders'
+    })
+  },
+
   // 退出登录
   onLogout() {
     wx.showModal({

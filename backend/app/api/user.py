@@ -2,7 +2,7 @@
 """
 用户相关API
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -69,6 +69,7 @@ class UserResponse(BaseModel):
     real_name: Optional[str]
     height: Optional[int]
     weight: Optional[int]
+    role: str
     created_at: datetime
 
 
@@ -142,6 +143,7 @@ async def login(request: LoginRequest):
                 "real_name": user['real_name'],
                 "height": user['height'],
                 "weight": user['weight'],
+                "role": user.get('role', 'user'),
                 "created_at": user['created_at'].isoformat() if user['created_at'] else None
             }
         }
@@ -149,13 +151,12 @@ async def login(request: LoginRequest):
 
 
 @router.get("/profile")
-async def get_profile(token: str):
+async def get_profile(authorization: Optional[str] = Header(None)):
     """
     获取用户信息
     """
-    # TODO: 验证token，获取user_id
-    # 这里简化处理，从token解析user_id
-    user_id = 1  # 模拟
+    # TODO: 从 authorization 解析 token 并获取 user_id
+    user_id = 1
 
     user = db.execute_one("SELECT * FROM users WHERE id = %s", (user_id,))
     if not user:
@@ -179,18 +180,19 @@ async def get_profile(token: str):
             "bust": user['bust'],
             "waist": user['waist'],
             "hips": user['hips'],
+            "role": user.get('role', 'user'),
             "created_at": user['created_at'].isoformat() if user['created_at'] else None
         }
     }
 
 
 @router.post("/profile")
-async def update_profile(request: UpdateProfileRequest, token: str):
+async def update_profile(request: UpdateProfileRequest, authorization: Optional[str] = Header(None)):
     """
     更新用户信息
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    # TODO: 从 authorization 解析 token 并获取 user_id
+    user_id = 1
 
     # 构建更新语句
     update_fields = []

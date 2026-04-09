@@ -2,7 +2,7 @@
 """
 预约试穿相关API
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Header
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, date, timedelta
@@ -31,12 +31,12 @@ class UpdateAppointmentRequest(BaseModel):
 # ============ 预约API ============
 
 @router.post("/appointments")
-async def create_appointment(request: CreateAppointmentRequest, token: str):
+async def create_appointment(request: CreateAppointmentRequest, authorization: Optional[str] = Header(None)):
     """
     创建预约
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    # TODO: 从 authorization 解析 token 并获取 user_id
+    user_id = 1
 
     # 检查商品是否存在
     product = db.execute_one(
@@ -91,16 +91,16 @@ async def create_appointment(request: CreateAppointmentRequest, token: str):
 
 @router.get("/appointments")
 async def get_appointments(
-    token: str,
     status: Optional[int] = None,
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100)
+    page_size: int = Query(20, ge=1, le=100),
+    authorization: Optional[str] = Header(None)
 ):
     """
     获取预约列表
     """
-    # TODO: 验证token，获取user_id
-    user_id = 1  # 模拟
+    # TODO: 从 authorization 解析 token 并获取 user_id
+    user_id = 1
 
     # 构建查询条件
     conditions = ["a.user_id = %s"]
