@@ -194,18 +194,17 @@ async def get_products(
         conditions.append("p.is_hot = %s")
         params.append(is_hot)
 
-    # 如果指定日期，筛选未预订的商品
+    # 如果指定日期，筛选未预订的商品 (reservations 记录必须排除)
+    # 如果指定日期，筛选该日期未预订的商品
     if available_date:
-        conditions.append("r.id IS NULL")
-        join_clause = "LEFT JOIN reservations r ON p.id = r.product_id AND r.reserved_date = %s"
+        # 子查询排除在指定日期已被预订的商品
+        conditions.append("p.id NOT IN (SELECT product_id FROM reservations WHERE reserved_date = %s)")
         params.append(available_date)
-    else:
-        join_clause = ""
-
+    
     where_clause = " AND ".join(conditions)
 
     # 查询总数
-    count_sql = f"SELECT COUNT(*) as total FROM products p {join_clause} WHERE {where_clause}"
+    count_sql = f"SELECT COUNT(*) as total FROM products p WHERE {where_clause}"
     total_result = db.execute_one(count_sql, tuple(params))
     total = total_result['total'] if total_result else 0
 
@@ -213,7 +212,6 @@ async def get_products(
     offset = (page - 1) * page_size
     list_sql = f"""
         SELECT p.* FROM products p
-        {join_clause}
         WHERE {where_clause}
         ORDER BY p.is_hot DESC, p.id DESC
         LIMIT %s OFFSET %s
@@ -251,16 +249,29 @@ async def get_products(
 
 
 @router.get("/products/hot")
-async def get_hot_products(limit: int = Query(10, ge=1, le=50)):
+async def get_hot_products(
+    limit: int = Query(10, ge=1, le=50),
+    available_date: Optional[str] = None
+):
     """
     获取热门商品
     """
+    conditions = ["status = 1", "is_hot = 1"]
+    params = []
+
+    if available_date:
+        conditions.append("id NOT IN (SELECT product_id FROM reservations WHERE reserved_date = %s)")
+        params.append(available_date)
+
+    where_clause = " AND ".join(conditions)
+    params.append(limit)
+
     products = db.execute_query(
-        """SELECT * FROM products
-           WHERE status = 1 AND is_hot = 1
+        f"""SELECT * FROM products
+           WHERE {where_clause}
            ORDER BY rent_count DESC, view_count DESC
            LIMIT %s""",
-        (limit,)
+        tuple(params)
     )
 
     return {
@@ -282,16 +293,29 @@ async def get_hot_products(limit: int = Query(10, ge=1, le=50)):
 
 
 @router.get("/products/new")
-async def get_new_products(limit: int = Query(10, ge=1, le=50)):
+async def get_new_products(
+    limit: int = Query(10, ge=1, le=50),
+    available_date: Optional[str] = None
+):
     """
     获取新品商品
     """
+    conditions = ["status = 1", "is_new = 1"]
+    params = []
+
+    if available_date:
+        conditions.append("id NOT IN (SELECT product_id FROM reservations WHERE reserved_date = %s)")
+        params.append(available_date)
+
+    where_clause = " AND ".join(conditions)
+    params.append(limit)
+
     products = db.execute_query(
-        """SELECT * FROM products
-           WHERE status = 1 AND is_new = 1
+        f"""SELECT * FROM products
+           WHERE {where_clause}
            ORDER BY created_at DESC
            LIMIT %s""",
-        (limit,)
+        tuple(params)
     )
 
     return {

@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # 导入路由
-from app.api import user, product, order, subscription, appointment, review
+from app.api import user, product, order, subscription, appointment, review, ai, admin
 
 
 # 注册路由
@@ -33,6 +33,8 @@ app.include_router(order.router, prefix="/api/order", tags=["订单"])
 app.include_router(subscription.router, prefix="/api/subscription", tags=["订阅"])
 app.include_router(appointment.router, prefix="/api/appointment", tags=["预约"])
 app.include_router(review.router, prefix="/api/review", tags=["评价"])
+app.include_router(ai.router, prefix="/api/ai", tags=["AI智能客服"])
+app.include_router(admin.router, prefix="/api/admin", tags=["店主后台"])
 
 
 @app.get("/")

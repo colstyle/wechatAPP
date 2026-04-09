@@ -5,6 +5,67 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* 日期选择器样式 */
+.date-picker-section {
+  padding: 20rpx 30rpx;
+  background-color: #fff;
+  margin-bottom: 20rpx;
+}
+
+.date-picker-trigger {
+  display: flex;
+  align-items: center;
+  background-color: #fff5f5;
+  padding: 20rpx 30rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #ffebeb;
+}
+
+.date-picker-icon {
+  font-size: 32rpx;
+  margin-right: 20rpx;
+}
+
+.date-picker-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.date-picker-arrow {
+  font-size: 24rpx;
+  color: #ff6b6b;
+}
+
+/* AI 客服悬浮按钮 */
+.ai-fab {
+  position: fixed;
+  right: 30rpx;
+  bottom: 120rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(255, 107, 107, 0.4);
+  z-index: 99;
+}
+
+.ai-fab-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.ai-fab-text {
+  font-size: 20rpx;
+  color: #fff;
+  margin-top: 4rpx;
+}
+
 /* 搜索栏 */
 .search-bar {
   padding: 30rpx 30rpx 20rpx;

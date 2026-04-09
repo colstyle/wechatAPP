@@ -18,6 +18,10 @@
       <text class="label">开始日期：</text>
       <text class="value">{{order.start_date}}</text>
     </view>
+    <view class="info-row" wx:if="{{order.status === 2 && countdown}}">
+      <text class="label">剩余租赁时长：</text>
+      <text class="value countdown">{{countdown}}</text>
+    </view>
     <view class="info-row" wx:if="{{order.expected_return_time}}">
       <text class="label">预期归还：</text>
       <text class="value">{{order.expected_return_time}}</text>

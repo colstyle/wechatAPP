@@ -6,7 +6,9 @@ Page({
   data: {
     orderId: null,
     order: null,
-    loading: false
+    loading: false,
+    countdown: '',
+    timer: null
   },
 
   onLoad(options) {
@@ -14,6 +16,47 @@ Page({
       this.setData({ orderId: parseInt(options.id) })
       this.loadOrder()
     }
+  },
+
+  onUnload() {
+    this.clearTimer()
+  },
+
+  clearTimer() {
+    if (this.data.timer) {
+      clearInterval(this.data.timer)
+      this.setData({ timer: null })
+    }
+  },
+
+  startCountdown() {
+    this.clearTimer()
+    if (!this.data.order || this.data.order.status !== 2 || !this.data.order.expected_return_time) return
+
+    const expectedTime = new Date(this.data.order.expected_return_time).getTime()
+    
+    const updateCountdown = () => {
+      const now = new Date().getTime()
+      const diff = expectedTime - now
+      
+      if (diff <= 0) {
+        this.setData({ countdown: '已到期' })
+        this.clearTimer()
+        return
+      }
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60))
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+      
+      this.setData({
+        countdown: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+      })
+    }
+
+    updateCountdown()
+    const timer = setInterval(updateCountdown, 1000)
+    this.setData({ timer })
   },
 
   loadOrder() {
@@ -24,6 +67,9 @@ Page({
         order.statusText = util.orderStatusMap[order.status] || '未知'
         order.rentalTypeText = util.rentalTypeMap[order.rental_type] || '未知'
         this.setData({ order, loading: false })
+        if (order.status === 2) {
+          this.startCountdown()
+        }
       })
       .catch(err => {
         this.setData({ loading: false })

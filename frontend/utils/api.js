@@ -68,13 +68,13 @@ const productApi = {
   },
 
   // 获取热门商品
-  getHotProducts: (limit = 10) => {
-    return app.request(`/api/product/products/hot?limit=${limit}`, 'GET')
+  getHotProducts: (limit = 10, params = {}) => {
+    return app.request(`/api/product/products/hot?limit=${limit}`, 'GET', params)
   },
 
   // 获取新品商品
-  getNewProducts: (limit = 10) => {
-    return app.request(`/api/product/products/new?limit=${limit}`, 'GET')
+  getNewProducts: (limit = 10, params = {}) => {
+    return app.request(`/api/product/products/new?limit=${limit}`, 'GET', params)
   },
 
   // 获取商品详情

@@ -1,6 +1,8 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/package/package",
+    "pages/chat/chat",
     "pages/category/category",
     "pages/product/product",
     "pages/detail/detail",

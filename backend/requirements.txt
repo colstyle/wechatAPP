@@ -21,5 +21,9 @@ python-multipart
 # 数据库迁移
 alembic
 
+# AI
+google-generativeai
+openai
+
 # 调试
 python-json-logger

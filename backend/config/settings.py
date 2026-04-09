@@ -42,6 +42,16 @@ class Settings(BaseSettings):
     # CORS配置
     CORS_ORIGINS: list = ["*"]
 
+    # Google Gemini API 配置
+    GEMINI_API_KEY: str = "your-gemini-api-key"
+
+    # DeepSeek API 配置
+    DEEPSEEK_API_KEY: str = "your-deepseek-api-key"
+    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com"
+    
+    # 默认 AI 模型类型: "gemini" 或 "deepseek"
+    AI_SERVICE_TYPE: str = "deepseek"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

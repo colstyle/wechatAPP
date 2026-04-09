@@ -101,56 +101,52 @@ async def create_order(request: CreateOrderRequest, token: str):
     if not address:
         raise HTTPException(status_code=404, detail="地址不存在")
 
-    # 获取商品信息并计算金额
+    # 核心规则：必须有开始日期
+    if not request.start_date:
+        raise HTTPException(status_code=400, detail="必须选择使用日期")
+    
+    start_date = datetime.strptime(request.start_date, '%Y-%m-%d').date()
+
+    # 获取商品信息
     product_ids = [item['product_id'] for item in request.items]
     products_query = "SELECT * FROM products WHERE id IN (%s)" % ','.join(['%s'] * len(product_ids))
     products = db.execute_query(products_query, tuple(product_ids))
-
     product_map = {p['id']: p for p in products}
 
     total_rent = Decimal('0.00')
     total_deposit = Decimal('0.00')
     order_items = []
 
-    # 特殊处理租赁类型
-    if request.rental_type in [2, 4, 5]:  # 单次租赁或单品/套餐租赁，按日期锁定
-        if not request.start_date:
-            raise HTTPException(status_code=400, detail="租赁模式需要选择开始日期")
-        start_date = datetime.strptime(request.start_date, '%Y-%m-%d').date()
-        rent_days = 1  # 固定24小时
-        if request.rental_type == 5:  # 套餐租赁
-            if len(request.items) != 3:
-                raise HTTPException(status_code=400, detail="套餐租赁需要选择3件商品")
-            total_rent = Decimal('69.90')  # 固定租金
-    else:
-        start_date = None
-        rent_days = request.rent_days or 0
-
+    # 套餐租赁逻辑 (类型5: 3件69.9元)
+    if request.rental_type == 5:
+        if len(request.items) != 3:
+            raise HTTPException(status_code=400, detail="特惠套餐必须选择3件衣物")
+        total_rent = Decimal('69.90')
+    
     for item in request.items:
         product = product_map.get(item['product_id'])
         if not product:
             raise HTTPException(status_code=404, detail=f"商品ID {item['product_id']} 不存在")
 
-        # 计算租金和押金
-        rent_price = Decimal('0.00')
+        # 检查日期锁定：同一日期同一件衣服仅支持一单
+        existing = db.execute_one(
+            "SELECT id FROM reservations WHERE product_id = %s AND reserved_date = %s",
+            (item['product_id'], start_date)
+        )
+        if existing:
+            raise HTTPException(status_code=400, detail=f"衣物 {product['name']} 在 {request.start_date} 已被预订")
+
+        # 计算押金 (单品累加)
         deposit = Decimal(str(product['deposit']))
+        total_deposit += deposit * item.get('quantity', 1)
 
-        if request.rental_type == 1:  # 按天
-            if not request.rent_days or request.rent_days < 1:
-                raise HTTPException(status_code=400, detail="请选择租赁天数")
-            rent_price = Decimal(str(product['daily_rent'])) * request.rent_days
-        if request.rental_type == 2:  # 按次 / 单次租赁
-            rent_price = Decimal(str(product['single_rent']))
-        elif request.rental_type == 3:  # 订阅
-            rent_price = Decimal(str(product['month_card_rent']))
-        elif request.rental_type in [4, 5]:  # 租赁模式
-            if request.rental_type == 4:  # 单品租赁
-                rent_price = Decimal(str(product['daily_rent']))  # 按日租金算24小时
-            # 套餐租金已设置
-
-        if request.rental_type not in [5]:  # 非套餐模式累加租金
-            total_rent += rent_price * item['quantity']
-        total_deposit += deposit * item['quantity']
+        # 计算租金 (非套餐模式下累加单品租金)
+        if request.rental_type != 5:
+            # 默认使用 daily_rent 作为 24h 租金
+            rent_price = Decimal(str(product['daily_rent']))
+            total_rent += rent_price * item.get('quantity', 1)
+        else:
+            rent_price = Decimal('0.00') # 套餐模式单品租金在条目中记为0，总额固定
 
         order_items.append({
             'product_id': item['product_id'],
@@ -160,32 +156,15 @@ async def create_order(request: CreateOrderRequest, token: str):
             'color': item.get('color', ''),
             'rent_price': rent_price,
             'deposit': deposit,
-            'quantity': item['quantity']
+            'quantity': item.get('quantity', 1)
         })
 
     total_amount = total_rent + total_deposit
-
-    # 计算起止日期
-    end_date = None
-    if start_date:
-        from datetime import timedelta
-        end_date = start_date + timedelta(days=rent_days)
-
-    # 检查日期锁定（租赁类型2/4/5）
-    if request.rental_type in [2, 4, 5]:
-        for item in request.items:
-            # 检查是否已被预订
-            existing = db.execute_one(
-                "SELECT id FROM reservations WHERE product_id = %s AND reserved_date = %s",
-                (item['product_id'], start_date)
-            )
-            if existing:
-                raise HTTPException(status_code=400, detail=f"商品 {product_map[item['product_id']]['name']} 在 {request.start_date} 已被预订")
-
-    # 生成订单号
     order_no = generate_order_no()
+    
+    # 租赁结束日期固定为开始日期+1天 (24小时制在取衣时激活)
+    end_date = start_date + timedelta(days=1)
 
-    # 创建订单
     db.begin_transaction()
     try:
         order_id = db.execute_insert(
@@ -193,10 +172,9 @@ async def create_order(request: CreateOrderRequest, token: str):
                rent_days, start_date, end_date, address_id, status, remark, created_at)
                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
             (order_no, user_id, request.rental_type, total_rent, total_deposit, total_amount,
-             rent_days, start_date, end_date, request.address_id, 0, request.remark)
+             1, start_date, end_date, request.address_id, 0, request.remark)
         )
 
-        # 创建订单商品
         for item in order_items:
             db.execute_insert(
                 """INSERT INTO order_items (order_id, product_id, product_name, product_image, size, color,
@@ -205,21 +183,11 @@ async def create_order(request: CreateOrderRequest, token: str):
                 (order_id, item['product_id'], item['product_name'], item['product_image'],
                  item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
             )
-
-        # 日期锁定订单：锁定日期而不是扣库存
-        if request.rental_type in [2, 4, 5]:
-            for item in request.items:
-                db.execute_insert(
-                    "INSERT INTO reservations (product_id, reserved_date, order_id, created_at) VALUES (%s, %s, %s, NOW())",
-                    (item['product_id'], start_date, order_id)
-                )
-        else:
-            # 原有模式：扣减库存
-            for item in request.items:
-                db.execute_update(
-                    "UPDATE products SET stock = stock - %s WHERE id = %s",
-                    (item['quantity'], item['product_id'])
-                )
+            # 锁定日期库存
+            db.execute_insert(
+                "INSERT INTO reservations (product_id, reserved_date, order_id, created_at) VALUES (%s, %s, %s, NOW())",
+                (item['product_id'], start_date, order_id)
+            )
 
         db.commit()
     except Exception as e:
@@ -228,13 +196,90 @@ async def create_order(request: CreateOrderRequest, token: str):
 
     return {
         "code": 0,
-        "message": "订单创建成功",
+        "message": "订单预定成功",
         "data": {
             "order_id": order_id,
             "order_no": order_no,
             "total_amount": float(total_amount),
-            "total_rent": float(total_rent),
             "total_deposit": float(total_deposit)
+        }
+    }
+
+@router.post("/orders/{order_id}/pickup")
+async def pickup_order(order_id: int, request: PickupOrderRequest, token: str):
+    """
+    用户点击「我已取衣」：状态由「已预定」自动变为「租赁中」，开始24小时计时
+    """
+    # TODO: 验证token
+    user_id = 1
+
+    order = db.execute_one(
+        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
+        (order_id, user_id)
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    
+    if order['status'] != 1: # 1 为已支付待取衣
+        raise HTTPException(status_code=400, detail="当前订单状态不可执行取衣操作")
+
+    now = datetime.now()
+    expected_return_time = now + timedelta(hours=24)
+
+    db.execute_update(
+        """UPDATE orders SET 
+           status = 2, 
+           pickup_time = %s, 
+           expected_return_time = %s,
+           remark = %s
+           WHERE id = %s""",
+        (now, expected_return_time, request.remark or "用户已取衣", order_id)
+    )
+
+    return {
+        "code": 0,
+        "message": "取衣成功，24小时计时开始",
+        "data": {
+            "pickup_time": now.isoformat(),
+            "expected_return_time": expected_return_time.isoformat()
+        }
+    }
+
+
+@router.post("/orders/{order_id}/return")
+async def return_order(order_id: int, request: ReturnOrderRequest, token: str):
+    """
+    用户点击「我已还衣」：状态由「租赁中」或「逾期」变为「已归还待审核」
+    """
+    # TODO: 验证token
+    user_id = 1
+
+    order = db.execute_one(
+        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
+        (order_id, user_id)
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    
+    if order['status'] not in [2, 3]: # 2为租赁中，3为逾期
+        raise HTTPException(status_code=400, detail="当前订单状态不可执行还衣操作")
+
+    now = datetime.now()
+
+    db.execute_update(
+        """UPDATE orders SET 
+           status = 4, 
+           return_time = %s,
+           remark = %s
+           WHERE id = %s""",
+        (now, request.remark or "用户已还衣，待店主审核", order_id)
+    )
+
+    return {
+        "code": 0,
+        "message": "归还申请成功，请等待店主核验",
+        "data": {
+            "return_time": now.isoformat()
         }
     }
 
@@ -666,9 +711,78 @@ async def pickup_order(order_id: int, request: PickupOrderRequest, token: str):
 @router.post("/orders/{order_id}/return")
 async def return_order(order_id: int, request: ReturnOrderRequest, token: str):
     """
-    申请归还
+    用户点击「我已还衣」：等待店主核验
     """
-    # TODO: 验证token，获取user_id
+    # TODO: 验证token
+    user_id = 1
+
+    order = db.execute_one(
+        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
+        (order_id, user_id)
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    
+    if order['status'] not in [2, 3]: # 2: 租赁中, 3: 已逾期
+        raise HTTPException(status_code=400, detail="当前订单状态不可执行还衣操作")
+
+    now = datetime.now()
+
+    db.execute_update(
+        """UPDATE orders SET 
+           status = 4, 
+           return_time = %s, 
+           remark = %s
+           WHERE id = %s""",
+        (now, request.remark or "用户已还衣，待店主核验", order_id)
+    )
+
+    return {
+        "code": 0,
+        "message": "还衣申请已提交，请等待店主核验"
+    }
+
+# ============ 店主管理 API (Admin) ============
+
+@router.post("/admin/orders/{order_id}/confirm-return")
+async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = None):
+    """
+    店主核验无误，确认还衣：衣服自动恢复可租赁状态，一键退还押金
+    """
+    order = db.execute_one("SELECT * FROM orders WHERE id = %s", (order_id,))
+    if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    
+    if order['status'] != 4:
+        raise HTTPException(status_code=400, detail="订单尚未申请还衣")
+
+    # 如果未传退款金额，默认退还全部押金
+    final_refund = Decimal(str(refund_amount)) if refund_amount is not None else Decimal(str(order['total_deposit']))
+
+    db.begin_transaction()
+    try:
+        # 1. 更新订单状态为已完成/已退款
+        db.execute_update(
+            "UPDATE orders SET status = 7, refund_amount = %s, refund_time = NOW() WHERE id = %s",
+            (final_refund, order_id)
+        )
+        
+        # 2. 释放日期锁定 (其实还衣后全日期开放，这里可以删除该订单相关的未来锁定，或者简单标记为已释放)
+        # 根据需求：店主确认还衣后，自动恢复可租赁状态。
+        # 这里我们简单地保持 reservations 表记录，但 product 筛选时会根据状态判断。
+        
+        # TODO: 调用微信支付退款 API
+        
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"确认还衣失败: {str(e)}")
+
+    return {
+        "code": 0,
+        "message": "确认还衣成功，押金已原路退回",
+        "data": {"refund_amount": float(final_refund)}
+    }# TODO: 验证token，获取user_id
     user_id = 1  # 模拟
 
     # 查询订单

@@ -42,29 +42,33 @@ const formatCount = count => {
 // 订单状态文本
 const orderStatusMap = {
   0: '待支付',
-  1: '待发货',
+  1: '待取衣',
   2: '租赁中',
-  3: '待归还',
-  4: '已归还',
+  3: '已逾期',
+  4: '待审核',
   5: '已取消',
-  6: '已完成'
+  6: '退款中',
+  7: '已完成'
 }
 
 const orderStatusClassMap = {
   0: 'text-warning',
   1: 'text-primary',
   2: 'text-success',
-  3: 'text-warning',
+  3: 'text-danger',
   4: 'text-info',
   5: 'text-muted',
-  6: 'text-success'
+  6: 'text-warning',
+  7: 'text-success'
 }
 
 // 租赁类型文本
 const rentalTypeMap = {
   1: '按天租赁',
   2: '单次租赁',
-  3: '订阅租赁'
+  3: '订阅租赁',
+  4: '单品租赁',
+  5: '3件69.9套餐'
 }
 
 // 预约状态文本

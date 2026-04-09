@@ -1,5 +1,16 @@
 <!--pages/index/index.wxml-->
 <view class="page">
+  <!-- 日期选择器 (核心需求：优先选择日期) -->
+  <view class="date-picker-section">
+    <picker mode="date" value="{{selectedDate}}" start="{{startDate}}" end="{{endDate}}" bindchange="onDateChange">
+      <view class="date-picker-trigger">
+        <text class="date-picker-icon">📅</text>
+        <text class="date-picker-text">{{selectedDate ? '当前预约日期：' + selectedDate : '请先选择租赁日期'}}</text>
+        <text class="date-picker-arrow">修改 ></text>
+      </view>
+    </picker>
+  </view>
+
   <!-- 搜索栏 -->
   <view class="search-bar" bindtap="onSearch">
     <view class="search-input">
@@ -133,4 +144,10 @@
   <view class="no-more" wx:if="{{!hasMore && newProducts.length > 0}}">
     <text>已经到底了</text>
   </view>
+
+  <!-- AI 客服悬浮按钮 -->
+  <navigator url="/pages/chat/chat" class="ai-fab">
+    <text class="ai-fab-icon">🤖</text>
+    <text class="ai-fab-text">客服</text>
+  </navigator>
 </view>

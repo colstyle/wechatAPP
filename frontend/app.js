@@ -7,7 +7,8 @@ App({
   globalData: {
     token: null,
     userInfo: null,
-    activeSubscription: null
+    activeSubscription: null,
+    selectedDate: null, // 用户选择的租赁日期 (YYYY-MM-DD)
   },
 
   onLaunch() {
