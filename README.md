@@ -4,7 +4,7 @@
 
 **24小时自助租衣小程序。日期锁定、套餐优惠、AI智能客服。**
 
-![Project Status](https://img.shields.io/badge/状态-Phase%204%20RoleMock-yellow?style=flat-square)
+![Project Status](https://img.shields.io/badge/状态-Phase%205%20Refactor-green?style=flat-square)
 ![Platform](https://img.shields.io/badge/平台-WeChat%20Mini%20Program%20%7C%20FastAPI-blue?style=flat-square)
 ![Tech Stack](https://img.shields.io/badge/技术栈-FastAPI%20%2B%20MySQL%20%2B%20DeepSeek-blueviolet?style=flat-square)
 
@@ -153,7 +153,7 @@ git pull origin main
 | Phase 2 | [店主管理与支付框架](./README/20260409_Phase2_Admin_Payment.md)      | 店主订单管理、微信支付V3框架                  | ✅ 完成 |
 | Phase 3 | [MVP 精简与闭环](./README/20260409_Phase3_MVP_Simplification.md) | 日期选衣、下单、支付（模拟）、取衣/还衣、店主退押/扣费     | ✅ 完成 |
 | Phase 4 | [身份与权限调试](./README/20260409_Phase4_Identity_Role_Mock.md)   | Mock 固定身份、role(1/2) 权限分流、店主端套餐管理 | ✅ 完成 |
-| Phase 5 | **高奢审美与架构重构** | 莫兰迪 UI、沉浸导航、原子组件库、可视化倒计时 | 🚀 启动 |
+| Phase 5 | [[高奢审美与架构重构]](./README/20260410_Phase5_Aesthetic_Refactor.md) | 莫兰迪 UI、沉浸导航、原子组件库、可视化倒计时 | ✅ 完成 |
 
 ***
 
