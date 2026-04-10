@@ -50,10 +50,10 @@
     <button class="btn btn-outline" wx:if="{{order.status === 1}}" bindtap="onUpdateItems">手动修改衣物(换款)</button>
     
     <!-- 待审核状态可一键退押金 -->
-    <button class="btn btn-primary" wx:if="{{order.status === 4}}" bindtap="onRefund">一键原路退押金</button>
+    <button class="btn btn-primary btn-lg" wx:if="{{order.status === 4}}" bindtap="onRefund">一键原路退押金</button>
     
     <!-- 租赁中、逾期、已归还均可执行扣费 -->
-    <button class="btn btn-danger" wx:if="{{order.status >= 2 && order.status <= 4}}" bindtap="onDeduct">手动扣除押金</button>
+    <button class="btn btn-danger btn-lg" wx:if="{{order.status >= 2 && order.status <= 4}}" bindtap="onDeduct">手动扣除押金</button>
   </view>
 
   <!-- 退款/扣款弹窗 -->

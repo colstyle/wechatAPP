@@ -1,96 +1,353 @@
 /* pages/order/order.wxss */
-.page {
-  background: #f8f9fa;
+
+.page-root {
   min-height: 100vh;
+  background: #FDFCF9;
+  padding-bottom: 40rpx;
 }
 
-/* 统计区域 */
-.stats-section {
-  background: #fff;
-  margin-bottom: 16rpx;
-  padding: 24rpx;
+.content {
+  padding: 24rpx 24rpx 0;
 }
 
-.section-title {
-  font-size: 32rpx;
-  font-weight: 500;
+/* === 状态卡 === */
+.status-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx 24rpx;
   margin-bottom: 24rpx;
-  color: #212529;
+  box-shadow: 0 4rpx 20rpx rgba(28,28,28,0.04);
 }
-
-.stats-grid {
+.status-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin-bottom: 24rpx;
+  letter-spacing: 0.5px;
+}
+.status-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24rpx;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
 }
-
-.stat-item {
+.status-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32rpx 0;
-  background: #f8f9fa;
-  border-radius: 8rpx;
+  gap: 10rpx;
   position: relative;
 }
-
-.stat-icon {
-  font-size: 48rpx;
-  margin-bottom: 16rpx;
-}
-
-.stat-label {
-  font-size: 28rpx;
-  color: #495057;
-}
-
-.stat-badge {
-  position: absolute;
-  top: 16rpx;
-  right: 16rpx;
-  background: #ff6348;
-  color: #fff;
-  font-size: 20rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 12rpx;
-  min-width: 32rpx;
-  text-align: center;
-}
-
-/* 功能入口 */
-.function-section {
-  background: #fff;
-  padding: 0 24rpx;
-}
-
-.function-item {
+.si-icon-wrap {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 20rpx;
   display: flex;
   align-items: center;
-  padding: 32rpx 0;
-  border-bottom: 1rpx solid #dee2e6;
+  justify-content: center;
+}
+.si-blue    { background: rgba(122,143,166,0.12); }
+.si-gold    { background: rgba(197,160,89,0.12); }
+.si-sage    { background: rgba(142,151,117,0.12); }
+.si-neutral { background: rgba(28,28,28,0.05); }
+
+.si-label {
+  font-size: 22rpx;
+  color: #8E877F;
 }
 
-.function-item:last-child {
-  border-bottom: none;
+/* 数字角标 */
+.si-badge {
+  position: absolute;
+  top: -6rpx;
+  right: 8rpx;
+  background: #B05B5B;
+  border-radius: 999rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6rpx;
+  box-sizing: border-box;
+}
+.si-count { font-size: 18rpx; color: #FFF; font-weight: 600; }
+
+/* -------- 纯 CSS 图标 -------- */
+
+/* 衣架 */
+.icon-hanger {
+  position: relative;
+  width: 44rpx;
+  height: 40rpx;
+}
+.hanger-hook {
+  width: 10rpx;
+  height: 10rpx;
+  border: 2.5rpx solid #7A8FA6;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.hanger-bar {
+  width: 44rpx;
+  height: 2.5rpx;
+  background: #7A8FA6;
+  position: absolute;
+  top: 19rpx;
+  border-radius: 2rpx;
+}
+.hanger-left {
+  width: 2.5rpx;
+  height: 18rpx;
+  background: #7A8FA6;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform-origin: top center;
+  transform: rotate(15deg);
+  border-radius: 2rpx;
+}
+.hanger-right {
+  width: 2.5rpx;
+  height: 18rpx;
+  background: #7A8FA6;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform-origin: top center;
+  transform: rotate(-15deg);
+  border-radius: 2rpx;
 }
 
-.function-icon {
-  font-size: 40rpx;
-  margin-right: 24rpx;
+/* 时钟 */
+.icon-clock {
+  width: 38rpx;
+  height: 38rpx;
+  position: relative;
+}
+.clock-face {
+  width: 38rpx;
+  height: 38rpx;
+  border: 2.5rpx solid #C5A059;
+  border-radius: 50%;
+}
+.clock-hand-h {
+  width: 2rpx;
+  height: 12rpx;
+  background: #C5A059;
+  position: absolute;
+  top: 7rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 2rpx;
+}
+.clock-hand-m {
+  width: 2rpx;
+  height: 14rpx;
+  background: #C5A059;
+  position: absolute;
+  top: 19rpx;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+  transform-origin: bottom center;
+  border-radius: 2rpx;
 }
 
-.function-text {
-  flex: 1;
+/* 返回箭头 */
+.icon-return {
+  width: 36rpx;
+  height: 28rpx;
+  position: relative;
+}
+.return-line {
+  width: 28rpx;
+  height: 2.5rpx;
+  background: #8E9775;
+  position: absolute;
+  top: 12rpx;
+  left: 4rpx;
+  border-radius: 2rpx;
+}
+.return-arrow {
+  width: 14rpx;
+  height: 14rpx;
+  border-left: 2.5rpx solid #8E9775;
+  border-top: 2.5rpx solid #8E9775;
+  position: absolute;
+  top: 6rpx;
+  left: 4rpx;
+  transform: rotate(-45deg);
+}
+
+/* 列表图标 */
+.icon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  width: 32rpx;
+}
+.list-line {
+  height: 2.5rpx;
+  background: #B0A99A;
+  border-radius: 2rpx;
+}
+.list-line.short { width: 60%; }
+
+/* === 快捷入口 === */
+.quick-section {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx 8rpx;
+  box-shadow: 0 4rpx 20rpx rgba(28,28,28,0.04);
+}
+.quick-title {
   font-size: 28rpx;
-  color: #495057;
+  font-weight: 600;
+  color: #1C1C1C;
+  margin-bottom: 8rpx;
+  letter-spacing: 0.5px;
+}
+.quick-list { display: flex; flex-direction: column; }
+.quick-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid rgba(28,28,28,0.05);
+}
+.quick-item.last { border-bottom: none; }
+.qi-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+.qi-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.qi-gold    { background: rgba(197,160,89,0.12); }
+.qi-blue    { background: rgba(122,143,166,0.12); }
+.qi-sage    { background: rgba(142,151,117,0.12); }
+
+.qi-text {
+  font-size: 28rpx;
+  color: #1C1C1C;
+  font-weight: 400;
+}
+/* 右箭头 */
+.qi-arrow {
+  width: 14rpx;
+  height: 14rpx;
+  border-right: 2rpx solid #C0BBB4;
+  border-bottom: 2rpx solid #C0BBB4;
+  transform: rotate(-45deg);
 }
 
-.function-item .icon-arrow-right {
-  color: #adb5bd;
-  font-size: 24rpx;
+/* -------- 快捷入口 CSS 图标 -------- */
+
+/* 衬衫形状 */
+.icon-shirt {
+  position: relative;
+  width: 36rpx;
+  height: 34rpx;
+}
+.shirt-body {
+  width: 24rpx;
+  height: 26rpx;
+  border: 2.5rpx solid #C5A059;
+  border-radius: 0 0 4rpx 4rpx;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.shirt-sleeve-l {
+  width: 2.5rpx;
+  height: 16rpx;
+  background: #C5A059;
+  position: absolute;
+  top: 2rpx;
+  left: 0;
+  transform: rotate(-20deg);
+  transform-origin: top center;
+  border-radius: 2rpx;
+}
+.shirt-sleeve-r {
+  width: 2.5rpx;
+  height: 16rpx;
+  background: #C5A059;
+  position: absolute;
+  top: 2rpx;
+  right: 0;
+  transform: rotate(20deg);
+  transform-origin: top center;
+  border-radius: 2rpx;
 }
 
-/* 底部占位 */
-.bottom-placeholder {
-  height: 120rpx;
+/* 日历 */
+.icon-cal {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  flex-direction: column;
+  border: 2.5rpx solid #7A8FA6;
+  border-radius: 6rpx;
+  overflow: hidden;
 }
+.cal-top-bar {
+  height: 10rpx;
+  background: #7A8FA6;
+}
+.cal-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  justify-items: center;
+  padding: 2rpx;
+}
+.cal-dot {
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background: rgba(122,143,166,0.4);
+}
+.cal-dot.act {
+  background: #7A8FA6;
+}
+
+/* 皇冠 */
+.icon-crown {
+  position: relative;
+  width: 38rpx;
+  height: 28rpx;
+}
+.crown-body {
+  position: absolute;
+  bottom: 0;
+  left: 2rpx;
+  right: 2rpx;
+  height: 14rpx;
+  border: 2.5rpx solid #8E9775;
+  border-radius: 0 0 4rpx 4rpx;
+  border-top: none;
+}
+.crown-spike-l,
+.crown-spike-m,
+.crown-spike-r {
+  position: absolute;
+  bottom: 14rpx;
+  width: 2.5rpx;
+  background: #8E9775;
+  border-radius: 2rpx;
+}
+.crown-spike-l { height: 16rpx; left: 2rpx; }
+.crown-spike-m { height: 22rpx; left: 50%; transform: translateX(-50%); }
+.crown-spike-r { height: 16rpx; right: 2rpx; }

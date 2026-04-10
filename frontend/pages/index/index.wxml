@@ -1,61 +1,109 @@
-<!--pages/index/index.wxml-->
-<view class="page">
-  <!-- 日期选择器 (核心需求：优先选择日期) -->
-  <view class="date-picker-section">
+<!-- pages/index/index.wxml -->
+<view class="page-root">
+
+  <!-- 沉浸式导航栏 -->
+  <cp-nav-bar title="小时光租衣舍" show-back="{{false}}" bg="white"></cp-nav-bar>
+
+  <!-- 日期选择区 -->
+  <view class="date-section">
     <picker mode="date" value="{{selectedDate}}" start="{{startDate}}" end="{{endDate}}" bindchange="onDateChange">
-      <view class="date-picker-trigger">
-        <text class="date-picker-icon">📅</text>
-        <text class="date-picker-text">{{selectedDate ? '当前预约日期：' + selectedDate : '请先选择租赁日期'}}</text>
-        <text class="date-picker-arrow">修改 ></text>
+      <view class="date-trigger">
+        <view class="date-icon-wrap">
+          <!-- 纯 CSS 日历图标 -->
+          <view class="icon-calendar">
+            <view class="cal-top"></view>
+            <view class="cal-body">
+              <view class="cal-dot"></view>
+              <view class="cal-dot"></view>
+              <view class="cal-dot"></view>
+            </view>
+          </view>
+        </view>
+        <view class="date-info">
+          <text class="date-label">租衣日期</text>
+          <text class="date-value">{{selectedDate || '·  请选择日期'}}</text>
+        </view>
+        <view class="date-arrow">
+          <view class="icon-chevron-right"></view>
+        </view>
       </view>
     </picker>
   </view>
 
   <!-- 分类导航 -->
-  <view class="category-nav">
-    <view class="category-item" wx:for="{{categories}}" wx:key="id" bindtap="onCategoryTap" data-id="{{item.id}}">
-      <view class="category-icon-wrap" style="background: {{item.gradient}}">
-        <text class="category-emoji">{{item.emoji}}</text>
-      </view>
-      <text class="category-name">{{item.name}}</text>
-    </view>
-  </view>
-
-  <!-- 可租衣物列表 -->
-  <view class="section">
-    <view class="section-header">
-      <text class="section-title">可租衣物</text>
-    </view>
-    <view class="product-grid">
-      <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="onProductTap" data-id="{{item.id}}">
-        <image class="product-cover" src="{{item.cover_image}}" mode="aspectFill"></image>
-        <view class="product-info">
-          <text class="product-name">{{item.name}}</text>
-          <view class="product-bottom">
-            <view class="product-price-row">
-              <text class="product-price">¥{{item.daily_rent}}</text>
-              <text class="product-unit">/天</text>
-            </view>
-            <text class="product-single">押金 ¥{{item.deposit}}</text>
-          </view>
+  <scroll-view class="category-scroll" scroll-x enable-flex>
+    <view class="category-list">
+      <view
+        class="cat-item"
+        wx:for="{{categories}}"
+        wx:key="id"
+        bindtap="onCategoryTap"
+        data-id="{{item.id}}"
+      >
+        <view class="cat-icon-bg" style="background: {{item.bgColor}};">
+          <image class="cat-icon-img" src="{{item.iconPath}}" mode="aspectFit" lazy-load></image>
         </view>
+        <text class="cat-name">{{item.name}}</text>
       </view>
     </view>
-    <view class="load-more" wx:if="{{hasMore}}">
-      <text wx:if="{{loading}}">加载中...</text>
-      <text wx:else bindtap="onLoadMore">加载更多</text>
+  </scroll-view>
+
+  <!-- 商品列表 -->
+  <view class="products-section">
+    <view class="section-head">
+      <text class="section-title">可租好物</text>
+      <text class="section-hint" wx:if="{{selectedDate}}">{{selectedDate}} 可租</text>
     </view>
-    <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">
-      <text>已经到底了</text>
+
+    <!-- 骨架屏 -->
+    <view class="product-grid" wx:if="{{loading && products.length === 0}}">
+      <view class="card-root shimmer-card" wx:for="{{[0,1,2,3]}}" wx:key="*this">
+        <view class="shimmer-img shimmer"></view>
+        <view class="shimmer-text shimmer" style="width:70%;height:24rpx;margin: 18rpx 16rpx 10rpx;border-radius:8rpx;"></view>
+        <view class="shimmer-text shimmer" style="width:40%;height:20rpx;margin: 0 16rpx 20rpx;border-radius:8rpx;"></view>
+      </view>
     </view>
-    <view class="empty" wx:if="{{!loading && products.length === 0}}">
-      <text>该日期暂无可租衣物</text>
+
+    <!-- 商品网格 -->
+    <view class="product-grid" wx:elif="{{products.length > 0}}">
+      <cp-product-card
+        wx:for="{{products}}"
+        wx:key="id"
+        product="{{item}}"
+        bindtap="onProductTap"
+        data-id="{{item.id}}"
+      ></cp-product-card>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-box" wx:elif="{{!loading}}">
+      <view class="empty-icon-wrap">
+        <view class="icon-dress"></view>
+      </view>
+      <text class="empty-text">该日期暂无可租衣物</text>
+      <text class="empty-hint">试试换个日期？</text>
+    </view>
+
+    <!-- 加载更多 -->
+    <view class="load-footer" wx:if="{{products.length > 0}}">
+      <view class="loading-dots" wx:if="{{loading}}">
+        <view class="dot"></view><view class="dot"></view><view class="dot"></view>
+      </view>
+      <text wx:elif="{{hasMore}}" class="load-more-btn" bindtap="onLoadMore">加载更多</text>
+      <text wx:else class="no-more">— 已经到底了 —</text>
     </view>
   </view>
 
-  <!-- AI 客服悬浮按钮 -->
+  <!-- AI 客服悬浮球 -->
   <navigator url="/pages/chat/chat" class="ai-fab">
-    <text class="ai-fab-icon">🤖</text>
-    <text class="ai-fab-text">客服</text>
+    <view class="fab-inner">
+      <!-- 纯 CSS 对话图标 -->
+      <view class="fab-chat-icon">
+        <view class="fab-chat-bubble"></view>
+        <view class="fab-chat-tail"></view>
+      </view>
+    </view>
+    <view class="fab-hint">穿搭</view>
   </navigator>
+
 </view>

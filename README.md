@@ -14,11 +14,11 @@
 
 ## ✨ 核心特性
 
-- 📅 **日期优先预约** — 强制用户先选日期再看衣服，确保库存实时锁定，杜绝超卖。
+- 📅 **沉浸式预约体验** — 仪式感全屏日历选择，确保库存实时锁定，杜绝超卖。
 - 🎁 **3件69.9套餐** — 灵活的套餐逻辑，固定租金+阶梯押金，自动计算最优组合。
-- ⏱️ **24h 精准租赁** — 以“取衣”动作激活计时器，前端实时倒计时，后端自动计算逾期。
-- 🤖 **AI 智能客服** — 集成 DeepSeek-V3/Gemini，预置业务知识库，提供 7x24h 咨询服务。
-- 💰 **极简退押逻辑** — 店主端一键原路退还押金，支持因逾期或损毁手动扣费。
+- ⏲️ **可视化 24h 租赁** — 以取衣激活，环形倒计时精细化展示，后端自动计算逾期。
+- 🤖 **AI 灵感客服** — 集成 DeepSeek-V3/Gemini，不仅解答业务，更提供穿搭灵感。
+- 💎 **高奢视觉设计** — 莫兰迪色系、沉浸式顶部、玻璃拟态 UI，打造“小时光”审美。
 
 ## ✅ 当前版本能力
 
@@ -152,9 +152,47 @@ git pull origin main
 | Phase 1 | [业务逻辑与AI基座](./README/20260409_Phase1_BusinessLogic_AI.md)   | 24h计时、3件套餐、DeepSeek接入            | ✅ 完成 |
 | Phase 2 | [店主管理与支付框架](./README/20260409_Phase2_Admin_Payment.md)      | 店主订单管理、微信支付V3框架                  | ✅ 完成 |
 | Phase 3 | [MVP 精简与闭环](./README/20260409_Phase3_MVP_Simplification.md) | 日期选衣、下单、支付（模拟）、取衣/还衣、店主退押/扣费     | ✅ 完成 |
-| Phase 4 | [身份与权限调试](./README/20260409_Phase3_Identity_Role_Mock.md)   | Mock 固定身份、role(1/2) 权限分流、店主端套餐管理 | ✅ 完成 |
+| Phase 4 | [身份与权限调试](./README/20260409_Phase4_Identity_Role_Mock.md)   | Mock 固定身份、role(1/2) 权限分流、店主端套餐管理 | ✅ 完成 |
+| Phase 5 | **高奢审美与架构重构** | 莫兰迪 UI、沉浸导航、原子组件库、可视化倒计时 | 🚀 启动 |
 
 ***
+
+## 🧭 继续开发导航
+
+### 目录与入口
+
+- 文档：`README/`、`plan.md`、`test_plan.md`
+- 后端入口：`backend/main.py`
+- 小程序入口：`frontend/app.js`（登录态/统一请求）、`frontend/app.json`（页面注册）
+- 前端 API 聚合：`frontend/utils/api.js`
+
+### 技术栈
+
+- 后端：FastAPI + Uvicorn
+- 数据库：MySQL + PyMySQL（主要为手写 SQL）
+- 鉴权：JWT Bearer Token
+- AI：DeepSeek / Gemini（通过 `AI_SERVICE_TYPE` 切换）
+- 支付：微信支付 V3（当前为框架位，可模拟）
+
+### 核心闭环（优先改这些）
+
+- 日期锁定与可租：`backend/app/api/product.py` + `reservations` 表
+- 订单状态机：`backend/app/api/order.py`
+- 店主端：`backend/app/api/admin.py` + `frontend/pages/admin/*`
+- 权限与分流：`backend/app/utils/auth.py` + `frontend/app.js`
+
+### 本地启动
+
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env
+python check_db.py
+python main.py
+```
+
+- 小程序：微信开发者工具打开 `frontend/`，并在「设置」页配置 `apiBase`
+
 
 ## 📄 许可证
 

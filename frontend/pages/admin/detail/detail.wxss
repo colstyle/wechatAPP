@@ -1,26 +1,27 @@
 .container {
   padding: 20rpx;
-  background-color: #f8f8f8;
+  background-color: #f7f7f7;
   min-height: 100vh;
 }
 
 .section {
   background-color: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.10);
 }
 
 .section-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  margin-bottom: 30rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 20rpx;
+  margin-bottom: 12rpx;
 }
 
 .label {
@@ -33,7 +34,7 @@
 
 .price {
   color: #ff6b6b;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .danger {
@@ -49,7 +50,7 @@
 .product-img {
   width: 150rpx;
   height: 200rpx;
-  border-radius: 10rpx;
+  border-radius: 16rpx;
   margin-right: 20rpx;
 }
 
@@ -61,7 +62,7 @@
 
 .product-name {
   font-size: 28rpx;
-  font-weight: bold;
+  font-weight: 600;
   margin-bottom: 10rpx;
 }
 
@@ -79,27 +80,12 @@
 .admin-actions {
   display: flex;
   flex-direction: column;
-  padding: 20rpx;
+  padding: 0;
 }
 
 .btn {
   margin-bottom: 20rpx;
   width: 100%;
-}
-
-.btn-primary {
-  background-color: #1890ff;
-  color: #fff;
-}
-
-.btn-danger {
-  background-color: #ff4d4f;
-  color: #fff;
-}
-
-.btn-outline {
-  border: 1px solid #d9d9d9;
-  color: #333;
 }
 
 .modal {
@@ -118,15 +104,15 @@
 .modal-content {
   background-color: #fff;
   width: 80%;
-  border-radius: 20rpx;
-  padding: 40rpx;
+  border-radius: 16rpx;
+  padding: 20rpx;
 }
 
 .modal-header {
   font-size: 36rpx;
-  font-weight: bold;
+  font-weight: 600;
   text-align: center;
-  margin-bottom: 30rpx;
+  margin-bottom: 16rpx;
 }
 
 .input-group {
@@ -140,26 +126,29 @@
 }
 
 .input {
-  border: 1px solid #d9d9d9;
-  padding: 15rpx;
+  border: 1rpx solid #eeeeee;
+  padding: 18rpx 20rpx;
   border-radius: 10rpx;
+  background: #f7f7f7;
 }
 
 .textarea {
-  border: 1px solid #d9d9d9;
-  padding: 15rpx;
+  border: 1rpx solid #eeeeee;
+  padding: 18rpx 20rpx;
   border-radius: 10rpx;
   height: 200rpx;
   width: 100%;
+  background: #f7f7f7;
 }
 
 .modal-footer {
   display: flex;
   justify-content: space-between;
+  gap: 12rpx;
 }
 
 .modal-btn {
-  width: 45%;
+  flex: 1;
 }
 
 .modal-btn.cancel {

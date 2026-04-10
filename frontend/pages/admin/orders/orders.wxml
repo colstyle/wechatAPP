@@ -1,20 +1,29 @@
-<view class="container">
-  <!-- 搜索栏 -->
-  <view class="search-section">
+<!-- pages/admin/orders/orders.wxml -->
+<view class="page-root">
+  <!-- 自定义导航栏 -->
+  <cp-nav-bar title="店主后台" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <view class="admin-header">
     <view class="search-bar">
-      <icon type="search" size="14"></icon>
-      <input type="text" placeholder="搜索单号/昵称" bindinput="onSearchInput" value="{{keyword}}" confirm-type="search" bindconfirm="onSearch" />
-      <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
+      <!-- 搜索图标 纯CSS -->
+      <view class="icon-search-sm">
+        <view class="sc-cir"></view>
+        <view class="sc-han"></view>
+      </view>
+      <input class="search-input" placeholder="搜索单号 / 用户昵称" value="{{keyword}}" bindconfirm="onSearch" confirm-type="search" bindinput="onSearchInput" />
     </view>
-    <view class="admin-actions">
-      <view class="action-btn" bindtap="goToPackageManage">套餐管理</view>
+    <view class="btn-pkg" bindtap="goToPackageManage">
+      <view class="icon-pkg"></view>
+      <text>套餐管理</text>
     </view>
   </view>
 
   <!-- 状态筛选 -->
   <scroll-view class="status-scroll" scroll-x>
     <view class="status-tabs">
-      <view class="status-tab {{currentStatus === null ? 'active' : ''}}" bindtap="onStatusChange" data-status="{{null}}">全部</view>
+      <view class="status-tab {{currentStatus === null ? 'active' : ''}}" bindtap="onStatusChange" data-status="{{null}}">
+        <text class="st-text">全部</text>
+      </view>
       <view class="status-tab {{currentStatus === 1 ? 'active' : ''}}" bindtap="onStatusChange" data-status="1">待取衣</view>
       <view class="status-tab {{currentStatus === 2 ? 'active' : ''}}" bindtap="onStatusChange" data-status="2">租赁中</view>
       <view class="status-tab {{currentStatus === 3 ? 'active' : ''}}" bindtap="onStatusChange" data-status="3">已逾期</view>
@@ -26,28 +35,46 @@
   <!-- 订单列表 -->
   <scroll-view class="order-list" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="order-card" wx:for="{{orders}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
-      <view class="card-header">
-        <text class="order-no">单号: {{item.order_no}}</text>
-        <text class="status-text status-{{item.status}}">{{item.status_text}}</text>
-      </view>
-      <view class="card-body">
-        <image class="user-avatar" src="{{item.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
-        <view class="order-info">
-          <text class="user-name">{{item.nickname}}</text>
-          <text class="order-time">下单时间: {{item.created_at}}</text>
+      
+      <view class="oc-header">
+        <view class="oc-no">
+          <text class="oc-hash">#</text>
+          <text>{{item.order_no}}</text>
         </view>
-        <view class="order-amount">
-          <text class="amount-label">实付</text>
-          <text class="amount-value">¥{{item.total_amount}}</text>
+        <view class="oc-status status-{{item.status}}">{{item.status_text}}</view>
+      </view>
+
+      <view class="oc-body">
+        <view class="user-avatar-wrap">
+          <image class="user-avatar" src="{{item.avatar || ''}}" mode="aspectFill"></image>
+          <!-- 默认用户纯CSS -->
+          <view class="avatar-placeholder" wx:if="{{!item.avatar}}">
+            <view class="icon-person-sm"></view>
+          </view>
+        </view>
+        <view class="oc-info">
+          <text class="user-name">{{item.nickname || '微信用户'}}</text>
+          <text class="order-time">{{item.created_at}}</text>
+        </view>
+        <view class="oc-price">
+          <text class="op-sym">¥</text>
+          <text class="op-num">{{item.total_amount}}</text>
         </view>
       </view>
+
     </view>
-    
-    <view class="loading-status" wx:if="{{loading}}">加载中...</view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
+    </view>
     <view class="no-more" wx:if="{{!hasMore && orders.length > 0}}">没有更多订单了</view>
+    
     <view class="empty-state" wx:if="{{!loading && orders.length === 0}}">
-      <text class="empty-icon">📝</text>
+      <view class="icon-empty-doc">
+        <view class="doc-line"></view><view class="doc-line short"></view>
+      </view>
       <text class="empty-text">暂无相关订单</text>
     </view>
   </scroll-view>
+
 </view>

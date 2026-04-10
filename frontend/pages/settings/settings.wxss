@@ -1,143 +1,115 @@
 /* pages/settings/settings.wxss */
-.page {
-  background: #f8f9fa;
-  min-height: 100vh;
+
+.page-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #FDFCF9;
+  overflow: hidden;
 }
 
-/* 用户区域 */
-.section {
-  background: #fff;
-  margin-bottom: 16rpx;
+.content {
+  flex: 1;
+  padding: 24rpx;
+  box-sizing: border-box;
 }
 
-.user-section {
-  padding: 32rpx 24rpx;
+/* === 基础卡片规约 === */
+.card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(28,28,28,0.03);
 }
 
-.user-header {
+.arrow-right {
+  width: 14rpx; height: 14rpx;
+  border-right: 2.5rpx solid #C0BBB4;
+  border-bottom: 2.5rpx solid #C0BBB4;
+  transform: rotate(-45deg);
+}
+
+/* === 个人信息卡片 === */
+.profile-card {
+  padding: 32rpx 28rpx;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+}
+.pc-left {
+  display: flex; align-items: center; gap: 24rpx; flex: 1;
+}
+.avatar-wrap {
+  width: 96rpx; height: 96rpx; border-radius: 50%; overflow: hidden; position: relative; background: #F5F4F0;
+}
+.avatar-img { width: 100%; height: 100%; }
+.avatar-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+/* 人形图标兜底 */
+.icon-person-sm {
+  width: 32rpx; height: 32rpx; border: 2.5rpx solid #C0BBB4; border-radius: 50% 50% 0 0; position: relative;
+}
+.icon-person-sm::after {
+  content: ''; position: absolute; bottom: -12rpx; left: -8rpx; right: -8rpx; height: 12rpx; border: 2.5rpx solid #C0BBB4; border-bottom: none; border-radius: 50% 50% 0 0;
 }
 
-.user-avatar {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 50%;
-  background: #f8f9fa;
-  margin-right: 24rpx;
+.pc-info { display: flex; flex-direction: column; }
+.pc-name { font-size: 32rpx; font-weight: 600; color: #1C1C1C; margin-bottom: 8rpx; }
+.pc-sub { font-size: 24rpx; color: #8E877F; }
+
+/* === 菜单卡片 === */
+.menu-card {
+  padding: 0 28rpx;
+}
+.menu-item {
+  display: flex; align-items: center; justify-content: space-between; padding: 28rpx 0;
+  border-bottom: 1rpx solid rgba(28,28,28,0.04);
+}
+.menu-item.last { border-bottom: none; }
+.mi-icon-wrap { width: 64rpx; height: 64rpx; border-radius: 16rpx; display: flex; align-items: center; justify-content: center; margin-right: 20rpx;}
+.mi-gold { background: rgba(197,160,89,0.12); }
+.mi-sage { background: rgba(142,151,117,0.12); }
+
+/* 尺码图标 (纯CSS) */
+.icon-ruler {
+  width: 28rpx; height: 32rpx; border: 2.5rpx solid #C5A059; border-radius: 4rpx; position: relative;
+}
+.icon-ruler::before { content: ''; position: absolute; top: 6rpx; right: 0; width: 10rpx; height: 2.5rpx; background: #C5A059; box-shadow: 0 10rpx 0 #C5A059, 0 20rpx 0 #C5A059; }
+
+/* Info 关于图标 (纯CSS) */
+.icon-info {
+  width: 28rpx; height: 28rpx; border: 2.5rpx solid #8E9775; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4rpx;
+}
+.icon-info::before { content: ''; width: 4rpx; height: 4rpx; background: #8E9775; border-radius: 50%; }
+.icon-info::after { content: ''; width: 4rpx; height: 10rpx; background: #8E9775; border-radius: 2rpx; }
+
+.mi-text { flex: 1; font-size: 28rpx; color: #1C1C1C; }
+
+
+/* === 开发设置卡片 === */
+.dev-card {
+  padding: 32rpx 28rpx;
+}
+.dev-title { font-size: 26rpx; font-weight: 600; color: #1C1C1C; margin-bottom: 24rpx; }
+.dev-field { margin-bottom: 24rpx; }
+.dev-label { display: block; font-size: 24rpx; color: #8E877F; margin-bottom: 12rpx; }
+.dev-input {
+  width: 100%; height: 76rpx; border-radius: 12rpx; background: rgba(238, 236, 232, 0.4);
+  padding: 0 24rpx; font-size: 26rpx; color: #1C1C1C; box-sizing: border-box; margin-bottom: 16rpx;
 }
 
-.user-info {
-  flex: 1;
+/* 按钮组 */
+.dev-btn-group { display: flex; gap: 16rpx; }
+.dev-btn {
+  flex: 1; height: 64rpx; border-radius: 32rpx; display: flex; align-items: center; justify-content: center;
+  font-size: 24rpx; font-weight: 500; transition: all 0.2s;
 }
+.dev-btn.sub { background: #FFFFFF; color: #1C1C1C; border: 1.5rpx solid rgba(28,28,28,0.1); }
+.dev-btn.main { background: #1C1C1C; color: #FFFFFF; border: 1.5rpx solid #1C1C1C; }
 
-.user-nickname {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 500;
-  color: #212529;
-  margin-bottom: 8rpx;
-}
+.dev-divider { height: 1rpx; background: rgba(28,28,28,0.04); margin: 32rpx 0; }
 
-.user-phone {
-  display: block;
-  font-size: 26rpx;
-  color: #adb5bd;
+/* 版本号 */
+.version-mark {
+  padding: 40rpx 0; text-align: center;
 }
-
-/* 功能区域 */
-.function-section {
-  padding: 0 24rpx;
-}
-
-.function-item {
-  display: flex;
-  align-items: center;
-  padding: 32rpx 0;
-  border-bottom: 1rpx solid #dee2e6;
-}
-
-.function-item:last-child {
-  border-bottom: none;
-}
-
-.function-icon {
-  font-size: 40rpx;
-  margin-right: 24rpx;
-}
-
-.function-text {
-  flex: 1;
-  font-size: 28rpx;
-  color: #495057;
-}
-
-.function-item .icon-arrow-right {
-  color: #adb5bd;
-  font-size: 24rpx;
-}
-
-.section-title {
-  padding: 24rpx 0 8rpx;
-  font-size: 26rpx;
-  color: #868e96;
-}
-
-.api-row {
-  display: flex;
-  align-items: center;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid #dee2e6;
-}
-
-.api-label {
-  width: 140rpx;
-  font-size: 28rpx;
-  color: #495057;
-}
-
-.api-input {
-  flex: 1;
-  height: 64rpx;
-  line-height: 64rpx;
-  padding: 0 16rpx;
-  background: #f8f9fa;
-  border-radius: 12rpx;
-  font-size: 26rpx;
-  color: #212529;
-}
-
-.api-actions {
-  display: flex;
-  gap: 16rpx;
-  padding: 24rpx 0 32rpx;
-}
-
-.api-btn {
-  flex: 1;
-  height: 72rpx;
-  line-height: 72rpx;
-  font-size: 28rpx;
-  border-radius: 12rpx;
-}
-
-.api-btn-secondary {
-  background: #f1f3f5;
-  color: #495057;
-}
-
-.api-btn-primary {
-  background: #4c6ef5;
-  color: #fff;
-}
-
-/* 版本信息 */
-.version-section {
-  text-align: center;
-  padding: 48rpx;
-}
-
-.version-text {
-  font-size: 24rpx;
-  color: #adb5bd;
-}
+.vm-text { font-size: 22rpx; color: #C0BBB4; letter-spacing: 1px; }

@@ -1,64 +1,70 @@
-<view class="container">
-  <!-- 日期提示 -->
-  <view class="date-header">
-    <text>预约日期：{{selectedDate}}</text>
-  </view>
-
-  <!-- 套餐进度条 -->
-  <view class="package-progress">
-    <view class="progress-text">
-      <text>已选择 {{selectedItems.length}}/3 件</text>
-      <text class="price">套餐价：¥69.9</text>
-    </view>
-    <view class="progress-bar">
-      <view class="progress-inner" style="width: {{selectedItems.length * 33.33}}%"></view>
-    </view>
-  </view>
-
-  <!-- 已选商品展示 -->
-  <view class="selected-items-row" wx:if="{{selectedItems.length > 0}}">
-    <view class="selected-item" wx:for="{{selectedItems}}" wx:key="id">
-      <view class="item-img-wrap">
-        <text class="item-emoji">{{item.placeholder || '👗'}}</text>
-        <view class="remove-btn" bindtap="removeItem" data-id="{{item.id}}">×</view>
+<view class="page package-page">
+  <view class="page-pad package-top">
+    <view class="card">
+      <view class="flex justify-between items-center">
+        <text class="text-muted">预约日期</text>
+        <text class="text-bold">{{selectedDate}}</text>
       </view>
     </view>
-  </view>
 
-  <!-- 商品列表 -->
-  <scroll-view class="product-list" scroll-y bindscrolltolower="onLoadMore">
-    <view class="product-grid">
-      <view class="product-card {{item.selected ? 'active' : ''}}" 
-            wx:for="{{products}}" 
-            wx:key="id" 
-            bindtap="toggleSelect" 
-            data-item="{{item}}">
-        <view class="product-img">
-          <text class="product-emoji">{{item.placeholder || '👗'}}</text>
-          <view class="select-badge" wx:if="{{item.selected}}">✓</view>
-        </view>
-        <view class="product-info">
-          <text class="product-name">{{item.name}}</text>
-          <text class="product-deposit">押金: ¥{{item.deposit}}</text>
+    <view class="card">
+      <view class="flex justify-between items-center">
+        <text class="text-bold">已选择 {{selectedItems.length}}/3 件</text>
+        <text class="text-primary text-bold">¥69.9</text>
+      </view>
+      <view class="progress-track">
+        <view class="progress-fill" style="width: {{selectedItems.length * 33.33}}%"></view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{selectedItems.length > 0}}">
+      <view class="selected-items">
+        <view class="selected-item" wx:for="{{selectedItems}}" wx:key="id">
+          <view class="selected-thumb">
+            <text class="selected-emoji">{{item.placeholder || '👗'}}</text>
+            <view class="selected-remove" bindtap="removeItem" data-id="{{item.id}}">×</view>
+          </view>
         </view>
       </view>
     </view>
-    
-    <view class="loading-status" wx:if="{{loading}}">加载中...</view>
-    <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多可租衣物了</view>
-    <view class="empty" wx:if="{{!loading && products.length === 0}}">该日期暂无可用衣物</view>
+  </view>
+
+  <scroll-view class="package-scroll" scroll-y bindscrolltolower="onLoadMore">
+    <view class="page-pad">
+      <view class="grid-2">
+        <view class="package-card {{item.selected ? 'selected' : ''}}"
+              wx:for="{{products}}"
+              wx:key="id"
+              bindtap="toggleSelect"
+              data-id="{{item.id}}">
+          <view class="package-cover">
+            <text class="package-emoji">{{item.placeholder || '👗'}}</text>
+            <view class="package-check" wx:if="{{item.selected}}">✓</view>
+          </view>
+          <view class="package-info">
+            <text class="package-name">{{item.name}}</text>
+            <text class="package-meta">押金 ¥{{item.deposit}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="loading-state" wx:if="{{loading}}">
+        <text>加载中...</text>
+      </view>
+      <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多可租衣物了</view>
+      <view class="empty-state" wx:if="{{!loading && products.length === 0}}">
+        <text>该日期暂无可用衣物</text>
+      </view>
+    </view>
   </scroll-view>
 
-  <!-- 底部结算 -->
-  <view class="bottom-bar">
+  <view class="footer-bar package-footer">
     <view class="total-info">
-      <text class="total-label">预估总额:</text>
+      <text class="total-label">预估总额</text>
       <text class="total-price">¥{{totalAmount}}</text>
-      <text class="total-desc">(租金69.9 + 押金{{totalDeposit}})</text>
+      <text class="total-desc">租金 69.9 + 押金 {{totalDeposit}}</text>
     </view>
-    <button class="submit-btn {{selectedItems.length === 3 ? '' : 'disabled'}}" 
-            bindtap="onSubmit" 
-            disabled="{{selectedItems.length !== 3}}">
+    <button class="btn btn-primary btn-lg package-submit" bindtap="onSubmit" disabled="{{selectedItems.length !== 3}}">
       立即预定
     </button>
   </view>

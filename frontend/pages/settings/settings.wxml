@@ -1,71 +1,87 @@
-<!--pages/settings/settings.wxml-->
-<view class="page">
-  <!-- 用户信息 -->
-  <view class="section user-section">
-    <view class="user-header">
-      <image class="user-avatar" src="{{userInfo.avatar || '/images/avatar-default.png'}}" mode="aspectFill" bindtap="onAvatarTap"></image>
-      <view class="user-info">
-        <text class="user-nickname">{{userInfo.nickname || '未登录'}}</text>
-        <text class="user-phone">{{userInfo.phone || '点击完善信息'}}</text>
+<!-- pages/settings/settings.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="设置与偏好" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <scroll-view class="content" scroll-y>
+    
+    <!-- 个人信息卡片 -->
+    <view class="card profile-card" bindtap="onProfileTap">
+      <view class="pc-left">
+        <view class="avatar-wrap">
+          <image class="avatar-img" src="{{userInfo.avatar || ''}}" mode="aspectFill" wx:if="{{userInfo.avatar}}"></image>
+          <view class="avatar-placeholder" wx:else>
+            <view class="icon-person-sm"></view>
+          </view>
+        </view>
+        <view class="pc-info">
+          <text class="pc-name">{{userInfo.nickname || '未登录配置'}}</text>
+          <text class="pc-sub">{{userInfo.phone || '点击完善个人信息'}}</text>
+        </view>
       </view>
-      <text class="iconfont icon-arrow-right" bindtap="onProfileTap"></text>
+      <view class="arrow-right"></view>
     </view>
-  </view>
 
-  <!-- 功能列表 -->
-  <view class="section function-section">
-    <view class="function-item" bindtap="onProfileTap">
-      <text class="function-icon">👤</text>
-      <text class="function-text">个人信息</text>
-      <text class="iconfont icon-arrow-right"></text>
+    <!-- 常规设置卡片 -->
+    <view class="card menu-card">
+      <view class="menu-item" bindtap="onSizeTap">
+        <view class="mi-icon-wrap mi-gold">
+          <view class="icon-ruler"></view>
+        </view>
+        <text class="mi-text">我的尺码档案</text>
+        <view class="arrow-right"></view>
+      </view>
+      <view class="menu-item last" bindtap="onAboutTap">
+        <view class="mi-icon-wrap mi-sage">
+          <view class="icon-info"></view>
+        </view>
+        <text class="mi-text">关于小时光租衣舍</text>
+        <view class="arrow-right"></view>
+      </view>
     </view>
-    <view class="function-item" bindtap="onSizeTap">
-      <text class="function-icon">📏</text>
-      <text class="function-text">我的尺码</text>
-      <text class="iconfont icon-arrow-right"></text>
-    </view>
-    <view class="function-item" bindtap="onAboutTap">
-      <text class="function-icon">ℹ️</text>
-      <text class="function-text">关于我们</text>
-      <text class="iconfont icon-arrow-right"></text>
-    </view>
-  </view>
 
-  <view class="section function-section">
-    <view class="section-title">开发设置</view>
-    <view class="api-row">
-      <text class="api-label">后端地址</text>
-      <input
-        class="api-input"
-        value="{{apiBase}}"
-        placeholder="例如：http://192.168.1.10:8000"
-        bindinput="onApiBaseInput"
-        confirm-type="done"
-      />
-    </view>
-    <view class="api-actions">
-      <button class="api-btn api-btn-secondary" bindtap="testApiBase">测试连接</button>
-      <button class="api-btn api-btn-primary" bindtap="saveApiBase">保存</button>
-    </view>
-    <view class="api-row">
-      <text class="api-label">模拟身份</text>
-      <input
-        class="api-input"
-        value="{{mockOpenid}}"
-        placeholder="普通：user_1  管理：admin_1"
-        bindinput="onMockOpenidInput"
-        confirm-type="done"
-      />
-    </view>
-    <view class="api-actions">
-      <button class="api-btn api-btn-secondary" bindtap="useMockUser">普通用户</button>
-      <button class="api-btn api-btn-secondary" bindtap="useMockAdmin">管理员</button>
-      <button class="api-btn api-btn-primary" bindtap="reLogin">重新登录</button>
-    </view>
-  </view>
+    <!-- 开发设置卡片 (用于测试) -->
+    <view class="card dev-card">
+      <view class="dev-title">开发设置 (Developer)</view>
+      
+      <view class="dev-field">
+        <text class="dev-label">后端 API 聚点</text>
+        <input 
+          class="dev-input" 
+          value="{{apiBase}}"
+          placeholder="例如：http://192.168.1.10:8000"
+          bindinput="onApiBaseInput"
+          confirm-type="done"
+        />
+        <view class="dev-btn-group">
+          <view class="dev-btn sub" bindtap="testApiBase">连通测试</view>
+          <view class="dev-btn main" bindtap="saveApiBase">应用地址</view>
+        </view>
+      </view>
 
-  <!-- 版本信息 -->
-  <view class="version-section">
-    <text class="version-text">版本号: 1.0.0</text>
-  </view>
+      <view class="dev-divider"></view>
+
+      <view class="dev-field">
+        <text class="dev-label">身份模拟标识 (OpenID)</text>
+        <input 
+          class="dev-input" 
+          value="{{mockOpenid}}"
+          placeholder="普通：user_1  店长：admin_1"
+          bindinput="onMockOpenidInput"
+          confirm-type="done"
+        />
+        <view class="dev-btn-group">
+          <view class="dev-btn sub" bindtap="useMockUser">切为用户</view>
+          <view class="dev-btn sub" bindtap="useMockAdmin">切为店主</view>
+          <view class="dev-btn main" bindtap="reLogin">强制重载</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 版本标记 -->
+    <view class="version-mark">
+      <text class="vm-text">小时光 V 1.0.0(Alpha)</text>
+    </view>
+
+    <view style="height: 120rpx;"></view>
+  </scroll-view>
 </view>

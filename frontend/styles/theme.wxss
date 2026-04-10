@@ -1,0 +1,45 @@
+/* styles/theme.wxss */
+/* 高奢审美 Design Tokens */
+
+page {
+  /* 莫兰迪色系 */
+  --bg-color: #FDFCF9;         /* 燕麦白背景 */
+  --color-primary: #1C1C1C;    /* 乌木黑 - 标题/主字 */
+  --color-accent: #C5A059;     /* 哑光金 - 价格/主动作 */
+  --color-secondary: #8E9775;  /* 鼠尾草绿 - 辅助/图标 */
+  --color-white: #FFFFFF;
+  
+  /* 辅助色 */
+  --color-success: #7EA172;
+  --color-error: #B05B5B;
+  --color-warning: #D4A373;
+  
+  /* 边距与圆角 */
+  --page-gutter: 32rpx;        /* 提升呼吸感的边距 */
+  --card-radius: 24rpx;        /* 更圆润的视觉 */
+  --button-radius: 12rpx;
+  
+  /* 阴影 */
+  --shadow-soft: 0 4rpx 20rpx rgba(28, 28, 28, 0.04);
+  --shadow-float: 0 12rpx 40rpx rgba(28, 28, 28, 0.08);
+
+  /* 文字层级 */
+  --font-h1: 40rpx;
+  --font-h2: 34rpx;
+  --font-body: 28rpx;
+  --font-desc: 24rpx;
+  --font-hint: 20rpx;
+}
+
+/* 字体权重规范 */
+.w-300 { font-weight: 300; }
+.w-400 { font-weight: 400; }
+.w-500 { font-weight: 500; }
+.w-600 { font-weight: 600; }
+
+/* 玻璃拟态基础类 */
+.glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+}

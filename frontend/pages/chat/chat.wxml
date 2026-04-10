@@ -1,16 +1,57 @@
-<view class="container">
+<!-- pages/chat/chat.wxml -->
+<view class="page-root">
+  
+  <!-- 自定义导航栏 -->
+  <cp-nav-bar title="AI 穿搭助理" show-back="{{true}}" bg="white"></cp-nav-bar>
+
   <scroll-view class="chat-list" scroll-y scroll-into-view="{{lastMessageId}}">
-    <view wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}" class="message-item {{item.role}}">
-      <view class="avatar">{{item.role === 'user' ? 'U' : 'AI'}}</view>
-      <view class="content">
-        <text>{{item.content}}</text>
+    <view class="chat-pad">
+      
+      <!-- 空状态欢迎语 -->
+      <view class="empty-state" wx:if="{{messages.length === 0}}">
+        <view class="empty-icon">
+          <view class="icon-chat-bubble"></view>
+        </view>
+        <text class="empty-text">你好！我是你的专属 AI 穿搭顾问</text>
+        <text class="empty-sub">你可以问我：「今天去参加婚礼怎么穿？」</text>
       </view>
+
+      <view wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}" class="message-item {{item.role}}">
+        
+        <!-- 头像区 -->
+        <view class="avatar-wrap">
+          <view class="avatar-ai" wx:if="{{item.role === 'ai' || item.role === 'assistant'}}">AI</view>
+          <view class="avatar-user" wx:else>你</view>
+        </view>
+        
+        <!-- 气泡区 -->
+        <view class="bubble {{item.role}}">
+          <text class="bubble-text">{{item.content}}</text>
+        </view>
+        
+      </view>
+      <view id="bottom-view" style="height: 60rpx;"></view>
     </view>
-    <view id="bottom-view"></view>
   </scroll-view>
 
-  <view class="input-area">
-    <input class="input" placeholder="请输入您的问题..." value="{{inputValue}}" bindinput="onInput" confirm-type="send" bindconfirm="onSend" />
-    <button class="send-btn" type="primary" size="mini" bindtap="onSend" disabled="{{!inputValue || loading}}">发送</button>
+  <!-- 底部输入栏 (磨砂玻璃) -->
+  <view class="footer-bar glass">
+    <view class="chat-input-wrap">
+      <input 
+        class="chat-input" 
+        placeholder="聊聊你的穿搭需求..." 
+        placeholder-class="chat-ph"
+        value="{{inputValue}}" 
+        bindinput="onInput" 
+        confirm-type="send" 
+        bindconfirm="onSend" 
+      />
+      <view class="btn-send {{inputValue ? 'active' : ''}}" bindtap="onSend">
+        <!-- 纯CSS发送按钮箭头 -->
+        <view class="icon-send-arrow"></view>
+      </view>
+    </view>
+    <view style="height: env(safe-area-inset-bottom);"></view>
   </view>
+  
 </view>

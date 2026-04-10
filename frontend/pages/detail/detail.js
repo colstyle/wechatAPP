@@ -179,5 +179,9 @@ Page({
   contactService() {
     wx.navigateTo({ url: '/pages/chat/chat' })
   },
+
+  goBack() {
+    wx.navigateBack({ delta: 1 })
+  }
   
 })

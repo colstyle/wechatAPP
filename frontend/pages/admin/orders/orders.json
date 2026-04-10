@@ -1,5 +1,8 @@
 {
-  "navigationBarTitleText": "店主订单管理",
+  "navigationStyle": "custom",
   "enablePullDownRefresh": true,
+  "usingComponents": {
+    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar"
+  },
   "backgroundTextStyle": "dark"
 }

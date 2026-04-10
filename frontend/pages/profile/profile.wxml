@@ -1,67 +1,124 @@
-<!--pages/profile/profile.wxml-->
-<view class="page">
-  <!-- 用户信息区 -->
-  <view class="user-section">
-    <view class="user-info" bindtap="handleLogin">
-      <image class="user-avatar" src="{{userInfo.avatar || ''}}" mode="aspectFill"></image>
-      <view class="user-detail">
+<!-- pages/profile/profile.wxml -->
+<view class="page-root">
+
+  <!-- 自定义导航栏 -->
+  <cp-nav-bar title="我的" show-back="{{false}}" bg="white"></cp-nav-bar>
+
+  <view class="content">
+
+    <!-- 用户信息卡 -->
+    <view class="user-card" bindtap="handleLogin">
+      <view class="avatar-wrap">
+        <image class="user-avatar" src="{{userInfo.avatar || ''}}" mode="aspectFill"></image>
+        <!-- 无头像时显示占位圆 -->
+        <view class="avatar-placeholder" wx:if="{{!userInfo.avatar}}">
+          <view class="icon-person"></view>
+        </view>
+      </view>
+      <view class="user-meta">
         <text class="user-name">{{userInfo.nickname || '点击登录'}}</text>
-        <text class="user-id" wx:if="{{userInfo.openid}}">ID: {{userInfo.openid.substring(0, 8)}}</text>
+        <text class="user-sub" wx:if="{{userInfo.openid}}">ID · {{userInfo.openid.substring(0, 8)}}</text>
+        <text class="user-sub" wx:else>登录后享受完整体验</text>
       </view>
-      <text class="arrow-icon">></text>
+      <view class="user-chevron"></view>
     </view>
-  </view>
 
-  <!-- 订单状态栏 -->
-  <view class="order-bar">
-    <view class="order-title">我的订单</view>
-    <view class="order-tabs">
-      <view class="order-tab" bindtap="onOrdersTap" data-status="1">
-        <text class="order-icon">📦</text>
-        <text class="order-text">待取衣</text>
-        <text class="order-badge" wx:if="{{orderStats.pendingPickup}}">{{orderStats.pendingPickup}}</text>
-      </view>
-      <view class="order-tab" bindtap="onOrdersTap" data-status="2">
-        <text class="order-icon">👗</text>
-        <text class="order-text">租赁中</text>
-        <text class="order-badge" wx:if="{{orderStats.renting}}">{{orderStats.renting}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 功能列表 -->
-  <view class="function-section">
-    <view class="function-group">
-      <view class="function-item" bindtap="onServiceTap">
-        <view class="item-left">
-          <text class="item-icon">🤖</text>
-          <text class="item-text">AI 客服</text>
+    <!-- 订单速览 -->
+    <view class="order-card">
+      <view class="oc-header">
+        <text class="oc-title">我的订单</text>
+        <view class="oc-all" bindtap="onOrdersTap" data-status="">
+          <text class="oc-all-text">全部</text>
+          <view class="oc-all-arrow"></view>
         </view>
-        <text class="arrow-icon">></text>
       </view>
-      <view class="function-item" bindtap="onSettingsTap">
-        <view class="item-left">
-          <text class="item-icon">⚙️</text>
-          <text class="item-text">设置</text>
+      <view class="order-shortcuts">
+        <view class="os-item" bindtap="onOrdersTap" data-status="1">
+          <view class="os-icon-wrap os-blue">
+            <!-- 衣架 -->
+            <view class="icon-hanger-sm"></view>
+          </view>
+          <text class="os-label">待取衣</text>
+          <view class="os-badge" wx:if="{{orderStats.pendingPickup > 0}}">
+            <text>{{orderStats.pendingPickup}}</text>
+          </view>
         </view>
-        <text class="arrow-icon">></text>
+        <view class="os-item" bindtap="onOrdersTap" data-status="2">
+          <view class="os-icon-wrap os-gold">
+            <view class="icon-clock-sm"></view>
+          </view>
+          <text class="os-label">租赁中</text>
+          <view class="os-badge" wx:if="{{orderStats.renting > 0}}">
+            <text>{{orderStats.renting}}</text>
+          </view>
+        </view>
+        <view class="os-item" bindtap="onOrdersTap" data-status="3">
+          <view class="os-icon-wrap os-sage">
+            <view class="icon-return-sm"></view>
+          </view>
+          <text class="os-label">待归还</text>
+        </view>
+        <view class="os-item" bindtap="onOrdersTap" data-status="4">
+          <view class="os-icon-wrap os-neutral">
+            <view class="icon-check-sm"></view>
+          </view>
+          <text class="os-label">已完成</text>
+        </view>
       </view>
     </view>
 
-    <view class="function-group">
-      <!-- 店主管理入口 (仅管理员可见) -->
-      <view class="function-item" bindtap="onAdminTap" wx:if="{{userInfo.role === 'admin' || userInfo.role === '2' || userInfo.role === 2}}">
-        <view class="item-left">
-          <text class="item-icon">🏪</text>
-          <text class="item-text admin-text">店铺管理</text>
-        </view>
-        <text class="arrow-icon">></text>
-      </view>
-    </view>
-  </view>
+    <!-- 服务列表 -->
+    <view class="menu-card">
 
-  <!-- 退出登录 -->
-  <view class="logout-section" wx:if="{{userInfo.nickname}}">
-    <button class="btn-logout" bindtap="onLogout">退出登录</button>
+      <view class="menu-item" bindtap="onServiceTap">
+        <view class="mi-icon-wrap mi-gold">
+          <!-- AI 客服: 对话气泡 -->
+          <view class="icon-chat-m">
+            <view class="chat-bubble"></view>
+            <view class="chat-tail"></view>
+          </view>
+        </view>
+        <text class="mi-text">AI 穿搭客服</text>
+        <view class="mi-tag">智能</view>
+        <view class="mi-arrow"></view>
+      </view>
+
+      <view class="menu-item" bindtap="onSettingsTap">
+        <view class="mi-icon-wrap mi-neutral">
+          <!-- 设置: 齿轮 -->
+          <view class="icon-setting">
+            <view class="setting-ring"></view>
+            <view class="setting-dot"></view>
+          </view>
+        </view>
+        <text class="mi-text">设置</text>
+        <view class="mi-arrow"></view>
+      </view>
+
+      <!-- 店主管理入口（仅 admin 可见） -->
+      <view
+        class="menu-item last admin-item"
+        wx:if="{{userInfo.role === 'admin' || userInfo.role === '2' || userInfo.role === 2}}"
+        bindtap="onAdminTap"
+      >
+        <view class="mi-icon-wrap mi-dark">
+          <!-- 店铺: 建筑图标 -->
+          <view class="icon-store">
+            <view class="store-roof"></view>
+            <view class="store-body"></view>
+          </view>
+        </view>
+        <text class="mi-text">店铺管理</text>
+        <view class="mi-tag admin-tag">管理员</view>
+        <view class="mi-arrow"></view>
+      </view>
+
+    </view>
+
+    <!-- 退出按钮 -->
+    <view class="logout-btn" wx:if="{{userInfo.nickname}}" bindtap="onLogout">
+      <text class="logout-text">退出登录</text>
+    </view>
+
   </view>
 </view>

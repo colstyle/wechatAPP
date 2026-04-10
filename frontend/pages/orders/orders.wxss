@@ -1,19 +1,20 @@
 /* pages/orders/orders.wxss */
 .page {
-  background: #f8f9fa;
+  background: #f7f7f7;
   min-height: 100vh;
 }
 
 /* 订单列表 */
 .order-list {
-  padding: 24rpx;
+  padding: 20rpx;
 }
 
 .order-card {
   background: #fff;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   margin-bottom: 24rpx;
   overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.10);
 }
 
 /* 订单头部 */
@@ -22,7 +23,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 24rpx;
-  border-bottom: 1rpx solid #dee2e6;
+  border-bottom: 1rpx solid #eeeeee;
 }
 
 .order-no {
@@ -32,43 +33,43 @@
 
 .order-status {
   font-size: 24rpx;
-  padding: 8rpx 16rpx;
-  border-radius: 4rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
 }
 
 .order-status.status-0 {
-  background: #fff3cd;
-  color: #856404;
+  background: #e9ecef;
+  color: #495057;
 }
 
 .order-status.status-1 {
-  background: #cff4fc;
-  color: #0f5132;
+  background: rgba(47, 128, 237, 0.12);
+  color: #2f80ed;
 }
 
 .order-status.status-2 {
-  background: #d1e7dd;
-  color: #fff;
+  background: rgba(46, 204, 113, 0.12);
+  color: #2ecc71;
 }
 
 .order-status.status-3 {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(235, 87, 87, 0.14);
+  color: #eb5757;
 }
 
 .order-status.status-4 {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(47, 128, 237, 0.12);
+  color: #2f80ed;
 }
 
 .order-status.status-5 {
-  background: #f8d7da;
-  color: #721c24;
+  background: rgba(235, 87, 87, 0.14);
+  color: #eb5757;
 }
 
 .order-status.status-6 {
-  background: #d4edda;
-  color: #155724;
+  background: rgba(46, 204, 113, 0.12);
+  color: #2ecc71;
 }
 
 /* 订单商品 */
@@ -125,7 +126,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16rpx 24rpx 24rpx;
-  background: #f8f9fa;
+  background: #f7f7f7;
 }
 
 .order-time {
@@ -135,41 +136,7 @@
 
 .order-actions {
   display: flex;
-  gap: 16rpx;
-}
-
-/* 按钮样式 */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12rpx 24rpx;
-  border-radius: 8rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  border: none;
-  background: none;
-}
-
-.btn-primary {
-  background: #ff6b6b;
-  color: #fff;
-}
-
-.btn-outline {
-  border: 1rpx solid #ff6b6b;
-  color: #ff6b6b;
-  background: #fff;
-}
-
-.btn-danger {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.btn-sm {
-  padding: 12rpx 24rpx;
-  font-size: 24rpx;
+  gap: 12rpx;
 }
 
 /* 空状态 */

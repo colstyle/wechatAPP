@@ -1,28 +1,33 @@
 /* pages/product/product.wxss */
 .page {
-  background: #f8f9fa;
+  background: #f7f7f7;
   min-height: 100vh;
 }
 
 /* 搜索框 */
 .search-bar {
-  padding: 24rpx;
+  padding: 20rpx;
   background: #fff;
+  margin: 20rpx 20rpx 0;
+  border-radius: 16rpx 16rpx 0 0;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.10);
 }
 
 .search-input {
-  background: #f8f9fa;
-  border-radius: 32rpx;
-  padding: 16rpx 24rpx;
-  font-size: 28rpx;
+  background: #f7f7f7;
+  border-radius: 10rpx;
+  padding: 18rpx 20rpx;
+  font-size: 30rpx;
 }
 
 /* 筛选栏 */
 .filter-bar {
   display: flex;
   background: #fff;
-  padding: 16rpx 24rpx;
-  border-bottom: 1rpx solid #dee2e6;
+  padding: 12rpx 20rpx 16rpx;
+  margin: 0 20rpx 16rpx;
+  border-radius: 0 0 16rpx 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.10);
 }
 
 .filter-item {
@@ -30,32 +35,32 @@
   align-items: center;
   font-size: 28rpx;
   color: #495057;
-  margin-right: 32rpx;
 }
 
-.filter-item .icon-arrow-down {
+.filter-arrow {
   margin-left: 8rpx;
-  font-size: 20rpx;
+  font-size: 24rpx;
+  color: #999;
 }
 
 /* 商品列表 */
 .product-list {
-  padding: 24rpx;
+  padding: 0 20rpx 20rpx;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 24rpx;
+  gap: 16rpx;
 }
 
 .product-card {
   background: #fff;
-  border-radius: 8rpx;
+  border-radius: 16rpx;
   overflow: hidden;
-  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.1);
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.10);
 }
 
 .product-img {
   width: 100%;
-  height: 360rpx;
+  height: 320rpx;
   display: block;
 }
 
@@ -65,7 +70,7 @@
 
 .product-name {
   display: block;
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #212529;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -88,8 +93,8 @@
 
 .product-price {
   font-size: 32rpx;
-  color: #ff6348;
-  font-weight: 500;
+  color: #ff6b6b;
+  font-weight: 600;
 }
 
 .product-unit {
@@ -104,21 +109,6 @@
 }
 
 /* 空状态 */
-.empty {
-  padding: 120rpx 0;
-  text-align: center;
-  color: #adb5bd;
-  font-size: 28rpx;
-}
-
-/* 加载中 */
-.loading {
-  padding: 48rpx;
-  text-align: center;
-  color: #adb5bd;
-  font-size: 28rpx;
-}
-
 /* 加载更多 */
 .load-more {
   text-align: center;

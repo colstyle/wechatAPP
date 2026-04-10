@@ -2,14 +2,14 @@
 <view class="page">
   <!-- 搜索框 -->
   <view class="search-bar">
-    <input class="search-input" placeholder="搜索商品" bindconfirm="onSearchConfirm" confirm-type="search" value="{{keyword}}"/>
+    <input class="search-input" placeholder="搜索商品" bindconfirm="onSearchConfirm" confirm-type="search" value="{{keyword}}" />
   </view>
 
   <!-- 筛选栏 -->
   <view class="filter-bar">
     <view class="filter-item" bindtap="onSortTap">
       <text>排序</text>
-      <text class="iconfont icon-arrow-down"></text>
+      <text class="filter-arrow">⌄</text>
     </view>
   </view>
 
@@ -29,18 +29,18 @@
             <text class="product-price">¥{{item.daily_rent}}</text>
             <text class="product-unit">/天</text>
           </view>
-          <view class="product-stock">库存: {{item.stock}}</view>
+          <view class="product-stock">库存 {{item.stock}}</view>
         </view>
       </view>
     </view>
 
     <!-- 空状态 -->
-    <view class="empty" wx:if="{{products.length === 0 && !loading}}">
+    <view class="empty-state" wx:if="{{products.length === 0 && !loading}}">
       <text>暂无商品</text>
     </view>
 
     <!-- 加载中 -->
-    <view class="loading" wx:if="{{loading}}">
+    <view class="loading-state" wx:if="{{loading}}">
       <text>加载中...</text>
     </view>
   </view>

@@ -1,0 +1,26 @@
+<!-- components/cp-nav-bar/cp-nav-bar.wxml -->
+<view class="nav-bar-wrap" style="height: {{navBarData.navBarHeight}}px; padding-top: {{navBarData.statusBarHeight}}px; background: {{bgStyle}};">
+  <!-- 返回按钮区 -->
+  <view class="nav-bar-inner">
+    <view class="nav-btn-group" wx:if="{{showBack}}">
+      <view class="nav-btn" bindtap="onBack">
+        <view class="nav-icon-back"></view>
+      </view>
+    </view>
+    <view class="nav-btn-group" wx:else>
+      <view class="nav-btn-placeholder"></view>
+    </view>
+
+    <!-- 标题 -->
+    <view class="nav-title-wrap">
+      <text class="nav-title {{titleStyle}}" style="color: {{titleColor}};">{{title}}</text>
+    </view>
+
+    <!-- 右侧插槽占位 -->
+    <view class="nav-btn-group">
+      <slot name="right"></slot>
+    </view>
+  </view>
+</view>
+<!-- 占位高度，防止内容被遮挡 -->
+<view style="height: {{navBarData.navBarHeight}}px;"></view>

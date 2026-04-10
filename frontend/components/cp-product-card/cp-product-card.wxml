@@ -1,0 +1,43 @@
+<!-- components/cp-product-card/cp-product-card.wxml -->
+<view class="card-root" bindtap="onTap">
+  <!-- 图片区 3:4 比例 -->
+  <view class="img-wrap">
+    <!-- 骨架屏 shimmer -->
+    <view class="img-skeleton shimmer" wx:if="{{loading}}"></view>
+
+    <image
+      class="img-cover {{loaded ? 'img-loaded' : ''}}"
+      src="{{product.cover_image}}"
+      mode="aspectFill"
+      lazy-load
+      binderror="onImgError"
+      bindload="onImgLoad"
+    ></image>
+
+    <!-- 套餐标签 -->
+    <view class="badge-wrap" wx:if="{{product.in_package}}">
+      <text class="badge-pkg">套餐</text>
+    </view>
+
+    <!-- 热门/新品标签 -->
+    <view class="badge-status-wrap">
+      <text wx:if="{{product.is_hot}}" class="badge-status hot">热</text>
+      <text wx:if="{{product.is_new}}" class="badge-status new">新</text>
+    </view>
+  </view>
+
+  <!-- 信息区 -->
+  <view class="info-wrap">
+    <text class="name" number-of-lines="1">{{product.name}}</text>
+
+    <!-- 价格行 -->
+    <view class="price-row">
+      <view class="price-main">
+        <text class="price-unit">¥</text>
+        <text class="price-num">{{product.daily_rent}}</text>
+        <text class="price-day">/天</text>
+      </view>
+      <text class="price-deposit">押{{product.deposit}}</text>
+    </view>
+  </view>
+</view>

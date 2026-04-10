@@ -1,67 +1,88 @@
-<!--pages/category/category.wxml-->
-<view class="page">
-  <!-- 搜索框 -->
-  <view class="search-bar">
-    <input class="search-input" placeholder="搜索商品" bindconfirm="onSearchConfirm" confirm-type="search" value="{{keyword}}"/>
+<!-- pages/category/category.wxml -->
+<view class="page-root">
+  <!-- 自定义导航栏 -->
+  <cp-nav-bar title="分类与探索" show-back="{{false}}" bg="white"></cp-nav-bar>
+
+  <!-- 搜索栏区 (带流线型圆角与浮凸感) -->
+  <view class="search-wrap">
+    <view class="search-bar">
+      <!-- 搜索图标 纯 CSS -->
+      <view class="icon-search">
+        <view class="search-circle"></view>
+        <view class="search-handle"></view>
+      </view>
+      <input 
+        class="search-input" 
+        placeholder="搜索优质好物" 
+        placeholder-class="search-ph"
+        bindconfirm="onSearchConfirm" 
+        confirm-type="search" 
+        value="{{keyword}}" 
+      />
+    </view>
   </view>
 
-  <!-- 分类列表 -->
-  <view class="category-container">
-    <!-- 一级分类 -->
-    <view class="category-sidebar">
-      <view
-        class="category-item {{selectedCategory === item.id ? 'active' : ''}}"
+  <view class="content-body">
+    
+    <!-- 侧边栏 (莫兰迪风格) -->
+    <scroll-view class="sidebar" scroll-y>
+      <view 
+        class="sidebar-item {{selectedCategory === item.id ? 'active' : ''}}"
         wx:for="{{categories}}"
         wx:key="id"
         bindtap="onCategoryTap"
-        data-id="{{item.id}}">
-        {{item.name}}
+        data-id="{{item.id}}"
+      >
+        <view class="active-indicator" wx:if="{{selectedCategory === item.id}}"></view>
+        <text class="sidebar-text">{{item.name}}</text>
       </view>
-    </view>
+    </scroll-view>
 
-    <!-- 二级分类/商品 -->
-    <view class="category-content">
-      <!-- 子分类 -->
-      <view class="sub-category-list" wx:if="{{selectedCategory && subCategories.length > 0}}">
-        <view
-          class="sub-category-item"
-          wx:for="{{subCategories}}"
-          wx:key="id"
-          bindtap="onSubCategoryTap"
-          data-id="{{item.id}}">
-          <image class="sub-category-icon" src="{{item.icon}}" mode="aspectFill"></image>
-          <text class="sub-category-name">{{item.name}}</text>
+    <!-- 右侧主体内容 -->
+    <scroll-view class="main-content" scroll-y>
+      
+      <!-- 子分类宫格 (暂保留展示逻辑，如有数据可选) -->
+      <view class="sub-cats" wx:if="{{selectedCategory && subCategories.length > 0}}">
+        <view 
+          class="sub-cat-item" 
+          wx:for="{{subCategories}}" 
+          wx:key="id" 
+          bindtap="onSubCategoryTap" 
+          data-id="{{item.id}}"
+        >
+          <image class="sub-icon" src="{{item.icon}}" mode="aspectFill"></image>
+          <text class="sub-name">{{item.name}}</text>
         </view>
       </view>
 
-      <!-- 商品列表 -->
-      <view class="product-list" wx:if="{{products.length > 0}}">
-        <view
-          class="product-card"
+      <!-- 商品展示区 -->
+      <view class="product-grid" wx:if="{{products.length > 0}}">
+        <cp-product-card
+          style="width: 100%;"
           wx:for="{{products}}"
           wx:key="id"
+          product="{{item}}"
           bindtap="onProductTap"
-          data-id="{{item.id}}">
-          <image class="product-img" src="{{item.cover_image}}" mode="aspectFill"></image>
-          <view class="product-info">
-            <text class="product-name">{{item.name}}</text>
-            <view class="product-price-row">
-              <text class="product-price">¥{{item.daily_rent}}</text>
-              <text class="product-unit">/天</text>
-            </view>
-          </view>
-        </view>
+          data-id="{{item.id}}"
+        ></cp-product-card>
       </view>
 
       <!-- 空状态 -->
-      <view class="empty" wx:if="{{products.length === 0 && !loading}}">
-        <text>暂无商品</text>
+      <view class="empty-state" wx:if="{{products.length === 0 && !loading}}">
+        <view class="icon-empty-box">
+          <view class="box-lid"></view>
+          <view class="box-body"></view>
+        </view>
+        <text class="empty-text">该分类下暂无商品</text>
+        <text class="empty-sub">去看看别的分类吧？</text>
       </view>
 
-      <!-- 加载中 -->
-      <view class="loading" wx:if="{{loading}}">
-        <text>加载中...</text>
+      <view class="loading-state" wx:if="{{loading}}">
+        <view class="loading-dots">
+          <view class="dot"></view><view class="dot"></view><view class="dot"></view>
+        </view>
       </view>
-    </view>
+
+    </scroll-view>
   </view>
 </view>

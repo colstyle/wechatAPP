@@ -64,10 +64,10 @@ Page({
   onDateTap(e) {
     const date = e.currentTarget.dataset.date
     this.setData({
-      selectedDate: date.value,
+      selectedDate: date,
       selectedTime: null
     })
-    this.loadAvailableTimes(date.value)
+    this.loadAvailableTimes(date)
   },
 
   // 加载可用时间

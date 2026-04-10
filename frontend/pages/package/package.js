@@ -66,9 +66,12 @@ Page({
 
   // 切换选择
   toggleSelect(e) {
-    const item = e.currentTarget.dataset.item
+    const id = e.currentTarget.dataset.id
     const { selectedItems, products } = this.data
-    const index = selectedItems.findIndex(si => si.id === item.id)
+    const item = products.find(p => p.id === id)
+    if (!item) return
+
+    const index = selectedItems.findIndex(si => si.id === id)
 
     if (index > -1) {
       // 取消选择

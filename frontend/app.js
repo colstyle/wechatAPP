@@ -1,6 +1,6 @@
 // app.js
 App({
-  // API基础地址
+  // API基础地址 (电脑局域网 IP，供真机真机测试用)
   apiBase: 'http://192.168.43.79:8000',
 
   // 全局数据
@@ -15,6 +15,9 @@ App({
   },
 
   onLaunch() {
+    // 获取系统信息与胶囊按钮位置（用于自定义导航栏）
+    this.getNavBarData()
+
     const savedApiBase = wx.getStorageSync('apiBase')
     if (savedApiBase) {
       this.apiBase = savedApiBase
@@ -38,8 +41,9 @@ App({
   },
 
   setApiBase(apiBase) {
-    const value = (apiBase || '').trim()
+    let value = (apiBase || '').trim()
     if (!value) return
+    if (value.endsWith('/')) value = value.slice(0, -1)
     this.apiBase = value
     this.globalData.apiBase = value
     wx.setStorageSync('apiBase', value)
@@ -130,6 +134,14 @@ App({
 
   // 统一请求方法
   request(url, method = 'GET', data = {}, needAuth = true, retryAuth = true) {
+    if (!this.apiBase || typeof this.apiBase !== 'string' || !/^https?:\/\//.test(this.apiBase)) {
+      wx.showToast({
+        title: '请先在设置页配置后端地址',
+        icon: 'none'
+      })
+      return Promise.reject({ message: 'API_BASE_NOT_SET' })
+    }
+
     return new Promise((resolve, reject) => {
       const header = {
         'content-type': 'application/json'
@@ -246,5 +258,37 @@ App({
     const hour = String(date.getHours()).padStart(2, '0')
     const minute = String(date.getMinutes()).padStart(2, '0')
     return `${year}-${month}-${day} ${hour}:${minute}`
+  },
+
+  // 获取自定义导航栏所需的基础数据（使用新 API，避免 getSystemInfoSync 废弃警告）
+  getNavBarData() {
+    try {
+      const windowInfo = wx.getWindowInfo()           // 替代 getSystemInfoSync
+      const menuButtonInfo = wx.getMenuButtonBoundingClientRect()
+
+      const statusBarHeight = windowInfo.statusBarHeight
+      const menuTop    = menuButtonInfo.top
+      const menuHeight = menuButtonInfo.height
+
+      // 导航栏总高度 = (胶囊上边距 - 状态栏高度) × 2 + 胶囊高度 + 状态栏高度
+      const navBarHeight = (menuTop - statusBarHeight) * 2 + menuHeight + statusBarHeight
+
+      this.globalData.navBarData = {
+        statusBarHeight,
+        navBarHeight,
+        menuTop,
+        menuHeight,
+        windowWidth: windowInfo.windowWidth
+      }
+    } catch (e) {
+      // 降级兜底，避免旧设备异常崩溃
+      this.globalData.navBarData = {
+        statusBarHeight: 44,
+        navBarHeight: 88,
+        menuTop: 48,
+        menuHeight: 32,
+        windowWidth: 375
+      }
+    }
   }
 })

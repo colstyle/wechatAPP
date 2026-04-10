@@ -14,11 +14,11 @@
     <view class="section-title">选择日期</view>
     <view class="date-scroll">
       <view
-        class="date-item {{selectedDate === item ? 'active' : ''}}"
+        class="date-item {{selectedDate === item.value ? 'active' : ''}}"
         wx:for="{{dates}}"
-        wx:key="*this"
+        wx:key="value"
         bindtap="onDateTap"
-        data-date="{{item}}">
+        data-date="{{item.value}}">
         <text class="date-day">{{item.day}}</text>
         <text class="date-month">{{item.month}}</text>
       </view>

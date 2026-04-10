@@ -1,69 +1,100 @@
-<!--pages/orders/confirm.wxml-->
-<view class="page">
-  <!-- 商品信息 -->
-  <view class="section">
-    <view class="section-title">商品信息</view>
-    <view class="product-info-card" wx:for="{{displayItems}}" wx:key="index">
-      <image class="product-img" src="{{item.product.cover_image}}" mode="aspectFill"></image>
-      <view class="product-detail">
-        <text class="product-name">{{item.product.name}}</text>
-        <text class="product-spec">尺码: {{item.size}} | 颜色: {{item.color}} ×{{item.quantity}}</text>
+<!-- pages/orders/confirm.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="确认订单" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <scroll-view class="content-scroll" scroll-y>
+    
+    <!-- 商品信息卡片 -->
+    <view class="section-card">
+      <view class="sec-title">租赁明细</view>
+      <view class="item-list">
+        <view class="product-item" wx:for="{{displayItems}}" wx:key="index">
+          <image class="p-img" src="{{item.product.cover_image}}" mode="aspectFill"></image>
+          <view class="p-info">
+            <view class="p-name">{{item.product.name}}</view>
+            <view class="p-spec">
+              <text class="tag">{{item.size}}</text>
+              <text class="tag">{{item.color}}</text>
+              <text class="qty">×{{item.quantity}}</text>
+            </view>
+          </view>
+        </view>
       </view>
+    </view>
+
+    <!-- 租赁配置卡片 -->
+    <view class="section-card">
+      <view class="sec-title">租赁选项</view>
+      <view class="row-list">
+        <view class="row-item">
+          <text class="row-label">合作模式</text>
+          <text class="row-val mode-text">{{rentalTypeText}}</text>
+        </view>
+        
+        <view class="row-item" wx:if="{{rentalType === 1 || rentalType === 2}}">
+          <text class="row-label">起租日期</text>
+          <picker mode="date" start="{{todayDate}}" value="{{startDate}}" bindchange="onDateChange">
+            <view class="row-val date-picker">
+              <text>{{startDate || '请选择'}}</text>
+              <view class="icon-arrow"></view>
+            </view>
+          </picker>
+        </view>
+
+        <view class="row-item" wx:if="{{rentalType === 1}}">
+          <text class="row-label">租赁周期</text>
+          <text class="row-val">{{rentDays}} 天</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 资金账单卡片 -->
+    <view class="section-card">
+      <view class="sec-title">资金账单</view>
+      <view class="row-list">
+        <view class="row-item">
+          <text class="row-label">租金总计</text>
+          <text class="row-val price">¥ {{calculatedRent}}</text>
+        </view>
+        <view class="row-item">
+          <text class="row-label sub-label">押金预授权 (归还后极速退回)</text>
+          <text class="row-val price sub">¥ {{calculatedDeposit}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 备注卡片 -->
+    <view class="section-card">
+      <view class="sec-title">给店主留言</view>
+      <view class="remark-box">
+        <textarea 
+          class="remark-input" 
+          placeholder="选填，告诉我们您的特殊需求..." 
+          placeholder-class="ph-style"
+          value="{{remark}}" 
+          bindinput="onRemarkInput" 
+          maxlength="200"
+          auto-height
+        ></textarea>
+      </view>
+    </view>
+
+    <!-- 底部占位以免被悬浮栏遮挡 -->
+    <view style="height: 180rpx;"></view>
+  </scroll-view>
+
+  <!-- 底部悬浮确认栏 (磨砂玻璃) -->
+  <view class="footer-glass">
+    <view class="f-left">
+      <text class="f-lbl">总结算</text>
+      <text class="f-sym">¥</text>
+      <text class="f-total">{{calculatedTotal}}</text>
+    </view>
+    <!-- 修改了这里的文案和样式，明确指向【支付】动作 -->
+    <view class="btn-submit" bindtap="onSubmit">
+      <text>前往支付</text>
+      <view class="icon-submit-arrow"></view>
     </view>
   </view>
 
-  <!-- 租赁信息 -->
-  <view class="section">
-    <view class="section-title">租赁信息</view>
-    <view class="rental-info">
-      <view class="info-row">
-        <text class="label">租赁类型:</text>
-        <text class="value">{{rentalTypeText}}</text>
-      </view>
-      <view class="info-row" wx:if="{{rentalType === 1 || rentalType === 2}}">
-        <text class="label">使用日期:</text>
-        <picker mode="date" start="{{todayDate}}" value="{{startDate}}" bindchange="onDateChange">
-          <view class="value">{{startDate || '请选择日期'}}</view>
-        </picker>
-      </view>
-      <view class="info-row" wx:if="{{rentalType === 1}}">
-        <text class="label">租赁天数:</text>
-        <text class="value">{{rentDays}}天</text>
-      </view>
-      <view class="info-row">
-        <text class="label">租金:</text>
-        <text class="value price">¥{{calculatedRent}}</text>
-      </view>
-      <view class="info-row">
-        <text class="label">押金:</text>
-        <text class="value price">¥{{calculatedDeposit}}</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 备注 -->
-  <view class="section">
-    <view class="section-title">备注</view>
-    <textarea
-      class="remark-input"
-      placeholder="选填，请输入备注信息"
-      value="{{remark}}"
-      bindinput="onRemarkInput"
-      maxlength="200"
-    ></textarea>
-  </view>
-
-  <!-- 底部占位 -->
-  <view class="bottom-placeholder"></view>
-
-  <!-- 底部提交栏 -->
-  <view class="footer">
-    <view class="footer-left">
-      <text class="total-label">应付金额</text>
-      <text class="total-price">¥{{calculatedTotal}}</text>
-    </view>
-    <button class="btn btn-primary footer-btn" bindtap="onSubmit">
-      提交订单
-    </button>
-  </view>
 </view>
