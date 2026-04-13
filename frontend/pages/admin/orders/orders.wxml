@@ -12,9 +12,15 @@
       </view>
       <input class="search-input" placeholder="搜索单号 / 用户昵称" value="{{keyword}}" bindconfirm="onSearch" confirm-type="search" bindinput="onSearchInput" />
     </view>
-    <view class="btn-pkg" bindtap="goToPackageManage">
-      <view class="icon-pkg"></view>
-      <text>套餐管理</text>
+    <view class="action-btns">
+      <view class="btn-pkg" bindtap="goToInventoryManage" style="margin-right: 12rpx;">
+        <view class="icon-pkg"></view>
+        <text>库存管理</text>
+      </view>
+      <view class="btn-pkg" bindtap="goToPackageManage">
+        <view class="icon-pkg"></view>
+        <text>套餐管理</text>
+      </view>
     </view>
   </view>
 

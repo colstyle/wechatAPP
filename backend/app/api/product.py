@@ -8,7 +8,7 @@ from typing import Optional, List
 from datetime import datetime
 import json
 from database import db
-from app.utils.auth import get_current_user
+from app.utils.auth import get_current_user, require_admin
 
 router = APIRouter()
 
@@ -52,6 +52,25 @@ class ProductResponse(BaseModel):
     is_new: bool
     view_count: int
     rent_count: int
+
+class ProductSaveRequest(BaseModel):
+    name: str
+    category_id: int = 0
+    brand_id: int = 0
+    cover_image: str
+    images: list = []
+    description: str = ""
+    deposit: float = 0.0
+    daily_rent: float = 0.0
+    single_rent: float = 0.0
+    month_card_rent: float = 0.0
+    stock: int = 1
+    sizes: list = []
+    colors: list = []
+    is_hot: bool = False
+    is_new: bool = False
+    is_package_eligible: bool = False
+    status: int = 1
 
 
 class OutfitResponse(BaseModel):
@@ -177,7 +196,31 @@ async def get_products(
     支持按日期筛选可用商品
     """
     # 构建查询条件
-    conditions = ["p.status = 1"]
+    # 如果不仅查询上架商品，可以通过 admin 传参，但为安全起见，非 admin 强制 status=1
+    conditions = []
+    
+    # 鉴权判断，如果没带Token或不是admin，强制status=1
+    is_admin = False
+    if authorization:
+        try:
+            from app.utils.auth import _extract_token, jwt, settings
+            token = _extract_token(authorization)
+            if token:
+                payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+                user_id = int(payload.get("sub"))
+                user = db.execute_one("SELECT role FROM users WHERE id = %s", (user_id,))
+                if user and str(user.get("role")) in ("admin", "2"):
+                    is_admin = True
+        except Exception:
+            pass
+
+    if not is_admin:
+        conditions.append("p.status = 1")
+    else:
+        # 管理员也可以通过status参数筛选
+        # 如果需要的话，可以接收status参数。当前暂定返回非硬删除的所有商品
+        conditions.append("p.status IN (0, 1)")
+
     params = []
 
     if category_id:
@@ -242,6 +285,7 @@ async def get_products(
                     "is_hot": p['is_hot'],
                     "is_new": p['is_new'],
                     "is_package_eligible": bool(p.get('is_package_eligible')),
+                    "status": p.get('status', 1),
                     "view_count": p['view_count'],
                     "rent_count": p['rent_count']
                 }
@@ -437,6 +481,7 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "colors": colors,
             "is_hot": product['is_hot'],
             "is_new": product['is_new'],
+            "status": product.get('status', 1),
             "is_package_eligible": bool(product.get('is_package_eligible')),
             "view_count": product['view_count'],
             "rent_count": product['rent_count'],
@@ -468,6 +513,80 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "similar_products": similar_products
         }
     }
+
+
+# ============ 商品管理API (仅管理员) ============
+
+@router.post("/products")
+async def create_product(request: ProductSaveRequest, authorization: Optional[str] = Header(None)):
+    """新增商品"""
+    require_admin(authorization)
+    
+    images_str = json.dumps(request.images, ensure_ascii=False)
+    sizes_str = json.dumps(request.sizes, ensure_ascii=False)
+    colors_str = json.dumps(request.colors, ensure_ascii=False)
+    
+    product_id = db.execute_insert(
+        """INSERT INTO products 
+           (name, category_id, brand_id, cover_image, images, description, 
+            deposit, daily_rent, single_rent, month_card_rent, stock, 
+            sizes, colors, is_hot, is_new, is_package_eligible, status, created_at)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+        (request.name, request.category_id, request.brand_id, request.cover_image, images_str, request.description,
+         request.deposit, request.daily_rent, request.single_rent, request.month_card_rent, request.stock,
+         sizes_str, colors_str, int(request.is_hot), int(request.is_new), int(request.is_package_eligible), request.status)
+    )
+    return {"code": 0, "message": "添加成功", "data": {"id": product_id}}
+
+
+@router.put("/products/{product_id}")
+async def update_product(product_id: int, request: ProductSaveRequest, authorization: Optional[str] = Header(None)):
+    """编辑商品"""
+    require_admin(authorization)
+    
+    product = db.execute_one("SELECT id FROM products WHERE id = %s", (product_id,))
+    if not product:
+        raise HTTPException(status_code=404, detail="商品不存在")
+        
+    images_str = json.dumps(request.images, ensure_ascii=False)
+    sizes_str = json.dumps(request.sizes, ensure_ascii=False)
+    colors_str = json.dumps(request.colors, ensure_ascii=False)
+    
+    db.execute_update(
+        """UPDATE products SET 
+           name=%s, category_id=%s, brand_id=%s, cover_image=%s, images=%s, description=%s,
+           deposit=%s, daily_rent=%s, single_rent=%s, month_card_rent=%s, stock=%s,
+           sizes=%s, colors=%s, is_hot=%s, is_new=%s, is_package_eligible=%s, status=%s
+           WHERE id = %s""",
+        (request.name, request.category_id, request.brand_id, request.cover_image, images_str, request.description,
+         request.deposit, request.daily_rent, request.single_rent, request.month_card_rent, request.stock,
+         sizes_str, colors_str, int(request.is_hot), int(request.is_new), int(request.is_package_eligible), request.status,
+         product_id)
+    )
+    return {"code": 0, "message": "更新成功"}
+
+
+@router.delete("/products/{product_id}")
+async def delete_product(product_id: int, authorization: Optional[str] = Header(None)):
+    """删除商品：关联了订单只能软删除（下架），无关联直接硬删除"""
+    require_admin(authorization)
+    
+    product = db.execute_one("SELECT id FROM products WHERE id = %s", (product_id,))
+    if not product:
+        raise HTTPException(status_code=404, detail="商品不存在")
+        
+    has_orders = db.execute_one("SELECT id FROM order_items WHERE product_id = %s LIMIT 1", (product_id,))
+    if has_orders:
+        # 有关联订单，执行软删除：状态置为 0(下架)
+        db.execute_update("UPDATE products SET status = 0 WHERE id = %s", (product_id,))
+        return {"code": 0, "message": "该商品有关联订单，已做下架处理。"}
+    else:
+        # 无关联订单，硬删除
+        db.execute_update("DELETE FROM products WHERE id = %s", (product_id,))
+        # 清理关联的收藏记录、预约记录等
+        db.execute_update("DELETE FROM favorites WHERE product_id = %s", (product_id,))
+        db.execute_update("DELETE FROM reservations WHERE product_id = %s", (product_id,))
+        return {"code": 0, "message": "商品及相关记录已永久删除。"}
 
 
 # ============ 搭配API ============

@@ -1,0 +1,51 @@
+<!-- pages/admin/inventory/list/list.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="服装库存管理" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <view class="admin-header">
+    <view class="search-bar" style="flex: 1; margin-right: 20rpx;">
+      <view class="icon-search-sm">
+        <view class="sc-cir"></view>
+        <view class="sc-han"></view>
+      </view>
+      <input class="search-input" placeholder="搜索商品名称" value="{{keyword}}" bindconfirm="onSearch" confirm-type="search" bindinput="onSearchInput" />
+    </view>
+    <view class="btn-add" bindtap="goToAdd">
+      <text>+ 添加商品</text>
+    </view>
+  </view>
+
+  <scroll-view class="product-list" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="product-item" wx:for="{{products}}" wx:key="id">
+      <image class="cover" src="{{item.cover_image}}" mode="aspectFill"></image>
+      <view class="info">
+        <view class="name-row">
+          <text class="name">{{item.name}}</text>
+          <text class="tag-status {{item.status === 1 ? 'status-up' : 'status-down'}}">{{item.status === 1 ? '上架中' : '已下架'}}</text>
+        </view>
+        <view class="price-row">
+          <text class="price-label">日租</text> <text class="price-val">¥{{item.daily_rent}}</text>
+          <text class="price-label ml">押金</text> <text class="price-val">¥{{item.deposit}}</text>
+        </view>
+        <view class="stats-row">
+          <text>库存: {{item.stock}}</text>
+          <text class="ml">已租: {{item.rent_count}}次</text>
+        </view>
+        <view class="action-row">
+          <view class="btn-outline" bindtap="goToEdit" data-id="{{item.id}}">编辑</view>
+          <view class="btn-outline danger" bindtap="onDelete" data-id="{{item.id}}">{{item.status === 1 ? '下架/删除' : '删除'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
+    </view>
+    <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多商品了</view>
+    
+    <view class="empty-state" wx:if="{{!loading && products.length === 0}}">
+      <text class="empty-text">暂无相关商品</text>
+    </view>
+  </scroll-view>
+
+</view>

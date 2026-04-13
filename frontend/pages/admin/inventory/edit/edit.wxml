@@ -1,0 +1,100 @@
+<!-- pages/admin/inventory/edit/edit.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="{{id ? '编辑商品' : '新增商品'}}" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <scroll-view class="form-scroll" scroll-y>
+    <view class="form-group">
+      <view class="form-title">基本信息</view>
+      
+      <view class="form-item">
+        <text class="label required">商品名称</text>
+        <input class="input" placeholder="输入款式名称" value="{{formData.name}}" bindinput="onInput" data-field="name" />
+      </view>
+
+      <view class="form-item">
+        <text class="label required">分类ID</text>
+        <input class="input" type="number" placeholder="输入分类ID(数字)" value="{{formData.category_id}}" bindinput="onInput" data-field="category_id" />
+      </view>
+
+      <view class="form-item">
+        <text class="label required">品牌ID</text>
+        <input class="input" type="number" placeholder="输入品牌ID(数字)" value="{{formData.brand_id}}" bindinput="onInput" data-field="brand_id" />
+      </view>
+
+      <view class="form-item">
+        <text class="label">商品描述</text>
+        <textarea class="textarea" placeholder="输入相关描述或亮点" value="{{formData.description}}" bindinput="onInput" data-field="description" auto-height></textarea>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-title">租金与库存</view>
+      
+      <view class="form-item">
+        <text class="label required">日租金(¥)</text>
+        <input class="input" type="digit" placeholder="0.00" value="{{formData.daily_rent}}" bindinput="onInput" data-field="daily_rent" />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">单次租金(¥)</text>
+        <input class="input" type="digit" placeholder="可选填" value="{{formData.single_rent}}" bindinput="onInput" data-field="single_rent" />
+      </view>
+
+      <view class="form-item">
+        <text class="label required">押金(¥)</text>
+        <input class="input" type="digit" placeholder="0.00" value="{{formData.deposit}}" bindinput="onInput" data-field="deposit" />
+      </view>
+
+      <view class="form-item">
+        <text class="label required">当前库存数量</text>
+        <input class="input" type="number" placeholder="默认1" value="{{formData.stock}}" bindinput="onInput" data-field="stock" />
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-title">图片素材</view>
+      <view class="img-tips">首张图为封面图，最多支持5张</view>
+      
+      <view class="img-grid">
+        <view class="img-box" wx:for="{{formData.images}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFill"></image>
+          <view class="btn-del-img" bindtap="onRemoveImage" data-index="{{index}}">×</view>
+          <view class="tag-cover" wx:if="{{index === 0}}">封面</view>
+        </view>
+        <view class="img-box btn-upload" bindtap="onChooseImage" wx:if="{{formData.images.length < 5}}">
+          <view class="icon-plus">+</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-title">状态与标记</view>
+      
+      <view class="form-item switch-item">
+        <text class="label">立即上架在售</text>
+        <switch checked="{{formData.status === 1}}" color="#C5A059" bindchange="onSwitch" data-field="status" />
+      </view>
+      
+      <view class="form-item switch-item">
+        <text class="label">热门商品</text>
+        <switch checked="{{formData.is_hot}}" color="#C5A059" bindchange="onSwitch" data-field="is_hot" />
+      </view>
+
+      <view class="form-item switch-item">
+        <text class="label">新品标记</text>
+        <switch checked="{{formData.is_new}}" color="#C5A059" bindchange="onSwitch" data-field="is_new" />
+      </view>
+
+      <view class="form-item switch-item">
+        <text class="label">参与 3件69.9套餐</text>
+        <switch checked="{{formData.is_package_eligible}}" color="#C5A059" bindchange="onSwitch" data-field="is_package_eligible" />
+      </view>
+    </view>
+
+    <view class="bottom-holder"></view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <button class="btn-submit" bindtap="onSubmit" loading="{{submitting}}">保存商品</button>
+  </view>
+</view>

@@ -110,18 +110,24 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
     total_deposit = Decimal('0.00')
     order_items = []
 
-    # 套餐租赁逻辑 (类型5: 3件69.9元)
+    # ===== 套餐服务端校验（type=5：3件69.9元）=====
     if request.rental_type == 5:
         if len(request.items) != 3:
-            raise HTTPException(status_code=400, detail="特惠套餐必须选择3件衣物")
+            raise HTTPException(status_code=400, detail="套餐必须选择3件衣物")
+        # 防止同一件衣物重复加入套餐
+        item_ids = [i['product_id'] for i in request.items]
+        if len(item_ids) != len(set(item_ids)):
+            raise HTTPException(status_code=400, detail="套餐中不能重复选择同一件衣物")
         total_rent = Decimal('69.90')
-    
+
     for item in request.items:
         product = product_map.get(item['product_id'])
         if not product:
             raise HTTPException(status_code=404, detail=f"商品ID {item['product_id']} 不存在")
+
+        # 套餐资格服务端强校验
         if request.rental_type == 5 and not bool(product.get('is_package_eligible')):
-            raise HTTPException(status_code=400, detail=f"衣物 {product['name']} 不参与套餐活动")
+            raise HTTPException(status_code=400, detail=f"衣物《{product['name']}》不参与套餐活动")
 
         # 检查日期锁定：同一日期同一件衣服仅支持一单
         existing = db.execute_one(
@@ -129,29 +135,34 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
             (item['product_id'], start_date)
         )
         if existing:
-            raise HTTPException(status_code=400, detail=f"衣物 {product['name']} 在 {request.start_date} 已被预订")
+            raise HTTPException(status_code=400, detail=f"衣物《{product['name']}》在 {request.start_date} 已被预订")
 
-        # 计算押金 (单品累加)
-        deposit = Decimal(str(product['deposit']))
+        # ===== 快照固化：下单时记录当前价格，与商品表解耦 =====
+        # 后续修改商品价格不影响历史订单金额
+        snapshot_price   = Decimal(str(product.get('daily_rent', 0)))
+        snapshot_deposit = Decimal(str(product.get('deposit', 0)))
+        snapshot_image   = product.get('cover_image') or product.get('main_image') or ''
+
+        deposit = snapshot_deposit
         total_deposit += deposit * item.get('quantity', 1)
 
-        # 计算租金 (非套餐模式下累加单品租金)
         if request.rental_type != 5:
-            # 默认使用 daily_rent 作为 24h 租金
-            rent_price = Decimal(str(product['daily_rent']))
+            rent_price  = snapshot_price
             total_rent += rent_price * item.get('quantity', 1)
         else:
-            rent_price = Decimal('0.00') # 套餐模式单品租金在条目中记为0，总额固定
+            rent_price = Decimal('0.00')  # 套餐模式：单品租金记为0，总额固定69.9
 
         order_items.append({
-            'product_id': item['product_id'],
-            'product_name': product['name'],
-            'product_image': product['cover_image'],
-            'size': item.get('size', ''),
-            'color': item.get('color', ''),
-            'rent_price': rent_price,
-            'deposit': deposit,
-            'quantity': item.get('quantity', 1)
+            'product_id':       item['product_id'],
+            'product_name':     product['name'],
+            'product_image':    snapshot_image,
+            'snapshot_price':   snapshot_price,   # 价格快照
+            'snapshot_deposit': snapshot_deposit, # 押金快照
+            'size':             item.get('size', ''),
+            'color':            item.get('color', ''),
+            'rent_price':       rent_price,
+            'deposit':          deposit,
+            'quantity':         item.get('quantity', 1)
         })
 
     total_amount = total_rent + total_deposit
@@ -171,13 +182,28 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
         )
 
         for item in order_items:
-            db.execute_insert(
-                """INSERT INTO order_items (order_id, product_id, product_name, product_image, size, color,
-                   rent_price, deposit, quantity, created_at)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-                (order_id, item['product_id'], item['product_name'], item['product_image'],
-                 item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
-            )
+            # 尝试写入含快照字段的版本，若表中无该字段则回退（兼容旧表结构）
+            try:
+                db.execute_insert(
+                    """INSERT INTO order_items
+                       (order_id, product_id, product_name, product_image,
+                        snapshot_price, snapshot_deposit,
+                        size, color, rent_price, deposit, quantity, created_at)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+                    (order_id, item['product_id'], item['product_name'], item['product_image'],
+                     item['snapshot_price'], item['snapshot_deposit'],
+                     item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
+                )
+            except Exception:
+                # 旧表无 snapshot 字段时降级写入（迁移过渡期兼容）
+                db.execute_insert(
+                    """INSERT INTO order_items
+                       (order_id, product_id, product_name, product_image,
+                        size, color, rent_price, deposit, quantity, created_at)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+                    (order_id, item['product_id'], item['product_name'], item['product_image'],
+                     item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
+                )
             # 锁定日期库存
             db.execute_insert(
                 "INSERT INTO reservations (product_id, reserved_date, order_id, created_at) VALUES (%s, %s, %s, NOW())",

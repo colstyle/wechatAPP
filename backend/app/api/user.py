@@ -9,6 +9,7 @@ from datetime import datetime
 import hashlib
 import time
 import json
+import httpx
 from database import db
 from app.utils.auth import create_access_token, get_current_user
 from config import settings
@@ -104,15 +105,36 @@ async def login(request: LoginRequest):
     """
     微信登录
     """
-    # TODO: 调用微信API获取openid
-    # 这里先用模拟的方式，实际需要请求微信服务器
-    # openid = get_wechat_openid(request.code)
-
     openid = None
     if settings.DEBUG and request.mock_openid:
         openid = request.mock_openid.strip()
+        
     if not openid:
-        openid = hashlib.md5(request.code.encode()).hexdigest()
+        if not request.code:
+            raise HTTPException(status_code=400, detail="code不能为空")
+            
+        # 真实调用微信 jscode2session API
+        if settings.WECHAT_APP_ID == "your-wechat-app-id" and settings.DEBUG:
+            # 本地开发未配置真实的 AppID 时，回退使用 hash（仅限 DEBUG 环境）
+            openid = hashlib.md5(request.code.encode()).hexdigest()
+        else:
+            url = "https://api.weixin.qq.com/sns/jscode2session"
+            params = {
+                "appid": settings.WECHAT_APP_ID,
+                "secret": settings.WECHAT_APP_SECRET,
+                "js_code": request.code,
+                "grant_type": "authorization_code"
+            }
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(url, params=params)
+                data = resp.json()
+                
+            if "errcode" in data and data["errcode"] != 0:
+                raise HTTPException(status_code=400, detail=f"微信登录失败: {data.get('errmsg')}")
+                
+            openid = data.get("openid")
+            if not openid:
+                raise HTTPException(status_code=400, detail="获取微信openid失败")
 
     # 查询用户是否存在
     user = db.execute_one("SELECT * FROM users WHERE openid = %s", (openid,))

@@ -1,10 +1,12 @@
 const app = getApp()
+const faqData = require('../../data/faq.json')
 
 Page({
   data: {
     messages: [
       { id: 1, role: 'assistant', content: '您好！我是您的智能租衣助手，有什么可以帮您的吗？' }
     ],
+    faqs: faqData,
     inputValue: '',
     loading: false,
     lastMessageId: ''
@@ -49,5 +51,31 @@ Page({
         wx.showToast({ title: 'AI 暂时开小差了', icon: 'none' })
         this.setData({ loading: false })
       })
+  },
+
+  onFaqTap(e) {
+    if (this.data.loading) return
+    const id = e.currentTarget.dataset.id
+    const faq = this.data.faqs.find(f => f.id === id)
+    if (!faq) return
+
+    const userMsg = { id: Date.now(), role: 'user', content: faq.question }
+    this.setData({
+      messages: [...this.data.messages, userMsg],
+      lastMessageId: `msg-${userMsg.id}`
+    })
+
+    // FAQ 问题直接本地回复，无需调用后端，节省 token
+    setTimeout(() => {
+      const aiMsg = {
+        id: Date.now() + 1,
+        role: 'assistant',
+        content: faq.answer
+      }
+      this.setData({
+        messages: [...this.data.messages, aiMsg],
+        lastMessageId: `msg-${aiMsg.id}`
+      })
+    }, 500)
   }
 })

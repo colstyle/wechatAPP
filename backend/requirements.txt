@@ -1,6 +1,7 @@
 # 核心依赖
 fastapi
 uvicorn[standard]
+httpx
 
 # 数据库
 pymysql

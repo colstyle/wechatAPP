@@ -126,7 +126,6 @@ Page({
     }
   },
 
-  // 跳转详情
   goToDetail(e) {
     const id = e.currentTarget.dataset.id
     wx.navigateTo({
@@ -136,5 +135,9 @@ Page({
 
   goToPackageManage() {
     wx.navigateTo({ url: '/pages/admin/package/package' })
+  },
+  
+  goToInventoryManage() {
+    wx.navigateTo({ url: '/pages/admin/inventory/list/list' })
   }
 })

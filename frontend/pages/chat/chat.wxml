@@ -36,6 +36,13 @@
 
   <!-- 底部输入栏 (磨砂玻璃) -->
   <view class="footer-bar glass">
+    <!-- FAQ 快捷提问 -->
+    <scroll-view class="faq-list" scroll-x wx:if="{{messages.length < 5}}">
+      <view class="faq-item" wx:for="{{faqs}}" wx:key="id" bindtap="onFaqTap" data-id="{{item.id}}">
+        {{item.question}}
+      </view>
+    </scroll-view>
+
     <view class="chat-input-wrap">
       <input 
         class="chat-input" 

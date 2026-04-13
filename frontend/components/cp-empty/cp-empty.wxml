@@ -1,0 +1,5 @@
+<view class="cp-empty">
+  <view class="empty-icon"><view class="circle"></view><view class="line"></view></view>
+  <view class="empty-text">{{text}}</view>
+  <view class="empty-sub" wx:if="{{subText}}">{{subText}}</view>
+</view>

@@ -1,0 +1,10 @@
+<view class="cp-countdown">
+  <view class="circle-wrap">
+    <view class="circle-left" style="transform: rotate({{degrees > 180 ? degrees - 180 : 0}}deg);"></view>
+    <view class="circle-right" style="transform: rotate({{degrees > 180 ? 180 : degrees}}deg);"></view>
+    <view class="circle-inner">
+      <text class="num">{{hoursLeft}}</text>
+      <text class="unit">h</text>
+    </view>
+  </view>
+</view>

@@ -1,16 +1,21 @@
 // app.js
+const envConfig = require('./config/env.js')
+
 App({
-  // API基础地址 (电脑局域网 IP，供真机真机测试用)
-  apiBase: 'http://192.168.43.79:8000',
+  // API基础地址：从多环境配置读取，不再硬编码
+  // 详见 frontend/config/env.js — develop(dev) / trial(test) / release(prod) 自动切换
+  apiBase: envConfig.apiBase,
 
   // 全局数据
   globalData: {
-    token: null,
-    userInfo: null,
-    selectedDate: null, // 用户选择的租赁日期 (YYYY-MM-DD)
-    apiBase: null,
-    _apiBaseWarned: false,
-    _loginPromise: null,
+    ENV:             envConfig.ENV,       // 当前环境标识
+    enableMock:      envConfig.enableMock, // 是否允许 mock 身份
+    token:           null,
+    userInfo:        null,
+    selectedDate:    null, // 用户选择的租赁日期 (YYYY-MM-DD)
+    apiBase:         null,
+    _apiBaseWarned:  false,
+    _loginPromise:   null,
     _adminAutoRouted: false
   },
 
@@ -18,13 +23,16 @@ App({
     // 获取系统信息与胶囊按钮位置（用于自定义导航栏）
     this.getNavBarData()
 
-    const savedApiBase = wx.getStorageSync('apiBase')
-    if (savedApiBase) {
-      this.apiBase = savedApiBase
-      this.globalData.apiBase = savedApiBase
-    } else {
-      this.globalData.apiBase = this.apiBase
+    // dev 环境：允许从本地存储读取手动覆盖的 apiBase（真机调试换 IP 用）
+    // test / prod 环境：强制使用 env.js 中配置的地址，忽略本地存储
+    if (envConfig.ENV === 'dev') {
+      const savedApiBase = wx.getStorageSync('apiBase')
+      if (savedApiBase) {
+        this.apiBase = savedApiBase
+      }
     }
+    this.globalData.apiBase = this.apiBase
+
     this.globalData.token = null
     this.globalData.userInfo = null
     this.ensureLogin(true)
@@ -39,6 +47,7 @@ App({
       })
       .catch(() => {})
   },
+
 
   setApiBase(apiBase) {
     let value = (apiBase || '').trim()
@@ -92,7 +101,7 @@ App({
 
   // 获取用户信息
   getUserInfo() {
-    return this.request('/api/user/profile', 'GET')
+    return this.request('/api/v1/user/profile', 'GET')
       .then(res => {
         if (res.code === 0) {
           this.globalData.userInfo = res.data
@@ -110,7 +119,7 @@ App({
             const payload = { code: res.code }
             const mockOpenid = wx.getStorageSync('mockOpenid')
             if (mockOpenid) payload.mock_openid = String(mockOpenid).trim()
-            this.request('/api/user/login', 'POST', payload)
+            this.request('/api/v1/user/login', 'POST', payload)
               .then(response => {
                 if (response.code === 0) {
                   this.globalData.token = response.data.token
@@ -132,94 +141,14 @@ App({
     })
   },
 
-  // 统一请求方法
-  request(url, method = 'GET', data = {}, needAuth = true, retryAuth = true) {
-    if (!this.apiBase || typeof this.apiBase !== 'string' || !/^https?:\/\//.test(this.apiBase)) {
-      wx.showToast({
-        title: '请先在设置页配置后端地址',
-        icon: 'none'
-      })
-      return Promise.reject({ message: 'API_BASE_NOT_SET' })
-    }
-
-    return new Promise((resolve, reject) => {
-      const header = {
-        'content-type': 'application/json'
-      }
-
-      // 添加token
-      if (needAuth && this.globalData.token) {
-        header['Authorization'] = `Bearer ${this.globalData.token}`
-      }
-
-      wx.request({
-        url: this.apiBase + url,
-        method: method,
-        data: data,
-        header: header,
-        success: (res) => {
-          if (res.statusCode === 200) {
-            if (res.data.code === 0) {
-              resolve(res.data)
-            } else {
-              // 未登录，尝试重新登录
-              if (res.data.code === 401) {
-                this.wechatLogin()
-                  .then(() => {
-                    // 重新请求
-                    this.request(url, method, data, needAuth, false).then(resolve).catch(reject)
-                  })
-                  .catch(reject)
-              } else {
-                wx.showToast({
-                  title: res.data.message || '请求失败',
-                  icon: 'none'
-                })
-                reject(res.data)
-              }
-            }
-          } else if (res.statusCode === 401 && retryAuth) {
-            this.globalData.token = null
-            this.globalData.userInfo = null
-            wx.removeStorageSync('token')
-            wx.removeStorageSync('userInfo')
-            this.wechatLogin()
-              .then(() => {
-                this.request(url, method, data, needAuth, false).then(resolve).catch(reject)
-              })
-              .catch(reject)
-          } else {
-            wx.showToast({
-              title: '网络请求失败',
-              icon: 'none'
-            })
-            reject({ message: '网络请求失败', statusCode: res.statusCode, data: res.data })
-          }
-        },
-        fail: (err) => {
-          if (!this.globalData._apiBaseWarned) {
-            this.globalData._apiBaseWarned = true
-            wx.showToast({
-              title: '网络异常，请检查后端地址',
-              icon: 'none'
-            })
-          } else {
-            wx.showToast({
-              title: '网络异常',
-              icon: 'none'
-            })
-          }
-          reject(err)
-        }
-      })
-    })
-  },
+  // 统一请求方法（已抽离至 utils/request.js 增加全局错误处理）
+  request: require('./utils/request.js'),
 
   // 上传图片
   uploadImage(filePath) {
     return new Promise((resolve, reject) => {
       wx.uploadFile({
-        url: this.apiBase + '/api/upload/image',
+        url: this.apiBase + '/api/v1/upload/image',
         filePath: filePath,
         name: 'file',
         header: {

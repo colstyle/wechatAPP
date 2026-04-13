@@ -2,198 +2,229 @@
 
 # 👗 小时光租衣舍 (Time Capsule Clothing Rental)
 
-**24小时自助租衣小程序。日期锁定、套餐优惠、AI智能客服。**
+**24小时自助租衣小程序。日期预约、套餐优惠、AI智能客服。**
 
-![Project Status](https://img.shields.io/badge/状态-Phase%205%20Refactor-green?style=flat-square)
+![Project Status](https://img.shields.io/badge/状态-Phase%208%20全量架构收官-success?style=flat-square)
 ![Platform](https://img.shields.io/badge/平台-WeChat%20Mini%20Program%20%7C%20FastAPI-blue?style=flat-square)
 ![Tech Stack](https://img.shields.io/badge/技术栈-FastAPI%20%2B%20MySQL%20%2B%20DeepSeek-blueviolet?style=flat-square)
+![Env](https://img.shields.io/badge/环境-dev%20%7C%20test%20%7C%20prod-lightgrey?style=flat-square)
 
 </div>
 
-***
+---
 
 ## ✨ 核心特性
 
-- 📅 **沉浸式预约体验** — 仪式感全屏日历选择，确保库存实时锁定，杜绝超卖。
-- 🎁 **3件69.9套餐** — 灵活的套餐逻辑，固定租金+阶梯押金，自动计算最优组合。
+- 📅 **沉浸式预约体验** — 仪式感全屏日历选择，库存实时锁定，杜绝超卖。
+- 🎁 **3件69.9套餐** — 固定租金 + 阶梯押金，自动计算最优组合。
 - ⏲️ **可视化 24h 租赁** — 以取衣激活，环形倒计时精细化展示，后端自动计算逾期。
-- 🤖 **AI 灵感客服** — 集成 DeepSeek-V3/Gemini，不仅解答业务，更提供穿搭灵感。
-- 💎 **高奢视觉设计** — 莫兰迪色系、沉浸式顶部、玻璃拟态 UI，打造“小时光”审美。
+- 🤖 **AI 灵感客服** — 集成 DeepSeek-V3/Gemini，解答业务问题并提供穿搭灵感。
+- 💎 **高奢视觉设计** — 莫兰迪色系、沉浸式自定义导航、Design Token 系统。
 
 ## ✅ 当前版本能力
 
-- 🏪 **线下自助取衣** — 下单流程不依赖收货地址，适配到店自助取还。
-- 💳 **支付流程** — 内置支付页面与支付成功状态流转（当前为模拟支付）。
-- 🧑‍💼 **店主端管理** — 管理端订单列表/详情，支持退押金与手动扣费。
-- 🧩 **身份与权限** — 通过用户 `role` 自动分流到店主端/用户端；支持测试环境 Mock 固定身份调试。
-- 🎛️ **套餐可配置** — 店主可配置哪些衣物参与「3件69.9」套餐活动。
+- 🏪 **线下自助取衣** — 下单不依赖收货地址，适配到店自助取还。
+- 💳 **支付流程** — 内置支付页面与状态流转（当前为模拟支付，v1.1 接入真实）。
+- 🧑‍💼 **店主端管理** — 全量订单查询、退押金、手动扣费、换款、套餐配置。
+- 📦 **库存可视化管控** — 实装了专属独立表单管理库存状况；关联订单时启用安全挂起的软删除以保障金融对账稳定性。
+- 🧩 **身份与权限** — 完善 `auth.js`，通过 Token与用户 `role` 自动拦截跨权越界操作；支持 Mock 开发者免签直通调试。
+- 🌐 **高防多环境引擎** — dev / test / prod 随微信编译配置动态平滑切换，搭配后端中间件的防报错机制全面兜底上线体验。
 
-***
+---
 
-## 🚀 开发者指南
+## 📚 项目文档索引
+
+| 文档 | 路径 | 说明 |
+|---|---|---|
+| **产品需求文档** | [docs/PRD.md](./docs/PRD.md) | 功能需求 F01-F23、RBAC 权限、验收标准 |
+| **设计方案** | [docs/DESIGN.md](./docs/DESIGN.md) | Design Tokens、组件规范、交互规范 |
+| **多环境策略** | [docs/ENV.md](./docs/ENV.md) | dev/test/prod 配置、Git 分支映射、上线检查清单 |
+| **开发与测试计划** | [docs/PLAN.md](./docs/PLAN.md) | Phase 进度总览、测试用例、外部对接清单 |
+| **全栈架构大版本** | [README/](./README/) | 记录 Phase6-8 的历史重要决策及业务修正 (如快照制引入) |
+
+---
+
+## 🚀 快速启动
 
 ### 环境要求
 
-| 工具             | 用途           | 建议版本  |
-| -------------- | ------------ | ----- |
-| **Python**     | FastAPI 后端开发 | ≥ 3.9 |
-| **MySQL**      | 数据持久化        | ≥ 5.7 |
-| **微信开发者工具**    | 小程序前端开发      | 最新稳定版 |
-| **OpenAI SDK** | DeepSeek 接入  | 最新版   |
+| 工具 | 用途 | 建议版本 |
+|---|---|---|
+| **Python** | FastAPI 后端 | ≥ 3.9 |
+| **MySQL** | 数据持久化 | ≥ 5.7 |
+| **微信开发者工具** | 小程序前端调试 | 最新稳定版 |
+| **OpenAI SDK** | DeepSeek / Gemini 接入 | 最新版 |
 
-### 快速启动
-
-#### 1. 后端配置 (FastAPI)
+### 1. 后端启动（FastAPI）
 
 ```bash
 cd backend
+
+# 安装依赖
 pip install -r requirements.txt
-# 复制并配置 .env 文件
+
+# 复制环境配置（首次使用）
 cp .env.example .env
-# 检查并初始化数据库
+# 编辑 .env，填写 DB_PASSWORD 和 JWT_SECRET_KEY
+
+# 初始化数据库表结构
 python check_db.py
-# 启动服务
+
+# 启动服务（开发模式，自动热重载）
 python main.py
 ```
 
-#### 2. 前端配置 (WeChat)
+> 多环境启动：`APP_ENV=test python main.py`（详见 [docs/ENV.md](./docs/ENV.md)）
 
-- 使用微信开发者工具打开 `frontend` 目录。
-- 修改 [frontend/app.js](file:///e:\AIProjects\202604@wechatAPP\frontend\app.js) 中的 `apiBase` 指向您的后端地址。
+### 2. 前端启动（微信小程序）
 
-#### 3. 真机调试要点（推荐）
+1. 用微信开发者工具打开 `frontend/` 目录。
+2. 环境配置已**自动化**：工具打开即为 dev 环境，体验版为 test，正式版为 prod（无需手动修改代码）。
+3. 如需覆盖开发环境 API 地址：在小程序「设置」页填写局域网 IP，如 `http://192.168.43.79:8000`。
 
-- 后端必须监听 `0.0.0.0:8000`，确保手机能访问（热点/同一局域网）。
-- 小程序不要使用 `127.0.0.1`；真机请在「设置」页填写电脑局域网 IP，例如 `http://192.168.43.79:8000`。
-- 遇到鉴权/角色不生效：清除小程序缓存并重新进入（避免旧 token 干扰）。
+### 3. 调试身份切换（Mock 登录）
 
-#### 4. 测试环境：Mock 固定身份（高效调试）
+> 仅在 dev / test 环境生效，prod 环境自动关闭。
 
-- 在「设置」页填写模拟身份 `mockOpenid` 后点击「重新登录」，可固定账号不再随机生成用户。
-  - 普通用户：`user_1`
-  - 店主/管理员：`admin_1`
-- 身份分流规则：后端用户字段 `role` 决定权限（兼容 `1/2` 与 `user/admin`）。
+在小程序「设置」页填写 `mockOpenid` 后点击「重新登录」：
 
-***
+| mockOpenid 值 | 身份 |
+|---|---|
+| `user_1` | 普通用户 |
+| `admin_1` | 店主/管理员 |
+
+---
 
 ## 📂 项目结构
 
 ```
 202604@wechatAPP/
+├── docs/                               ← 📚 项目正式文档（本次新建）
+│   ├── PRD.md                          ← 产品需求文档 v1.1
+│   ├── DESIGN.md                       ← 设计方案（Design Tokens/组件规范）
+│   ├── ENV.md                          ← 多环境策略设计
+│   └── PLAN.md                         ← 开发计划 & 测试计划（主计划文档）
 ├── backend/                            ← FastAPI 后端
 │   ├── app/
 │   │   ├── api/                        ← 业务路由层
-│   │   │   ├── admin.py                ← 店主端：订单检索/退押/扣费/换款
-│   │   │   ├── ai.py                   ← AI 客服 (DeepSeek/Gemini)
-│   │   │   ├── appointment.py          ← 预约相关
-│   │   │   ├── order.py                ← 下单/支付/取衣/还衣/订单查询
-│   │   │   ├── product.py              ← 商品/分类/品牌/收藏等
-│   │   │   ├── review.py               ← 评价体系
-│   │   │   ├── subscription.py         ← 订阅/套餐相关
-│   │   │   └── user.py                 ← 登录/用户资料/地址等
+│   │   │   ├── admin.py                ← 店主端：订单/退押/扣费/换款/库存管理
+│   │   │   ├── ai.py                   ← AI 客服（DeepSeek/Gemini）
+│   │   │   ├── order.py                ← 下单/支付/取衣/还衣/状态流转
+│   │   │   ├── product.py              ← 商品/分类/品牌/库存 CRUD
+│   │   │   ├── user.py                 ← 登录/用户资料
+│   │   │   └── ...                     ← review/subscription/appointment（预留）
 │   │   └── utils/
-│   │       └── wechat_pay.py           ← 微信支付 V3 框架封装（可模拟）
+│   │       ├── auth.py                 ← JWT 鉴权 + require_admin 依赖
+│   │       └── wechat_pay.py           ← 微信支付 V3 框架（模拟）
 │   ├── config/
-│   │   └── settings.py                 ← 系统配置（DB、AI、CORS等）
+│   │   └── settings.py                 ← 多环境配置（APP_ENV 驱动）
 │   ├── database/
-│   │   ├── connection.py               ← 数据库连接与封装
+│   │   ├── connection.py               ← 数据库连接封装
 │   │   └── init.sql                    ← 初始化建表脚本
-│   ├── check_db.py                     ← 初始化/自检数据库表结构
-│   ├── seed_db.py                      ← 测试数据种子脚本
-│   ├── main.py                         ← 后端启动入口
-│   └── requirements.txt                ← Python 依赖
-├── frontend/                           ← 微信小程序前端（原生）
-│   ├── app.js                          ← 全局请求封装/登录态
+│   ├── .env.example                    ← 环境变量模板（可提交）
+│   ├── .env.test                       ← 测试环境模板（可提交，无真实密钥）
+│   ├── check_db.py                     ← 数据库自检/初始化
+│   ├── seed_db.py                      ← 测试数据种子
+│   └── main.py                         ← 后端启动入口
+├── frontend/                           ← 微信小程序（原生）
+│   ├── config/
+│   │   └── env.js                      ← 🌐 多环境配置（envVersion 自动切换）
+│   ├── styles/
+│   │   └── theme.wxss                  ← Design Token 变量定义
+│   ├── components/
+│   │   ├── cp-nav-bar/                 ← 沉浸式自定义导航栏
+│   │   └── cp-product-card/            ← 高级商品卡片（3:4/骨架屏）
 │   ├── utils/
-│   │   ├── api.js                      ← API 封装（user/product/order/admin等）
-│   │   └── util.js                     ← 通用工具（状态文案、时间格式化等）
-│   └── pages/
-│       ├── index/                      ← 首页：选日期/商品列表
-│       ├── category/                   ← 分类
-│       ├── detail/                     ← 商品详情：立即预定/客服入口
-│       ├── orders/                     ← 下单确认/订单列表
-│       ├── order/                      ← 订单详情：取衣/还衣/倒计时
-│       ├── pay/                        ← 支付页（先模拟）
-│       ├── chat/                       ← AI 客服
-│       ├── profile/                    ← 我的
-│       └── admin/                      ← 店主端：订单列表/订单详情/套餐管理
-└── README/                             ← 项目文档与阶段说明
+│   │   ├── api.js                      ← API 聚合层（user/product/order/admin）
+│   │   └── util.js                     ← 通用工具函数
+│   ├── pages/
+│   │   ├── index/                      ← 首页：日历选日期 + 商品列表
+│   │   ├── category/                   ← 分类浏览
+│   │   ├── detail/                     ← 商品详情 + 立即预定
+│   │   ├── orders/                     ← 我的订单列表 + 下单确认
+│   │   ├── order/                      ← 订单详情：取衣/还衣/倒计时
+│   │   ├── pay/                        ← 支付页（模拟）
+│   │   ├── chat/                       ← AI 客服全屏对话
+│   │   ├── profile/                    ← 个人中心
+│   │   ├── settings/                   ← 开发者设置（dev/test 环境可见）
+│   │   └── admin/                      ← 店主端：订单/库存/套餐管理
+│   ├── app.js                          ← 全局登录态/请求封装
+│   ├── app.json                        ← 页面注册/tabBar 配置
+│   └── app.wxss                        ← 全局基础样式
+├── README/                             ← 各阶段更新详细日志
+├── .gitignore                          ← 含 .env / .env.prod 保护
+├── plan.md                             ← （同 docs/PLAN.md，根目录快捷访问）
+└── README.md                           ← 本文件
 ```
 
-#### 3. Git 常用命令
+---
+
+## 🛠️ 技术栈
+
+| 层 | 技术 | 说明 |
+|---|---|---|
+| **前端** | 微信小程序原生 | WXML + WXSS + JS，无框架依赖 |
+| **后端** | FastAPI + Uvicorn | Python 异步 Web 框架 |
+| **数据库** | MySQL 5.7+ + PyMySQL | 手写 SQL，无 ORM 抽象层 |
+| **鉴权** | JWT Bearer Token | `python-jose` 生成，7天有效期 |
+| **AI** | DeepSeek-V3 / Gemini 1.5 | 通过 `AI_SERVICE_TYPE` 切换 |
+| **支付** | 微信支付 V3 | 框架已就绪，当前为模拟模式 |
+
+---
+
+## 📅 Phase 进度总览
+
+| 阶段 | 主题 | 核心内容 | 状态 |
+|---|---|---|---|
+| Phase 1 | [业务逻辑与AI基座](./README/20260409_Phase1_BusinessLogic_AI.md) | 24h计时、3件套餐、DeepSeek接入 | ✅ 完成 |
+| Phase 2 | [店主管理与支付框架](./README/20260409_Phase2_Admin_Payment.md) | 店主订单管理、微信支付V3框架 | ✅ 完成 |
+| Phase 3 | [MVP 精简与闭环](./README/20260409_Phase3_MVP_Simplification.md) | 选衣→下单→取衣→还衣 核心闭环 | ✅ 完成 |
+| Phase 4 | [身份与权限调试](./README/20260409_Phase4_Identity_Role_Mock.md) | Mock身份、role权限分流 | ✅ 完成 |
+| Phase 5 | [高奢审美与架构重构](./README/20260410_Phase5_Aesthetic_Refactor.md) | 莫兰迪UI、沉浸导航、原子组件库 | ✅ 完成 |
+| **Phase 6** | **工程规范化** | **多环境、安全加固、全局错误处理** | 🚀 进行中 |
+| Phase 7 | 数据解耦 | 静态 JSON 化，接口对接准备 | ⏳ 规划 |
+| Phase 8 | 目录规范化 | 前后端目录整理、组件补全 | ⏳ 规划 |
+| Phase 9-10 | Git规范 & 上线 | 分支策略、上线验收清单 | ⏳ 规划 |
+
+> 详细任务列表见 [docs/PLAN.md](./docs/PLAN.md)
+
+---
+
+## 🌐 多环境说明
+
+| 环境 | 触发方式 | API 地址 | Mock 登录 |
+|---|---|---|---|
+| **dev**（开发版）| 微信开发者工具打开 | 局域网 IP（设置页可改）| ✅ 允许 |
+| **test**（体验版）| 上传为体验版后扫码 | 测试服务器（ENV.md 配置）| ✅ 允许 |
+| **prod**（正式版）| 小程序商店发布版本 | 正式 HTTPS 域名 | ❌ 禁止 |
+
+> 环境切换**全自动**，无需修改代码。详见 [docs/ENV.md](./docs/ENV.md)。
+
+---
+
+## 🔑 Git 工作流
 
 ```bash
-# 查看状态
-git status
-# 提交代码
-git add .
-git commit -m "feat: 描述你的改动"
-# 推送至远程仓库
-git push origin main
-# 拉取最新代码
-git pull origin main
+# 日常开发（在 dev 分支）
+git checkout dev
+git checkout -b feature/your-feature
+git add . && git commit -m "feat: 描述改动"
+git push origin feature/your-feature
+# → 发起 PR 合并到 dev
+
+# 发布测试版（体验版）
+git checkout test && git merge dev && git push origin test
+# → 微信开发者工具上传为「体验版」
+
+# 发布正式版
+git checkout main && git merge test && git push origin main
+# → 微信开发者工具提交审核 → 发布
 ```
 
-***
+提交信息规范：`feat:` / `fix:` / `refactor:` / `docs:` / `chore:`
 
-## 🛠️ 技术栈清单
-
-- **Backend**: FastAPI, SQLAlchemy, Pydantic, OpenAI SDK
-- **Frontend**: WeChat Mini Program 原生框架
-- **AI**: DeepSeek-V3, Google Gemini 1.5 Flash
-- **Database**: MySQL 5.7+
-
-***
-
-## 📅 更新日志 (Phases)
-
-| 阶段      | 标题                                                          | 主要功能                             | 状态   |
-| ------- | ----------------------------------------------------------- | -------------------------------- | ---- |
-| Phase 1 | [业务逻辑与AI基座](./README/20260409_Phase1_BusinessLogic_AI.md)   | 24h计时、3件套餐、DeepSeek接入            | ✅ 完成 |
-| Phase 2 | [店主管理与支付框架](./README/20260409_Phase2_Admin_Payment.md)      | 店主订单管理、微信支付V3框架                  | ✅ 完成 |
-| Phase 3 | [MVP 精简与闭环](./README/20260409_Phase3_MVP_Simplification.md) | 日期选衣、下单、支付（模拟）、取衣/还衣、店主退押/扣费     | ✅ 完成 |
-| Phase 4 | [身份与权限调试](./README/20260409_Phase4_Identity_Role_Mock.md)   | Mock 固定身份、role(1/2) 权限分流、店主端套餐管理 | ✅ 完成 |
-| Phase 5 | [[高奢审美与架构重构]](./README/20260410_Phase5_Aesthetic_Refactor.md) | 莫兰迪 UI、沉浸导航、原子组件库、可视化倒计时 | ✅ 完成 |
-
-***
-
-## 🧭 继续开发导航
-
-### 目录与入口
-
-- 文档：`README/`、`plan.md`、`test_plan.md`
-- 后端入口：`backend/main.py`
-- 小程序入口：`frontend/app.js`（登录态/统一请求）、`frontend/app.json`（页面注册）
-- 前端 API 聚合：`frontend/utils/api.js`
-
-### 技术栈
-
-- 后端：FastAPI + Uvicorn
-- 数据库：MySQL + PyMySQL（主要为手写 SQL）
-- 鉴权：JWT Bearer Token
-- AI：DeepSeek / Gemini（通过 `AI_SERVICE_TYPE` 切换）
-- 支付：微信支付 V3（当前为框架位，可模拟）
-
-### 核心闭环（优先改这些）
-
-- 日期锁定与可租：`backend/app/api/product.py` + `reservations` 表
-- 订单状态机：`backend/app/api/order.py`
-- 店主端：`backend/app/api/admin.py` + `frontend/pages/admin/*`
-- 权限与分流：`backend/app/utils/auth.py` + `frontend/app.js`
-
-### 本地启动
-
-```bash
-cd backend
-pip install -r requirements.txt
-cp .env.example .env
-python check_db.py
-python main.py
-```
-
-- 小程序：微信开发者工具打开 `frontend/`，并在「设置」页配置 `apiBase`
-
+---
 
 ## 📄 许可证
 
-MIT License · **小时光租衣舍007/100小石谈什么记** © 2026
+MIT License · **小时光租衣舍 007/100** © 2026

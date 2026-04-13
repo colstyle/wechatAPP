@@ -12,3 +12,12 @@ __pycache__/
 
 # Taro-main (Temporary / Reference)
 taro-main/
+
+# 环境配置（含密钥，禁止提交）
+backend/.env
+backend/.env.prod
+backend/app.db
+
+# 可提交（仅含示例/占位值）：
+#   backend/.env.example  → 变量模板，可提交
+#   backend/.env.test     → 测试环境模板（无真实密钥），可提交
