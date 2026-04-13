@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "套餐管理"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar"
+  }
 }

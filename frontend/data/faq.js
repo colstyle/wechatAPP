@@ -1,4 +1,4 @@
-[
+module.exports = [
   {
     "id": 1,
     "question": "租借一次是多久？怎么算逾期？",

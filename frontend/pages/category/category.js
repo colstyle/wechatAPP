@@ -68,6 +68,7 @@ Page({
     const params = {
       page: this.data.page,
       page_size: this.data.page_size,
+      show_rented: true,
       available_date: this.data.availableDate || app.globalData.selectedDate || undefined
     }
 

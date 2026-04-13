@@ -9,7 +9,8 @@ Page({
       pendingPickup: 0,
       renting: 0,
       pendingAudit: 0
-    }
+    },
+    imgBase: app.imgBase
   },
 
   onLoad() {
@@ -146,6 +147,30 @@ Page({
           wx.showToast({
             title: '已退出登录',
             icon: 'none'
+          })
+        }
+      }
+    })
+  },
+
+  // 一键拨号
+  callStore() {
+    wx.makePhoneCall({
+      phoneNumber: '18661771101' // 真实店主联络
+    })
+  },
+
+  // 打开地图 (模拟，实际发布时需配置坐标)
+  openMap() {
+    wx.showModal({
+      title: '门店位置',
+      content: '青岛市市北区青建太阳岛 2201室。点击确定可复制地址',
+      confirmText: '复制地址',
+      success: (res) => {
+        if (res.confirm) {
+          wx.setClipboardData({
+            data: '青岛市市北区青建太阳岛 2201',
+            success: () => wx.showToast({ title: '地址已复制', icon: 'none' })
           })
         }
       }

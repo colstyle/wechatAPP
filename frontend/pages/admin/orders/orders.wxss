@@ -41,31 +41,66 @@
   flex: 1; font-size: 26rpx; color: #1C1C1C;
 }
 
-/* 套餐管理按钮 */
-.btn-pkg {
-  height: 72rpx;
-  padding: 0 24rpx;
-  background: rgba(197,160,89,0.1);
-  border: 1rpx solid rgba(197,160,89,0.2);
-  border-radius: 36rpx;
+/* === 核心控制面板 === */
+.dashboard-panel {
+  padding: 32rpx 24rpx 12rpx 24rpx;
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  background: #FFFFFF;
+}
+.control-card {
+  flex: 1;
+  background: linear-gradient(135deg, #FDFCF9 0%, #F8F5EE 100%);
+  border: 1rpx solid rgba(197,160,89, 0.15);
+  border-radius: 20rpx;
+  padding: 24rpx;
   display: flex;
   align-items: center;
-  gap: 8rpx;
-  color: #9A7B3A;
-  font-size: 26rpx;
-  font-weight: 500;
-}
-/* 纯CSS套餐盒 */
-.icon-pkg {
-  width: 20rpx; height: 20rpx;
-  border: 2rpx solid #C5A059;
-  border-radius: 4rpx;
   position: relative;
+  overflow: hidden;
 }
-.icon-pkg::after {
-  content: ''; position: absolute;
-  top:0; bottom:0; left: 50%; width: 2rpx; background: #C5A059;
-  transform: translateX(-50%);
+.card-icon-wrap {
+  width: 72rpx; height: 72rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(197,160,89, 0.08);
+}
+/* 纯CSS库存图标 */
+.icon-stock {
+  width: 28rpx; height: 34rpx; border: 3rpx solid #C5A059; border-radius: 4rpx;
+  position: relative; box-sizing: border-box;
+}
+.icon-stock::after {
+  content: ''; position: absolute; bottom: 4rpx; left: 4rpx; right: 4rpx; height: 6rpx; background: #C5A059; border-radius: 2rpx;
+}
+/* 纯CSS套餐图标大 */
+.icon-pkg-large {
+  width: 32rpx; height: 32rpx; border: 3rpx solid #C5A059; border-radius: 6rpx;
+  position: relative; box-sizing: border-box;
+}
+.icon-pkg-large::after {
+  content: ''; position: absolute; left: 50%; top: -3rpx; bottom: -3rpx; width: 3rpx; background: #C5A059; transform: translateX(-50%);
+}
+.icon-pkg-large::before {
+  content: ''; position: absolute; top: 50%; left: -3rpx; right: -3rpx; height: 3rpx; background: #C5A059; transform: translateY(-50%);
+}
+
+.card-text {
+  display: flex; flex-direction: column; z-index: 1;
+}
+.card-title {
+  font-size: 28rpx; color: #1C1C1C; font-weight: 600; margin-bottom: 6rpx;
+}
+.card-sub {
+  font-size: 20rpx; color: #8E877F;
+}
+.card-arrow {
+  position: absolute; right: 24rpx; top: 50%; width: 10rpx; height: 10rpx;
+  border-top: 3rpx solid #C5A059; border-right: 3rpx solid #C5A059;
+  transform: translateY(-50%) rotate(45deg); opacity: 0.6;
 }
 
 /* === 状态分类区 === */

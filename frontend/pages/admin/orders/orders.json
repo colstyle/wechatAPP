@@ -2,7 +2,8 @@
   "navigationStyle": "custom",
   "enablePullDownRefresh": true,
   "usingComponents": {
-    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar"
+    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar",
+    "cp-empty": "/components/cp-empty/cp-empty"
   },
   "backgroundTextStyle": "dark"
 }

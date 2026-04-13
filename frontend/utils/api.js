@@ -31,17 +31,17 @@ const userApi = {
 
   // 更新地址
   updateAddress: (id, data) => {
-    return app.request(`/api/user/addresses/${id}`, 'PUT', data)
+    return app.request(`/api/v1/user/addresses/${id}`, 'PUT', data)
   },
 
   // 删除地址
   deleteAddress: (id) => {
-    return app.request(`/api/user/addresses/${id}`, 'DELETE')
+    return app.request(`/api/v1/user/addresses/${id}`, 'DELETE')
   },
 
   // 设置默认地址
   setDefaultAddress: (id) => {
-    return app.request(`/api/user/addresses/${id}/default`, 'POST')
+    return app.request(`/api/v1/user/addresses/${id}/default`, 'POST')
   }
 }
 
@@ -49,7 +49,7 @@ const userApi = {
 const productApi = {
   // 获取分类列表
   getCategories: (parentId = 0) => {
-    return app.request(`/api/product/categories?parent_id=${parentId}`, 'GET')
+    return app.request(`/api/v1/product/categories?parent_id=${parentId}`, 'GET')
   },
 
   // 获取品牌列表
@@ -59,7 +59,7 @@ const productApi = {
 
   // 获取品牌详情
   getBrand: (id) => {
-    return app.request(`/api/product/brands/${id}`, 'GET')
+    return app.request(`/api/v1/product/brands/${id}`, 'GET')
   },
 
   // 获取商品列表
@@ -69,37 +69,37 @@ const productApi = {
 
   // 获取热门商品
   getHotProducts: (limit = 10, params = {}) => {
-    return app.request(`/api/product/products/hot?limit=${limit}`, 'GET', params)
+    return app.request(`/api/v1/product/products/hot?limit=${limit}`, 'GET', params)
   },
 
   // 获取新品商品
   getNewProducts: (limit = 10, params = {}) => {
-    return app.request(`/api/product/products/new?limit=${limit}`, 'GET', params)
+    return app.request(`/api/v1/product/products/new?limit=${limit}`, 'GET', params)
   },
 
   // 获取商品详情
   getProduct: (id) => {
-    return app.request(`/api/product/products/${id}`, 'GET')
+    return app.request(`/api/v1/product/products/${id}`, 'GET')
   },
 
   // 获取搭配列表
   getOutfits: (limit = 20) => {
-    return app.request(`/api/product/outfits?limit=${limit}`, 'GET')
+    return app.request(`/api/v1/product/outfits?limit=${limit}`, 'GET')
   },
 
   // 添加收藏
   addFavorite: (productId) => {
-    return app.request(`/api/product/favorites/${productId}`, 'POST')
+    return app.request(`/api/v1/product/favorites/${productId}`, 'POST')
   },
 
   // 取消收藏
   removeFavorite: (productId) => {
-    return app.request(`/api/product/favorites/${productId}`, 'DELETE')
+    return app.request(`/api/v1/product/favorites/${productId}`, 'DELETE')
   },
 
   // 获取收藏列表
   getFavorites: (page = 1, pageSize = 20) => {
-    return app.request(`/api/product/favorites?page=${page}&page_size=${pageSize}`, 'GET')
+    return app.request(`/api/v1/product/favorites?page=${page}&page_size=${pageSize}`, 'GET')
   }
 }
 
@@ -117,32 +117,32 @@ const orderApi = {
 
   // 获取订单详情
   getOrder: (id) => {
-    return app.request(`/api/order/orders/${id}`, 'GET')
+    return app.request(`/api/v1/order/orders/${id}`, 'GET')
   },
 
   // 支付订单
   payOrder: (id) => {
-    return app.request(`/api/order/orders/${id}/pay`, 'POST')
+    return app.request(`/api/v1/order/orders/${id}/pay`, 'POST')
   },
 
   // 取衣确认
   pickupOrder: (id) => {
-    return app.request(`/api/order/orders/${id}/pickup`, 'POST', { remark: '用户已取衣' })
+    return app.request(`/api/v1/order/orders/${id}/pickup`, 'POST', { remark: '用户已取衣' })
   },
 
   // 取消订单
   cancelOrder: (id) => {
-    return app.request(`/api/order/orders/${id}/cancel`, 'POST')
+    return app.request(`/api/v1/order/orders/${id}/cancel`, 'POST')
   },
 
   // 确认收货
   receiveOrder: (id) => {
-    return app.request(`/api/order/orders/${id}/receive`, 'POST')
+    return app.request(`/api/v1/order/orders/${id}/receive`, 'POST')
   },
 
   // 申请归还
   returnOrder: (id, remark) => {
-    return app.request(`/api/order/orders/${id}/return`, 'POST', { remark })
+    return app.request(`/api/v1/order/orders/${id}/return`, 'POST', { remark })
   }
 }
 
@@ -155,7 +155,7 @@ const subscriptionApi = {
 
   // 获取套餐详情
   getPackage: (id) => {
-    return app.request(`/api/subscription/packages/${id}`, 'GET')
+    return app.request(`/api/v1/subscription/packages/${id}`, 'GET')
   },
 
   // 购买订阅
@@ -198,22 +198,22 @@ const appointmentApi = {
 
   // 获取预约详情
   getAppointment: (id) => {
-    return app.request(`/api/appointment/appointments/${id}`, 'GET')
+    return app.request(`/api/v1/appointment/appointments/${id}`, 'GET')
   },
 
   // 更新预约
   updateAppointment: (id, data) => {
-    return app.request(`/api/appointment/appointments/${id}`, 'PUT', data)
+    return app.request(`/api/v1/appointment/appointments/${id}`, 'PUT', data)
   },
 
   // 取消预约
   cancelAppointment: (id) => {
-    return app.request(`/api/appointment/appointments/${id}`, 'DELETE')
+    return app.request(`/api/v1/appointment/appointments/${id}`, 'DELETE')
   },
 
   // 获取可预约时间段
   getAvailableTimes: (productId, date) => {
-    return app.request(`/api/appointment/appointments/available-times?product_id=${productId}&appointment_date=${date}`, 'GET')
+    return app.request(`/api/v1/appointment/appointments/available-times?product_id=${productId}&appointment_date=${date}`, 'GET')
   }
 }
 
@@ -226,22 +226,22 @@ const reviewApi = {
 
   // 获取商品评价列表
   getReviews: (productId, page = 1, pageSize = 20) => {
-    return app.request(`/api/review/reviews?product_id=${productId}&page=${page}&page_size=${pageSize}`, 'GET')
+    return app.request(`/api/v1/review/reviews?product_id=${productId}&page=${page}&page_size=${pageSize}`, 'GET')
   },
 
   // 获取评价详情
   getReview: (id) => {
-    return app.request(`/api/review/reviews/${id}`, 'GET')
+    return app.request(`/api/v1/review/reviews/${id}`, 'GET')
   },
 
   // 获取我的评价列表
   getMyReviews: (page = 1, pageSize = 20) => {
-    return app.request(`/api/review/reviews/my?page=${page}&page_size=${pageSize}`, 'GET')
+    return app.request(`/api/v1/review/reviews/my?page=${page}&page_size=${pageSize}`, 'GET')
   },
 
   // 删除评价
   deleteReview: (id) => {
-    return app.request(`/api/review/reviews/${id}`, 'DELETE')
+    return app.request(`/api/v1/review/reviews/${id}`, 'DELETE')
   }
 }
 
@@ -250,6 +250,11 @@ const adminApi = {
   // 获取全量订单
   getOrders: (params) => {
     return app.request('/api/v1/admin/orders', 'GET', params)
+  },
+
+  // 获取订单详情
+  getOrder: (id) => {
+    return app.request(`/api/v1/admin/orders/${id}`, 'GET')
   },
 
   // 退押金

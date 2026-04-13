@@ -5,131 +5,243 @@
   min-height: 100vh;
   background: #FDFCF9;
   padding-bottom: 120rpx;
+  position: relative;
 }
 
-/* === 日期选择区 === */
-.date-section {
-  margin: 20rpx 24rpx 0;
+/* === 头部大屏 (Hero) === */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 600rpx;
+  background: #1C1C1C;
+  z-index: 1;
 }
 
-.date-trigger {
-  display: flex;
-  align-items: center;
+.hero-nav-holder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hero-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200rpx;
+  background: linear-gradient(to top, rgba(253, 252, 249, 1), rgba(253, 252, 249, 0));
+}
+
+/* === 主体内容 === */
+.main-body {
+  position: relative;
+  z-index: 10;
+  padding: 0 24rpx;
+  margin-top: -80rpx; /* 悬浮重叠效果 */
+}
+
+/* 阴影公共类 */
+.shadow-card {
   background: #FFFFFF;
   border-radius: 20rpx;
-  padding: 22rpx 24rpx;
-  box-shadow: 0 2rpx 16rpx rgba(28, 28, 28, 0.05);
+  box-shadow: 0 8rpx 32rpx rgba(28, 28, 28, 0.05);
+  margin-bottom: 24rpx;
 }
 
-/* 日历小图标 - 纯 CSS */
-.date-icon-wrap {
-  width: 60rpx;
+/* === 核心功能悬浮卡 (Function Area) === */
+.function-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32rpx 20rpx;
+}
+
+.func-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.divider {
+  width: 2rpx;
   height: 60rpx;
+  background: rgba(197, 160, 89, 0.15);
+}
+
+.func-icon {
+  width: 80rpx;
+  height: 80rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 20rpx;
+  margin-bottom: 12rpx;
+  position: relative;
 }
 
-.icon-calendar {
-  width: 42rpx;
-  height: 42rpx;
-  border: 3rpx solid #C5A059;
-  border-radius: 6rpx;
+/* 手绘/艺术感 CSS Icon */
+.icon-dress-art {
+  width: 36rpx; height: 44rpx; border: 4rpx solid #1C1C1C; border-radius: 6rpx 6rpx 16rpx 16rpx; position: relative; border-top: none;
+}
+.icon-dress-art::before {
+  content: ''; position: absolute; top: -8rpx; left: -10rpx; right: -10rpx; height: 8rpx; border: 4rpx solid #1C1C1C; border-radius: 8rpx;
+}
+
+.icon-pkg-art {
+  width: 40rpx; height: 40rpx; border: 4rpx solid #C5A059; border-radius: 8rpx; position: relative;
+}
+.icon-pkg-art::after {
+  content: ''; position: absolute; left: 50%; top: -6rpx; bottom: 8rpx; width: 4rpx; background: #C5A059; transform: translateX(-50%);
+}
+
+.icon-store-art {
+  width: 44rpx; height: 36rpx; border: 4rpx solid #8E9775; border-radius: 8rpx; position: relative; border-bottom: none;
+}
+.icon-store-art::after {
+  content: ''; position: absolute; bottom: -8rpx; left: -10rpx; right: -10rpx; height: 8rpx; background: #8E9775; border-radius: 8rpx;
+}
+
+.func-text {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-.cal-top {
-  height: 12rpx;
-  background: #C5A059;
-}
-.cal-body {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0 4rpx;
-}
-.cal-dot {
-  width: 6rpx;
-  height: 6rpx;
-  border-radius: 50%;
-  background: #8E9775;
 }
 
-.date-info {
-  flex: 1;
-}
-.date-label {
-  display: block;
-  font-size: 20rpx;
-  color: #B0A99A;
-  margin-bottom: 4rpx;
-}
-.date-value {
-  display: block;
-  font-size: 30rpx;
+.func-title {
+  font-size: 26rpx;
   color: #1C1C1C;
-  font-weight: 500;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.func-sub {
+  font-size: 18rpx;
+  color: #8E877F;
   letter-spacing: 0.5px;
 }
 
-/* 右箭头 */
-.icon-chevron-right {
-  width: 16rpx;
-  height: 16rpx;
-  border-right: 2rpx solid #C0BBB4;
-  border-bottom: 2rpx solid #C0BBB4;
-  transform: rotate(-45deg);
+/* === 精致日期选择器 (Sleek Date Bar) === */
+.sleek-date-bar {
+  padding: 0;
+  overflow: hidden;
 }
 
-/* === 分类导航 === */
-.category-scroll {
-  margin-top: 24rpx;
-  padding: 0 24rpx;
+.date-picker-wrap {
+  width: 100%;
 }
-.category-list {
+
+.date-inner {
   display: flex;
-  gap: 24rpx;
-  padding-right: 8rpx;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 32rpx;
+  background: linear-gradient(90deg, #FDFCF9, #FFFFFF);
 }
 
-.cat-item {
+.date-left {
+  display: flex;
+  align-items: center;
+}
+
+.icon-date-art {
+  width: 24rpx; height: 24rpx; border: 3rpx solid #C5A059; border-radius: 6rpx; position: relative; margin-right: 12rpx;
+}
+.icon-date-art::before {
+  content: ''; position: absolute; top: -6rpx; left: 4rpx; width: 4rpx; height: 8rpx; background: #C5A059;
+}
+.icon-date-art::after {
+  content: ''; position: absolute; top: -6rpx; right: 4rpx; width: 4rpx; height: 8rpx; background: #C5A059;
+}
+
+.date-label {
+  font-size: 24rpx;
+  color: #1C1C1C;
+  font-weight: 600;
+}
+
+.date-right {
+  display: flex;
+  align-items: center;
+}
+
+.date-value {
+  font-size: 26rpx;
+  color: #B0A99A;
+  margin-right: 12rpx;
+}
+
+.date-value.has-val {
+  color: #1C1C1C;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.arrow-right {
+  width: 12rpx; height: 12rpx; border-top: 3rpx solid #C0BBB4; border-right: 3rpx solid #C0BBB4; transform: rotate(45deg);
+}
+
+/* === 品牌文化横幅 === */
+.banner-section {
+  width: 100%;
+  height: 240rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 40rpx;
+  box-shadow: 0 8rpx 24rpx rgba(197, 160, 89, 0.1);
+}
+
+.banner-img {
+  width: 100%;
+  height: 100%;
+}
+
+.banner-text-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, rgba(28,28,28,0.7) 0%, rgba(28,28,28,0.1) 100%);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
-}
-.cat-icon-bg {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 28rpx;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  margin-bottom: 10rpx;
+  padding-left: 40rpx;
 }
-.cat-icon-img {
-  width: 52rpx;
-  height: 52rpx;
+
+.bt-title {
+  color: #FFFFFF;
+  font-size: 36rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  margin-bottom: 12rpx;
+  text-shadow: 0 4rpx 12rpx rgba(0,0,0,0.5);
 }
-.cat-name {
-  font-size: 22rpx;
-  color: #6B6660;
-  font-weight: 400;
+
+.bt-sub {
+  color: #FDFCF9;
+  font-size: 20rpx;
+  opacity: 0.9;
+  letter-spacing: 1rpx;
 }
 
 /* === 商品区 === */
 .products-section {
-  margin-top: 32rpx;
-  padding: 0 24rpx;
+  padding: 0 8rpx;
 }
 .section-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 20rpx;
+  margin-bottom: 24rpx;
 }
 .section-title {
   font-size: 32rpx;
@@ -173,42 +285,7 @@
 /* 空状态 */
 .empty-box {
   text-align: center;
-  padding: 100rpx 0 60rpx;
-}
-.empty-icon-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 24rpx;
-}
-.icon-dress {
-  width: 80rpx;
-  height: 100rpx;
-  border: 3rpx solid #D4CFC9;
-  border-radius: 0 0 30rpx 30rpx;
-  position: relative;
-}
-.icon-dress::before {
-  content: '';
-  position: absolute;
-  top: -24rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16rpx;
-  height: 16rpx;
-  border: 2rpx solid #D4CFC9;
-  border-radius: 50%;
-}
-.empty-text {
-  font-size: 28rpx;
-  color: #B0A99A;
-  display: block;
-}
-.empty-hint {
-  font-size: 22rpx;
-  color: #C0BBB4;
-  display: block;
-  margin-top: 8rpx;
+  padding: 80rpx 0 60rpx;
 }
 
 /* 加载更多 */
@@ -224,8 +301,8 @@
   border-radius: 999rpx;
 }
 .no-more {
-  font-size: 22rpx;
-  color: #C0BBB4;
+  font-size: 20rpx;
+  color: #B0A99A;
   letter-spacing: 2px;
 }
 
@@ -269,7 +346,6 @@
   justify-content: center;
   box-shadow: 0 8rpx 32rpx rgba(28, 28, 28, 0.25);
 }
-/* 纯 CSS 对话气泡图标 */
 .fab-chat-bubble {
   width: 40rpx;
   height: 36rpx;

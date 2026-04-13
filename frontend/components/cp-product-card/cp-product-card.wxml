@@ -14,6 +14,11 @@
       bindload="onImgLoad"
     ></image>
 
+    <!-- 已租赁遮罩层 -->
+    <view class="rented-overlay" wx:if="{{product.is_rented}}">
+      <view class="rented-tag">已定出</view>
+    </view>
+
     <!-- 套餐标签 -->
     <view class="badge-wrap" wx:if="{{product.in_package}}">
       <text class="badge-pkg">套餐</text>

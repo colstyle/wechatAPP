@@ -1,29 +1,42 @@
-<view class="container">
-  <view class="toolbar">
+<!-- pages/admin/package/package.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="套餐入选池管理" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <view class="admin-header">
     <view class="search-bar">
-      <icon type="search" size="14"></icon>
-      <input type="text" placeholder="搜索衣物名称" bindinput="onSearchInput" value="{{keyword}}" confirm-type="search" bindconfirm="onSearch" />
+      <view class="icon-search-sm">
+        <view class="sc-cir"></view>
+        <view class="sc-han"></view>
+      </view>
+      <input class="search-input" placeholder="搜索衣物名称" bindinput="onSearchInput" value="{{keyword}}" confirm-type="search" bindconfirm="onSearch" />
       <text class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">×</text>
     </view>
     <view class="filter-row">
-      <view class="filter-item {{eligible === null ? 'active' : ''}}" bindtap="setEligibleFilter" data-eligible="{{null}}">全部</view>
-      <view class="filter-item {{eligible === true ? 'active' : ''}}" bindtap="setEligibleFilter" data-eligible="true">参与</view>
-      <view class="filter-item {{eligible === false ? 'active' : ''}}" bindtap="setEligibleFilter" data-eligible="false">不参与</view>
+      <view class="filter-btn {{eligible === null ? 'active' : ''}}" bindtap="setEligibleFilter" data-eligible="{{null}}">全部</view>
+      <view class="filter-btn {{eligible === true ? 'active' : ''}}" bindtap="setEligibleFilter" data-eligible="true">参与套餐</view>
+      <view class="filter-btn {{eligible === false ? 'active' : ''}}" bindtap="setEligibleFilter" data-eligible="false">不参与套餐</view>
     </view>
   </view>
 
-  <scroll-view class="list" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
-    <view class="item" wx:for="{{products}}" wx:key="id">
+  <scroll-view class="package-list" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="product-item" wx:for="{{products}}" wx:key="id">
       <image class="cover" src="{{item.cover_image}}" mode="aspectFill"></image>
       <view class="info">
-        <text class="name">{{item.name}}</text>
-        <text class="sub">押金 ¥{{item.deposit}}</text>
+        <view class="name-row">
+          <text class="name">{{item.name}}</text>
+        </view>
+        <view class="price-row">
+          <text class="price-label">押金</text> <text class="price-val">¥{{item.deposit}}</text>
+        </view>
       </view>
-      <switch checked="{{item.is_package_eligible}}" data-id="{{item.id}}" bindchange="onToggle"></switch>
+      <switch color="#C5A059" checked="{{item.is_package_eligible}}" data-id="{{item.id}}" bindchange="onToggle"></switch>
     </view>
 
-    <view class="loading" wx:if="{{loading}}">加载中...</view>
-    <view class="empty" wx:if="{{!loading && products.length === 0}}">暂无数据</view>
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
+    </view>
     <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多了</view>
+    
+    <cp-empty wx:if="{{!loading && products.length === 0}}" text="暂无商品加入套餐池" subText=""></cp-empty>
   </scroll-view>
 </view>

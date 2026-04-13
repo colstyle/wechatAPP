@@ -1,87 +1,70 @@
-<!--pages/orders/orders.wxml-->
-<view class="page">
-  <!-- 订单列表 -->
-  <view class="order-list">
-    <view
-      class="order-card"
-      wx:for="{{orders}}"
-      wx:key="id"
-      bindtap="onOrderTap"
-      data-id="{{item.id}}">
-      <view class="order-header">
-        <text class="order-no">订单号: {{item.order_no}}</text>
-        <text class="order-status status-{{item.status}}">{{item.statusText}}</text>
-      </view>
+<!-- pages/orders/orders.wxml -->
+<view class="page-root">
+  <!-- 自定义导航栏 -->
+  <cp-nav-bar title="{{title}}" show-back="{{true}}" bg="white"></cp-nav-bar>
 
-      <view class="order-items">
-        <view class="order-item-mini" wx:for="{{item.items}}" wx:for-item="subItem" wx:key="id">
-          <image class="item-img" src="{{subItem.product_image}}" mode="aspectFill"></image>
-          <view class="item-info">
-            <text class="item-name">{{subItem.product_name}}</text>
-            <text class="item-spec">{{subItem.size}} / {{subItem.color}}</text>
+  <scroll-view class="order-scroll" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="order-list">
+      <view class="order-card shadow-card" wx:for="{{orders}}" wx:key="id" bindtap="onOrderTap" data-id="{{item.id}}">
+        
+        <view class="oc-header">
+          <view class="oc-no-wrap">
+            <text class="oc-hash">#</text>
+            <text class="oc-no">{{item.order_no}}</text>
           </view>
-          <view class="item-price">
-            <text class="price">¥{{subItem.rent_price}}</text>
+          <view class="oc-status status-{{item.status}}">{{item.statusText}}</view>
+        </view>
+
+        <view class="oc-body">
+          <view class="mini-product-item" wx:for="{{item.items}}" wx:for-item="subItem" wx:key="id">
+            <image class="mp-img" src="{{subItem.product_image}}" mode="aspectFill"></image>
+            <view class="mp-info">
+              <text class="mp-name">{{subItem.product_name}}</text>
+              <text class="mp-spec">{{subItem.size}} / {{subItem.color}}</text>
+            </view>
+            <view class="mp-price">
+              <text class="p-sym">¥</text>
+              <text class="p-val">{{subItem.rent_price}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="oc-footer">
+          <view class="oc-time-wrap">
+            <view class="icon-clock-sm"></view>
+            <text class="oc-time">{{item.created_at}}</text>
+          </view>
+          <view class="oc-actions">
+            <!-- 支付按钮：高光金 -->
+            <button class="action-btn btn-gold" wx:if="{{item.status === 0}}" bindtap="onPayTap" data-id="{{item.id}}" catchtap="true">
+              立即支付
+            </button>
+            
+            <!-- 其他操作：描边风格 -->
+            <button class="action-btn btn-outline" wx:if="{{item.status === 2}}" bindtap="onReceiveTap" data-id="{{item.id}}" catchtap="true">
+              确认收货
+            </button>
+            <button class="action-btn btn-outline" wx:if="{{item.status === 2 || item.status === 3}}" bindtap="onReturnTap" data-id="{{item.id}}" catchtap="true">
+              申请归还
+            </button>
+            
+            <!-- 取消：淡色 -->
+            <button class="action-btn btn-minor" wx:if="{{item.status === 0}}" bindtap="onCancelTap" data-id="{{item.id}}" catchtap="true">
+              取消
+            </button>
           </view>
         </view>
       </view>
 
-      <view class="order-footer">
-        <text class="order-time">{{item.created_at}}</text>
-        <view class="order-actions">
-          <button
-            class="btn btn-sm btn-primary"
-            wx:if="{{item.status === 0}}"
-            bindtap="onPayTap"
-            data-id="{{item.id}}"
-            catchtap="true">
-            去支付
-          </button>
-          <button
-            class="btn btn-sm btn-outline"
-            wx:if="{{item.status === 2}}"
-            bindtap="onReceiveTap"
-            data-id="{{item.id}}"
-            catchtap="true">
-            确认收货
-          </button>
-          <button
-            class="btn btn-sm btn-outline"
-            wx:if="{{item.status === 2 || item.status === 3}}"
-            bindtap="onReturnTap"
-            data-id="{{item.id}}"
-            catchtap="true">
-            申请归还
-          </button>
-          <button
-            class="btn btn-sm btn-danger"
-            wx:if="{{item.status === 0}}"
-            bindtap="onCancelTap"
-            data-id="{{item.id}}"
-            catchtap="true">
-            取消订单
-          </button>
-        </view>
+      <!-- 空状态 -->
+      <cp-empty wx:if="{{orders.length === 0 && !loading}}" title="暂无租赁记录" description="前往首页挑选本季心仪款型吧" padding="{{true}}"></cp-empty>
+
+      <!-- 加载提示 -->
+      <view class="loading-state" wx:if="{{loading}}">
+        <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
       </view>
+      
+      <view class="no-more" wx:if="{{!hasMore && orders.length > 0}}">— 已经加载全部订单 —</view>
     </view>
-
-    <!-- 空状态 -->
-    <view class="empty" wx:if="{{orders.length === 0 && !loading}}">
-      <text>暂无订单</text>
-    </view>
-
-    <!-- 加载中 -->
-    <view class="loading" wx:if="{{loading}}">
-      <text>加载中...</text>
-    </view>
-  </view>
-
-  <!-- 加载更多 -->
-  <view class="load-more" wx:if="{{hasMore}}">
-    <text wx:if="{{loading}}">加载中...</text>
-    <text wx:else bindtap="onLoadMore">加载更多</text>
-  </view>
-
-  <!-- 底部占位 -->
-  <view class="bottom-placeholder"></view>
+  </scroll-view>
 </view>

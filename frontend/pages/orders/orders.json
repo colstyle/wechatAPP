@@ -1,5 +1,9 @@
 {
+  "navigationBarTitleText": "我的订单",
+  "navigationStyle": "custom",
   "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark",
-  "onReachBottomDistance": 50
+  "usingComponents": {
+    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar",
+    "cp-empty": "/components/cp-empty/cp-empty"
+  }
 }

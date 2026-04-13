@@ -1,5 +1,17 @@
-<view class="cp-empty">
-  <view class="empty-icon"><view class="circle"></view><view class="line"></view></view>
-  <view class="empty-text">{{text}}</view>
-  <view class="empty-sub" wx:if="{{subText}}">{{subText}}</view>
+<!-- components/cp-empty/cp-empty.wxml -->
+<view class="empty-wrap {{padding ? 'has-padding' : ''}}">
+  <view class="icon-box">
+    <!-- 纯CSS绘制的高奢风格空状态图标 -->
+    <view class="luxury-folder">
+      <view class="folder-back"></view>
+      <view class="folder-front">
+        <view class="folder-line"></view>
+        <view class="folder-line short"></view>
+      </view>
+    </view>
+    <view class="pulse-ring"></view>
+  </view>
+  <text class="title">{{title}}</text>
+  <text class="desc">{{description}}</text>
+  <button class="action-btn" wx:if="{{actionText}}" bindtap="onActionTap">{{actionText}}</button>
 </view>

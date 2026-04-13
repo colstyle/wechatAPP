@@ -11,21 +11,24 @@ const { envVersion } = wx.getAccountInfoSync().miniProgram
 const ENV_MAP = {
   develop: {
     ENV:        'dev',
-    apiBase:    'http://192.168.43.79:8000',   // 本机局域网 IP（可在设置页手动覆盖）
-    enableMock: true,   // 允许 mockOpenid 固定调试身份
-    enableLog:  true,   // 开启 console.log
+    apiBase:    'http://127.0.0.1:8000',
+    imgBase:    'http://127.0.0.1:8000/static/images',
+    enableMock: true,
+    enableLog:  true,
   },
   trial: {
     ENV:        'test',
-    apiBase:    'http://YOUR_TEST_SERVER:8000', // 测试服务器地址 ← 上线前填写
-    enableMock: true,   // 测试阶段允许 mock，方便测试组切换身份
+    apiBase:    'http://YOUR_TEST_SERVER:8000',
+    imgBase:    'http://YOUR_TEST_SERVER:8000/static/images',
+    enableMock: true,
     enableLog:  true,
   },
   release: {
     ENV:        'prod',
-    apiBase:    'https://api.yourdomain.com',   // 正式域名，必须 HTTPS ← 上线前填写
-    enableMock: false,  // 生产环境严禁 mock
-    enableLog:  false,  // 关闭控制台日志
+    apiBase:    'https://api.yourdomain.com',
+    imgBase:    'https://api.yourdomain.com/static/images',
+    enableMock: false,
+    enableLog:  false,
   },
 }
 

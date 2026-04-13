@@ -12,10 +12,10 @@ from config import settings
 class WeChatPayV3:
     def __init__(self):
         self.mchid = settings.WECHAT_PAY_MCH_ID
-        self.appid = settings.WECHAT_PAY_APP_ID
+        self.appid = settings.WECHAT_APP_ID
         self.serial_no = settings.WECHAT_PAY_SERIAL_NO
         self.private_key = settings.WECHAT_PAY_PRIVATE_KEY
-        self.api_v3_key = settings.WECHAT_PAY_APIV3_PRIVATE_KEY
+        self.api_v3_key = settings.WECHAT_PAY_APIV3_KEY
         
     def _generate_signature(self, method: str, url: str, timestamp: int, nonce_str: str, body: str = "") -> str:
         """

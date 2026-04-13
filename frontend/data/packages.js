@@ -1,4 +1,4 @@
-[
+module.exports = [
   {
     "id": 1,
     "name": "3件69.9日常通勤套餐",

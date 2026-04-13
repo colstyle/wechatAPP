@@ -9,6 +9,7 @@ Page({
     title: '我的订单',
     orders: [],
     loading: false,
+    refreshing: false,
     page: 1,
     page_size: 20,
     hasMore: true
@@ -147,6 +148,20 @@ Page({
       orders: []
     })
     this.loadOrders()
+  },
+
+  // 原生 scroll-view 刷新
+  onRefresh() {
+    this.setData({
+      refreshing: true,
+      page: 1,
+      hasMore: true,
+      orders: []
+    })
+    this.loadOrders()
+    setTimeout(() => {
+      this.setData({ refreshing: false })
+    }, 500)
   },
 
   // 加载更多

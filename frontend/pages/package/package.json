@@ -1,4 +1,9 @@
 {
   "navigationBarTitleText": "3件69.9元套餐",
-  "enablePullDownRefresh": true
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar",
+    "cp-empty": "/components/cp-empty/cp-empty"
+  }
 }

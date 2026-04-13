@@ -24,17 +24,8 @@ class Database:
                 database=settings.DB_NAME,
                 charset='utf8mb4',
                 cursorclass=DictCursor,
-                autocommit=False
+                autocommit=True  # 默认 autocommit=True 减少挂起事务风险
             )
-            try:
-                with cls._connection.cursor() as cursor:
-                    cursor.execute("ALTER TABLE products ADD COLUMN is_package_eligible BOOLEAN DEFAULT FALSE")
-                cls._connection.commit()
-            except Exception:
-                try:
-                    cls._connection.rollback()
-                except Exception:
-                    pass
         return cls._connection
 
     @classmethod

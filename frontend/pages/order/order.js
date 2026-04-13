@@ -7,7 +7,8 @@ Page({
     orderStats: {
       renting: 0,
       returning: 0
-    }
+    },
+    imgBase: app.imgBase
   },
 
   onLoad() {
@@ -59,12 +60,11 @@ Page({
     const status = e.currentTarget.dataset.status
     const statusText = {
       0: '待付款',
-      1: '待发货',
+      1: '待取衣',
       2: '租赁中',
       3: '待归还',
-      4: '已归还',
-      5: '已取消',
-      6: '已完成'
+      4: '已完成',
+      5: '已取消'
     }
     wx.navigateTo({
       url: `/pages/orders/orders?status=${status}&title=${statusText[status]}`

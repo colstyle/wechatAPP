@@ -1,6 +1,13 @@
 Component({
   properties: {
-    text: { type: String, value: "暂无数据" },
-    subText: { type: String, value: "" }
+    title: { type: String, value: '暂无记录' },
+    description: { type: String, value: '这里还没有发现任何内容' },
+    actionText: { type: String, value: '' },
+    padding: { type: Boolean, value: false }
+  },
+  methods: {
+    onActionTap() {
+      this.triggerEvent('action')
+    }
   }
 })

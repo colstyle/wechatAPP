@@ -107,6 +107,69 @@ async def get_all_orders(
         }
     }
 
+@router.get("/orders/{order_id}")
+async def get_order_detail(order_id: int, authorization: Optional[str] = Header(None)):
+    """
+    获取单个订单详情 (店主端)
+    """
+    require_admin(authorization)
+    
+    order = db.execute_one(
+        """SELECT o.*, u.nickname, u.avatar 
+           FROM orders o 
+           LEFT JOIN users u ON o.user_id = u.id 
+           WHERE o.id = %s""", 
+        (order_id,)
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    
+    # 获取订单项
+    items = db.execute_query(
+        "SELECT * FROM order_items WHERE order_id = %s",
+        (order_id,)
+    )
+
+    status_text_map = {
+        0: '待支付', 1: '待取衣', 2: '租赁中', 3: '已逾期',
+        4: '待审核', 5: '已取消', 6: '退款中', 7: '已完成'
+    }
+
+    return {
+        "code": 0,
+        "message": "获取成功",
+        "data": {
+            "id": order['id'],
+            "order_no": order['order_no'],
+            "user_id": order['user_id'],
+            "nickname": order['nickname'],
+            "avatar": order['avatar'],
+            "total_rent": float(order['total_rent']),
+            "total_deposit": float(order['total_deposit']),
+            "total_amount": float(order['total_amount']),
+            "status": order['status'],
+            "status_text": status_text_map.get(order['status'], '未知'),
+            "pickup_time": order['pickup_time'].isoformat() if order['pickup_time'] else None,
+            "return_time": order['return_time'].isoformat() if order['return_time'] else None,
+            "expected_return_time": order['expected_return_time'].isoformat() if order['expected_return_time'] else None,
+            "created_at": order['created_at'].isoformat() if order['created_at'] else None,
+            "items": [
+                {
+                    "id": i['id'],
+                    "product_id": i['product_id'],
+                    "product_name": i['product_name'],
+                    "product_image": i['product_image'],
+                    "size": i['size'],
+                    "color": i['color'],
+                    "rent_price": float(i['rent_price']),
+                    "deposit": float(i['deposit']),
+                    "quantity": i['quantity']
+                }
+                for i in items
+            ]
+        }
+    }
+
 class RefundRequest(BaseModel):
     order_id: int
     amount: Optional[float] = None # 如果不填则退全额押金

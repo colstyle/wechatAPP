@@ -1,83 +1,110 @@
-<view class="container">
-  <view class="section" wx:if="{{order}}">
-    <view class="section-title">订单详情</view>
-    <view class="info-row">
-      <text class="label">订单号:</text>
-      <text class="value">{{order.order_no}}</text>
-    </view>
-    <view class="info-row">
-      <text class="label">下单用户:</text>
-      <text class="value">{{order.nickname}}</text>
-    </view>
-    <view class="info-row">
-      <text class="label">当前状态:</text>
-      <text class="value status status-{{order.status}}">{{order.status_text}}</text>
-    </view>
-    <view class="info-row">
-      <text class="label">实付总额:</text>
-      <text class="value price">¥{{order.total_amount}}</text>
-    </view>
-    <view class="info-row">
-      <text class="label">其中押金:</text>
-      <text class="value">¥{{order.total_deposit}}</text>
-    </view>
-    <view class="info-row" wx:if="{{order.pickup_time}}">
-      <text class="label">取衣时间:</text>
-      <text class="value">{{order.pickup_time}}</text>
-    </view>
-    <view class="info-row" wx:if="{{order.overdue_duration}}">
-      <text class="label">逾期时长:</text>
-      <text class="value danger">{{order.overdue_duration}} 小时</text>
-    </view>
-  </view>
+<!-- pages/admin/detail/detail.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="订单详情" show-back="{{true}}" bg="white"></cp-nav-bar>
 
-  <!-- 商品列表 -->
-  <view class="section" wx:if="{{order}}">
-    <view class="section-title">租赁衣物</view>
-    <view class="product-item" wx:for="{{order.items}}" wx:key="id">
-      <image class="product-img" src="{{item.product_image}}" mode="aspectFill"></image>
-      <view class="product-info">
-        <text class="product-name">{{item.product_name}}</text>
-        <text class="product-spec">{{item.size}} / {{item.color}}</text>
-        <text class="product-deposit">押金: ¥{{item.deposit}}</text>
+  <scroll-view class="page-scroll" scroll-y>
+    <view class="content-pad">
+      
+      <!-- 订单主信息 -->
+      <view class="detail-card shadow-card" wx:if="{{order}}">
+        <view class="card-header">
+          <text class="card-title">基本信息</text>
+          <text class="status-badge status-{{order.status}}">{{order.status_text}}</text>
+        </view>
+        <view class="info-list">
+          <view class="info-row">
+            <text class="label">订单编号</text>
+            <text class="value highlight-no">{{order.order_no}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">下单用户</text>
+            <text class="value">{{order.nickname}}</text>
+          </view>
+          <view class="divider-dashed"></view>
+          <view class="info-row">
+            <text class="label">实付总额</text>
+            <view class="value-price">
+              <text class="sym">¥</text><text class="num">{{order.total_amount}}</text>
+            </view>
+          </view>
+          <view class="info-row">
+            <text class="label">其中押金</text>
+            <text class="value">¥{{order.total_deposit}}</text>
+          </view>
+          
+          <block wx:if="{{order.pickup_time}}">
+            <view class="divider-dashed"></view>
+            <view class="info-row">
+              <text class="label">取衣时间</text>
+              <text class="value">{{order.pickup_time}}</text>
+            </view>
+          </block>
+          <view class="info-row" wx:if="{{order.overdue_duration}}">
+            <text class="label">逾期时长</text>
+            <text class="value danger-text">{{order.overdue_duration}} 小时</text>
+          </view>
+        </view>
       </view>
-    </view>
-  </view>
 
-  <!-- 管理操作区 -->
-  <view class="admin-actions" wx:if="{{order}}">
+      <!-- 租赁衣物清单 -->
+      <view class="detail-card shadow-card" wx:if="{{order}}">
+        <view class="card-header">
+          <text class="card-title">租赁清单</text>
+        </view>
+        <view class="product-list">
+          <view class="prod-item" wx:for="{{order.items}}" wx:key="id">
+            <image class="prod-img" src="{{item.product_image}}" mode="aspectFill"></image>
+            <view class="prod-info">
+              <text class="prod-name">{{item.product_name}}</text>
+              <text class="prod-spec">{{item.size}} / {{item.color}}</text>
+              <text class="prod-deposit">分项押金: ¥{{item.deposit}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+    </view>
+  </scroll-view>
+
+  <!-- 底部固定管理操作栏 -->
+  <view class="bottom-action-bar shadow-top" wx:if="{{order}}">
     <!-- 待取衣状态可修改衣物 (换款) -->
-    <button class="btn btn-outline" wx:if="{{order.status === 1}}" bindtap="onUpdateItems">手动修改衣物(换款)</button>
+    <button class="action-btn btn-outline" wx:if="{{order.status === 1}}" bindtap="onUpdateItems">调换衣物款型</button>
     
-    <!-- 待审核状态可一键退押金 -->
-    <button class="btn btn-primary btn-lg" wx:if="{{order.status === 4}}" bindtap="onRefund">一键原路退押金</button>
+    <!-- 待审核状态 -->
+    <button class="action-btn btn-gold" wx:if="{{order.status === 4}}" bindtap="onRefund">原路全退押金 (订单完成)</button>
     
-    <!-- 租赁中、逾期、已归还均可执行扣费 -->
-    <button class="btn btn-danger btn-lg" wx:if="{{order.status >= 2 && order.status <= 4}}" bindtap="onDeduct">手动扣除押金</button>
-  </view>
-
-  <!-- 退款/扣款弹窗 -->
-  <view class="modal" wx:if="{{showModal}}">
-    <view class="modal-content">
-      <view class="modal-header">{{modalTitle}}</view>
-      <view class="modal-body">
-        <view class="input-group">
-          <text class="input-label">金额 (元):</text>
-          <input class="input" type="digit" placeholder="输入金额" bindinput="onModalAmountInput" value="{{modalAmount}}" />
-        </view>
-        <view class="input-group">
-          <text class="input-label">原因:</text>
-          <textarea class="textarea" placeholder="输入说明内容" bindinput="onModalReasonInput" value="{{modalReason}}"></textarea>
-        </view>
-      </view>
-      <view class="modal-footer">
-        <button class="modal-btn cancel" bindtap="closeModal">取消</button>
-        <button class="modal-btn confirm" bindtap="confirmModal">提交</button>
-      </view>
-    </view>
+    <!-- 租赁中、逾期、待审核均可执行扣费 -->
+    <button class="action-btn btn-danger" wx:if="{{order.status >= 2 && order.status <= 4}}" bindtap="onDeduct">手动扣款操作</button>
   </view>
 
   <view class="loading-state" wx:if="{{loading}}">
-    <text>数据加载中...</text>
+    <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
+  </view>
+
+  <!-- 退款/扣款全屏交互模态框 -->
+  <view class="modal-overlay" wx:if="{{showModal}}">
+    <view class="modal-card">
+      <view class="modal-header">
+        <text class="modal-title">{{modalTitle}}</text>
+      </view>
+      
+      <view class="modal-body">
+        <view class="input-wrap">
+          <text class="input-label">扣/退金额 (¥)</text>
+          <input class="input-box" type="digit" placeholder="0.00" placeholder-class="ph-style" bindinput="onModalAmountInput" value="{{modalAmount}}" />
+        </view>
+        
+        <view class="input-wrap mt-20">
+          <text class="input-label">执行事由/凭证说明</text>
+          <textarea class="textarea-box" placeholder="如：衣物破损扣费、或无损全额退还" placeholder-class="ph-style" bindinput="onModalReasonInput" value="{{modalReason}}"></textarea>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <button class="modal-btn btn-cancel" bindtap="closeModal">再想想</button>
+        <button class="modal-btn btn-confirm" bindtap="confirmModal">授权确认</button>
+      </view>
+    </view>
   </view>
 </view>

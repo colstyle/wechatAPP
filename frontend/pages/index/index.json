@@ -2,7 +2,8 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar",
-    "cp-product-card": "/components/cp-product-card/cp-product-card"
+    "cp-product-card": "/components/cp-product-card/cp-product-card",
+    "cp-empty": "/components/cp-empty/cp-empty"
   },
   "backgroundTextStyle": "dark"
 }

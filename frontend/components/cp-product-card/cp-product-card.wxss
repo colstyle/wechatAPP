@@ -92,6 +92,27 @@
   color: #FFF;
 }
 
+/* 已定出遮罩 */
+.rented-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.rented-tag {
+  background: rgba(28, 28, 28, 0.7);
+  color: #FFF;
+  font-size: 24rpx;
+  font-weight: 600;
+  padding: 12rpx 36rpx;
+  border-radius: 8rpx;
+  letter-spacing: 2px;
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.1);
+}
+
 /* 信息区 */
 .info-wrap {
   padding: 16rpx 18rpx 20rpx;

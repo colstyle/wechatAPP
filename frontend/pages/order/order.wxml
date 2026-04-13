@@ -1,132 +1,90 @@
 <!-- pages/order/order.wxml -->
 <view class="page-root">
+  <!-- 沉浸式背景 -->
+  <view class="hero-bg">
+    <image class="hero-img" src="{{imgBase}}/order_center_banner.png" mode="aspectFill"></image>
+    <view class="hero-mask"></view>
+  </view>
 
-  <!-- 自定义导航栏 -->
-  <cp-nav-bar title="我的订单" show-back="{{false}}" bg="white"></cp-nav-bar>
+  <!-- 自定义导航 -->
+  <cp-nav-bar title="" show-back="{{false}}" bg="transparent" border="{{false}}"></cp-nav-bar>
 
-  <view class="content">
-
-    <!-- 订单状态卡 -->
-    <view class="status-card">
-      <view class="status-title">当前订单</view>
-      <view class="status-grid">
-
-        <view class="status-item" bindtap="onOrdersTap" data-status="1">
-          <view class="si-icon-wrap si-blue">
-            <!-- 待取衣: 衣架图标 -->
-            <view class="icon-hanger">
-              <view class="hanger-hook"></view>
-              <view class="hanger-bar"></view>
-              <view class="hanger-left"></view>
-              <view class="hanger-right"></view>
-            </view>
+  <view class="order-center-body">
+    
+    <!-- 状态磁贴区域 -->
+    <view class="status-glass-card">
+      <view class="sg-header">当前订单状态</view>
+      <view class="sg-grid">
+        <view class="sg-item" bindtap="onOrdersTap" data-status="1">
+          <view class="sg-icon-box bg-blue">
+            <view class="icon-hanger-m"></view>
           </view>
-          <text class="si-label">待取衣</text>
-          <view class="si-badge" wx:if="{{orderStats.pendingPickup > 0}}">
-            <text class="si-count">{{orderStats.pendingPickup}}</text>
-          </view>
+          <text class="sg-label">待取衣</text>
+          <view class="sg-dot" wx:if="{{orderStats.pendingPickup > 0}}">{{orderStats.pendingPickup}}</view>
         </view>
 
-        <view class="status-item" bindtap="onOrdersTap" data-status="2">
-          <view class="si-icon-wrap si-gold">
-            <!-- 租赁中: 时钟循环图标 -->
-            <view class="icon-clock">
-              <view class="clock-face"></view>
-              <view class="clock-hand-h"></view>
-              <view class="clock-hand-m"></view>
-            </view>
+        <view class="sg-item" bindtap="onOrdersTap" data-status="2">
+          <view class="sg-icon-box bg-gold">
+            <view class="icon-clock-m"></view>
           </view>
-          <text class="si-label">租赁中</text>
-          <view class="si-badge" wx:if="{{orderStats.renting > 0}}">
-            <text class="si-count">{{orderStats.renting}}</text>
-          </view>
+          <text class="sg-label">租赁中</text>
+          <view class="sg-dot" wx:if="{{orderStats.renting > 0}}">{{orderStats.renting}}</view>
         </view>
 
-        <view class="status-item" bindtap="onOrdersTap" data-status="3">
-          <view class="si-icon-wrap si-sage">
-            <!-- 待归还: 返回箭头 -->
-            <view class="icon-return">
-              <view class="return-arrow"></view>
-              <view class="return-line"></view>
-            </view>
+        <view class="sg-item" bindtap="onOrdersTap" data-status="3">
+          <view class="sg-icon-box bg-sage">
+            <view class="icon-return-m"></view>
           </view>
-          <text class="si-label">待归还</text>
-          <view class="si-badge" wx:if="{{orderStats.returning > 0}}">
-            <text class="si-count">{{orderStats.returning}}</text>
-          </view>
+          <text class="sg-label">待归还</text>
         </view>
 
-        <view class="status-item" bindtap="onOrdersTap" data-status="">
-          <view class="si-icon-wrap si-neutral">
-            <!-- 全部: 列表图标 -->
-            <view class="icon-list">
-              <view class="list-line"></view>
-              <view class="list-line"></view>
-              <view class="list-line short"></view>
-            </view>
+        <view class="sg-item" bindtap="onOrdersTap" data-status="">
+          <view class="sg-icon-box bg-neutral">
+            <view class="icon-all-m"></view>
           </view>
-          <text class="si-label">全部</text>
-        </view>
-
-      </view>
-    </view>
-
-    <!-- 快捷入口 -->
-    <view class="quick-section">
-      <view class="quick-title">更多服务</view>
-
-      <view class="quick-list">
-        <view class="quick-item" bindtap="onRentTap">
-          <view class="qi-left">
-            <view class="qi-icon-wrap qi-gold">
-              <!-- 衣服图标 -->
-              <view class="icon-shirt">
-                <view class="shirt-body"></view>
-                <view class="shirt-sleeve-l"></view>
-                <view class="shirt-sleeve-r"></view>
-              </view>
-            </view>
-            <text class="qi-text">我要租衣服</text>
-          </view>
-          <view class="qi-arrow"></view>
-        </view>
-
-        <view class="quick-item" bindtap="onAppointmentTap">
-          <view class="qi-left">
-            <view class="qi-icon-wrap qi-blue">
-              <!-- 日历图标 -->
-              <view class="icon-cal">
-                <view class="cal-top-bar"></view>
-                <view class="cal-grid">
-                  <view class="cal-dot"></view>
-                  <view class="cal-dot act"></view>
-                  <view class="cal-dot"></view>
-                  <view class="cal-dot"></view>
-                </view>
-              </view>
-            </view>
-            <text class="qi-text">预约试穿</text>
-          </view>
-          <view class="qi-arrow"></view>
-        </view>
-
-        <view class="quick-item last" bindtap="onSubscribeTap">
-          <view class="qi-left">
-            <view class="qi-icon-wrap qi-sage">
-              <!-- 会员皇冠图标 -->
-              <view class="icon-crown">
-                <view class="crown-body"></view>
-                <view class="crown-spike-l"></view>
-                <view class="crown-spike-m"></view>
-                <view class="crown-spike-r"></view>
-              </view>
-            </view>
-            <text class="qi-text">会员订阅</text>
-          </view>
-          <view class="qi-arrow"></view>
+          <text class="sg-label">全部</text>
         </view>
       </view>
     </view>
 
+    <!-- 悦己服务入口 -->
+    <view class="service-group">
+      <view class="group-title">专属悦己服务</view>
+      
+      <view class="service-row" bindtap="onRentTap">
+        <view class="sr-icon bg-gold-lite">
+          <view class="icon-shirt-m"></view>
+        </view>
+        <view class="sr-info">
+          <text class="sr-name">即刻选款</text>
+          <text class="sr-desc">挑选本季最热单品</text>
+        </view>
+        <view class="sr-chevron"></view>
+      </view>
+
+      <view class="service-row" bindtap="onAppointmentTap">
+        <view class="sr-icon bg-blue-lite">
+          <view class="icon-calendar-m"></view>
+        </view>
+        <view class="sr-info">
+          <text class="sr-name">到店试穿</text>
+          <text class="sr-desc">预约专属搭配顾问</text>
+        </view>
+        <view class="sr-chevron"></view>
+      </view>
+
+      <view class="service-row" bindtap="onSubscribeTap">
+        <view class="sr-icon bg-pearl-lite">
+          <view class="icon-crown-m"></view>
+        </view>
+        <view class="sr-info">
+          <text class="sr-name">会员订阅</text>
+          <text class="sr-desc">无限穿搭自由计划</text>
+        </view>
+        <view class="sr-chevron"></view>
+      </view>
+    </view>
+
+    <view class="order-footer-note">— 小时光 • 悦见更美的自己 —</view>
   </view>
 </view>

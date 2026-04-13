@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "店主订单管理详情"
+  "navigationBarTitleText": "订单详情",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "cp-nav-bar": "/components/cp-nav-bar/cp-nav-bar"
+  }
 }

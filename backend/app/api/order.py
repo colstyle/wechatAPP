@@ -168,8 +168,10 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
     total_amount = total_rent + total_deposit
     order_no = generate_order_no()
     
-    # 租赁结束日期固定为开始日期+1天 (24小时制在取衣时激活)
-    end_date = start_date + timedelta(days=1)
+    # 租赁天数，默认为1天
+    rent_days = request.rent_days or 1
+    # 租赁结束日期 (24小时制在取衣时激活，这里预存一个日期)
+    end_date = start_date + timedelta(days=rent_days)
 
     db.begin_transaction()
     try:
@@ -178,7 +180,7 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
                rent_days, start_date, end_date, status, remark, created_at)
                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
             (order_no, user_id, request.rental_type, total_rent, total_deposit, total_amount,
-             1, start_date, end_date, 0, request.remark)
+             rent_days, start_date, end_date, 0, request.remark)
         )
 
         for item in order_items:
@@ -245,7 +247,8 @@ async def pickup_order(order_id: int, request: PickupOrderRequest, authorization
         raise HTTPException(status_code=400, detail="当前订单状态不可执行取衣操作")
 
     now = datetime.now()
-    expected_return_time = now + timedelta(hours=24)
+    rent_hours = (order['rent_days'] or 1) * 24
+    expected_return_time = now + timedelta(hours=rent_hours)
 
     db.execute_update(
         """UPDATE orders SET 

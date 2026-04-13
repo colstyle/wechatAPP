@@ -32,7 +32,7 @@ Page({
 
   loadOrder() {
     this.setData({ loading: true })
-    orderApi.getOrder(this.data.orderId)
+    adminApi.getOrder(this.data.orderId)
       .then(res => {
         const order = res.data
         order.statusText = util.orderStatusMap[order.status] || '未知'

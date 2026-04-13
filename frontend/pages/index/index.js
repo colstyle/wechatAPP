@@ -6,19 +6,13 @@ Page({
     selectedDate: null,
     startDate: '',
     endDate: '',
-    categories: [
-      { id: 1, name: '礼服',    iconPath: '/images/category-dress.png',     bgColor: 'rgba(197,160,89,0.10)' },
-      { id: 2, name: '常服',    iconPath: '/images/category-casual.png',    bgColor: 'rgba(142,151,117,0.10)' },
-      { id: 3, name: '配饰',    iconPath: '/images/category-accessory.png', bgColor: 'rgba(184,150,122,0.10)' },
-      { id: 4, name: '鞋包',    iconPath: '/images/category-bag.png',       bgColor: 'rgba(122,143,166,0.10)' },
-      { id: 5, name: '3件套餐', iconPath: '/images/category-package.png',   bgColor: 'rgba(197,160,89,0.18)' }
-    ],
     products: [],
     page: 1,
     page_size: 10,
     hasMore: true,
     loading: false,
-    loadError: false
+    loadError: false,
+    imgBase: app.imgBase
   },
 
   onLoad() {
@@ -87,13 +81,22 @@ Page({
     })
   },
 
-  onCategoryTap(e) {
-    const id = e.currentTarget.dataset.id
-    if (id === 5) {
-      wx.navigateTo({ url: '/pages/package/package' })
-      return
-    }
-    wx.navigateTo({ url: `/pages/category/category?category_id=${id}` })
+  goToCategory() {
+    wx.switchTab({ url: '/pages/category/category' })
+  },
+
+  goToPackage() {
+    wx.navigateTo({ url: '/pages/package/package' })
+  },
+
+  onStoreServiceTap() {
+    wx.openLocation({
+      latitude: 36.09689,
+      longitude: 120.37053,
+      name: '小时光租衣舍',
+      address: '青岛市市北区青建太阳岛',
+      scale: 18
+    })
   },
 
   onProductTap(e) {
@@ -108,5 +111,13 @@ Page({
   onPullDownRefresh() {
     this.loadData()
     setTimeout(() => wx.stopPullDownRefresh(), 300)
+  },
+
+  onResetDate() {
+    this.setData({
+      selectedDate: this.data.todayDate
+    }, () => {
+      this.loadData()
+    })
   }
 })

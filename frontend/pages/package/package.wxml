@@ -1,71 +1,92 @@
-<view class="page package-page">
-  <view class="page-pad package-top">
-    <view class="card">
-      <view class="flex justify-between items-center">
-        <text class="text-muted">预约日期</text>
-        <text class="text-bold">{{selectedDate}}</text>
-      </view>
-    </view>
+<!-- pages/package/package.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="3件69.9元特惠套餐" show-back="{{true}}" bg="white"></cp-nav-bar>
 
-    <view class="card">
-      <view class="flex justify-between items-center">
-        <text class="text-bold">已选择 {{selectedItems.length}}/3 件</text>
-        <text class="text-primary text-bold">¥69.9</text>
-      </view>
-      <view class="progress-track">
-        <view class="progress-fill" style="width: {{selectedItems.length * 33.33}}%"></view>
-      </view>
-    </view>
-
-    <view class="card" wx:if="{{selectedItems.length > 0}}">
-      <view class="selected-items">
-        <view class="selected-item" wx:for="{{selectedItems}}" wx:key="id">
-          <view class="selected-thumb">
-            <text class="selected-emoji">{{item.placeholder || '👗'}}</text>
-            <view class="selected-remove" bindtap="removeItem" data-id="{{item.id}}">×</view>
-          </view>
+  <view class="package-header">
+    <view class="status-panel">
+      <view class="status-left">
+        <view class="status-count">
+          <text class="count-now">{{selectedItems.length}}</text>
+          <text class="count-total">/ 3</text>
         </view>
+        <text class="status-desc">已选件数</text>
+      </view>
+      <view class="status-right">
+        <view class="price-box">
+          <text class="price-sym">¥</text>
+          <text class="price-num">69.90</text>
+        </view>
+        <text class="status-desc text-right">套餐特惠价</text>
+      </view>
+    </view>
+    
+    <!-- 进度条 -->
+    <view class="progress-bar-wrap">
+      <view class="progress-track">
+        <view class="progress-inner" style="width: {{selectedItems.length * 33.33}}%"></view>
+      </view>
+    </view>
+
+    <!-- 已选缩略图 -->
+    <view class="selected-thumbs-row" wx:if="{{selectedItems.length > 0}}">
+      <view class="thumb-item" wx:for="{{selectedItems}}" wx:key="id">
+        <image class="thumb-img" src="{{item.cover_image}}" mode="aspectFill"></image>
+        <view class="thumb-remove" bindtap="removeItem" data-id="{{item.id}}">
+          <view class="icon-close-sm"></view>
+        </view>
+      </view>
+      <view class="thumb-placeholder" wx:for="{{[1,2,3]}}" wx:key="*this" wx:if="{{index >= selectedItems.length}}">
+        <view class="icon-plus-thin"></view>
       </view>
     </view>
   </view>
 
-  <scroll-view class="package-scroll" scroll-y bindscrolltolower="onLoadMore">
-    <view class="page-pad">
-      <view class="grid-2">
-        <view class="package-card {{item.selected ? 'selected' : ''}}"
-              wx:for="{{products}}"
-              wx:key="id"
-              bindtap="toggleSelect"
-              data-id="{{item.id}}">
-          <view class="package-cover">
-            <text class="package-emoji">{{item.placeholder || '👗'}}</text>
-            <view class="package-check" wx:if="{{item.selected}}">✓</view>
+  <scroll-view class="package-scroll" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="grid-container">
+      <view class="product-card {{item.selected ? 'is-selected' : ''}}" 
+            wx:for="{{products}}" 
+            wx:key="id" 
+            bindtap="toggleSelect" 
+            data-id="{{item.id}}">
+        <view class="card-cover-wrap">
+          <image class="card-img" src="{{item.cover_image}}" mode="aspectFill"></image>
+          <view class="selection-overlay" wx:if="{{item.selected}}">
+            <view class="icon-check-circle"></view>
           </view>
-          <view class="package-info">
-            <text class="package-name">{{item.name}}</text>
-            <text class="package-meta">押金 ¥{{item.deposit}}</text>
+        </view>
+        <view class="card-info">
+          <text class="prod-name">{{item.name}}</text>
+          <view class="prod-meta">
+            <text class="meta-label">押金</text>
+            <text class="meta-val">¥{{item.deposit}}</text>
           </view>
         </view>
       </view>
-
-      <view class="loading-state" wx:if="{{loading}}">
-        <text>加载中...</text>
-      </view>
-      <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多可租衣物了</view>
-      <view class="empty-state" wx:if="{{!loading && products.length === 0}}">
-        <text>该日期暂无可用衣物</text>
-      </view>
     </view>
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
+    </view>
+
+    <cp-empty wx:if="{{!loading && products.length === 0}}" text="该日期暂无可租衣物" subText="调整日期后再试"></cp-empty>
+    
+    <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多可选衣物了</view>
   </scroll-view>
 
-  <view class="footer-bar package-footer">
-    <view class="total-info">
-      <text class="total-label">预估总额</text>
-      <text class="total-price">¥{{totalAmount}}</text>
-      <text class="total-desc">租金 69.9 + 押金 {{totalDeposit}}</text>
+  <!-- 底部结算 -->
+  <view class="bottom-bar shadow-top">
+    <view class="total-detail">
+      <view class="price-row">
+        <text class="total-label">合计</text>
+        <text class="total-sym">¥</text>
+        <text class="total-val">{{totalAmount}}</text>
+      </view>
+      <text class="total-hint">(租金69.9 + 押金{{totalDeposit}})</text>
     </view>
-    <button class="btn btn-primary btn-lg package-submit" bindtap="onSubmit" disabled="{{selectedItems.length !== 3}}">
-      立即预定
+    <button class="submit-btn {{selectedItems.length === 3 ? 'btn-active' : ''}}" 
+            bindtap="onSubmit" 
+            disabled="{{selectedItems.length !== 3}}">
+      {{selectedItems.length < 3 ? '还需选 ' + (3 - selectedItems.length) + ' 件' : '选好了，去预定'}}
     </button>
   </view>
 </view>

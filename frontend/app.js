@@ -5,11 +5,13 @@ App({
   // API基础地址：从多环境配置读取，不再硬编码
   // 详见 frontend/config/env.js — develop(dev) / trial(test) / release(prod) 自动切换
   apiBase: envConfig.apiBase,
+  imgBase: envConfig.imgBase,
 
   // 全局数据
   globalData: {
-    ENV:             envConfig.ENV,       // 当前环境标识
-    enableMock:      envConfig.enableMock, // 是否允许 mock 身份
+    ENV:             envConfig.ENV,
+    enableMock:      envConfig.enableMock,
+    imgBase:         envConfig.imgBase,
     token:           null,
     userInfo:        null,
     selectedDate:    null, // 用户选择的租赁日期 (YYYY-MM-DD)

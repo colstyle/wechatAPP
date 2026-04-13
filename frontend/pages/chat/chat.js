@@ -1,5 +1,5 @@
 const app = getApp()
-const faqData = require('../../data/faq.json')
+const faqData = require('../../data/faq.js')
 
 Page({
   data: {

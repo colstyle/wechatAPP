@@ -188,8 +188,10 @@ async def get_products(
     is_hot: Optional[bool] = None,
     package_only: Optional[bool] = None,
     available_date: Optional[str] = None,  # YYYY-MM-DD format
+    show_rented: Optional[bool] = False,   # 是否显示已借出商品
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100)
+    page_size: int = Query(20, ge=1, le=100),
+    authorization: Optional[str] = Header(None)
 ):
     """
     获取商品列表
@@ -242,10 +244,8 @@ async def get_products(
     if package_only:
         conditions.append("p.is_package_eligible = 1")
 
-    # 如果指定日期，筛选未预订的商品 (reservations 记录必须排除)
-    # 如果指定日期，筛选该日期未预订的商品
-    if available_date:
-        # 子查询排除在指定日期已被预订的商品
+    # 如果指定日期并且没有强制要求显示已租商品，则过滤掉已预订的商品
+    if available_date and not show_rented:
         conditions.append("p.id NOT IN (SELECT product_id FROM reservations WHERE reserved_date = %s)")
         params.append(available_date)
     
@@ -268,6 +268,12 @@ async def get_products(
 
     products = db.execute_query(list_sql, tuple(params))
 
+    # 查询当日所有已预订的商品ID，用于标记是否租出
+    reserved_ids = set()
+    if available_date:
+        res = db.execute_query("SELECT product_id FROM reservations WHERE reserved_date = %s", (available_date,))
+        reserved_ids = {r['product_id'] for r in res}
+
     return {
         "code": 0,
         "message": "获取成功",
@@ -287,7 +293,8 @@ async def get_products(
                     "is_package_eligible": bool(p.get('is_package_eligible')),
                     "status": p.get('status', 1),
                     "view_count": p['view_count'],
-                    "rent_count": p['rent_count']
+                    "rent_count": p['rent_count'],
+                    "is_rented": bool(p['id'] in reserved_ids)
                 }
                 for p in products
             ],
