@@ -17,12 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装项目依赖
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # 拷贝项目代码
-COPY . .
+COPY backend/ .
 
 # 暴露端口 (FastAPI 默认 8000)
 EXPOSE 8000
