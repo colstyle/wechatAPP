@@ -7,26 +7,33 @@
 //   'release' → 正式版（小程序商店）         → prod
 
 const { envVersion } = wx.getAccountInfoSync().miniProgram
+const systemInfo = wx.getSystemInfoSync()
+const isDevTools = systemInfo.platform === 'devtools'
+
+// 局域网 IP (仅用于真机调试)
+const LOCAL_IP = '192.168.43.79'
+// 本地回环 (仅用于模拟器，最稳定)
+const LOCALHOST = '127.0.0.1'
 
 const ENV_MAP = {
   develop: {
     ENV:        'dev',
-    apiBase:    'http://192.168.43.79:8000',
-    imgBase:    'http://192.168.43.79:8000/static/images',
+    apiBase:    `http://${isDevTools ? LOCALHOST : LOCAL_IP}:8000`,
+    imgBase:    `http://${isDevTools ? LOCALHOST : LOCAL_IP}:8000/static/images`,
     enableMock: true,
     enableLog:  true,
   },
   trial: {
     ENV:        'test',
-    apiBase:    'http://YOUR_TEST_SERVER:8000',
-    imgBase:    'http://YOUR_TEST_SERVER:8000/static/images',
+    apiBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com',
+    imgBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com/static/images',
     enableMock: true,
     enableLog:  true,
   },
   release: {
     ENV:        'prod',
-    apiBase:    'https://api.yourdomain.com',
-    imgBase:    'https://api.yourdomain.com/static/images',
+    apiBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com',
+    imgBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com/static/images',
     enableMock: false,
     enableLog:  false,
   },
