@@ -14,18 +14,33 @@ class Database:
 
     @classmethod
     def get_connection(cls):
-        """获取数据库连接"""
+        """获取数据库连接 (增加重试逻辑以适配 Serverless 冷启动)"""
+        import time
+        max_retries = 3
+        retry_delay = 2  # 秒
+
         if cls._connection is None:
-            cls._connection = pymysql.connect(
-                host=settings.DB_HOST,
-                port=settings.DB_PORT,
-                user=settings.DB_USER,
-                password=settings.DB_PASSWORD,
-                database=settings.DB_NAME,
-                charset='utf8mb4',
-                cursorclass=DictCursor,
-                autocommit=True  # 默认 autocommit=True 减少挂起事务风险
-            )
+            for attempt in range(max_retries):
+                try:
+                    cls._connection = pymysql.connect(
+                        host=settings.DB_HOST,
+                        port=settings.DB_PORT,
+                        user=settings.DB_USER,
+                        password=settings.DB_PASSWORD,
+                        database=settings.DB_NAME,
+                        charset='utf8mb4',
+                        cursorclass=DictCursor,
+                        connect_timeout=10,  # 给足连接时间
+                        autocommit=True
+                    )
+                    return cls._connection
+                except (pymysql.MySQLError, IOError) as e:
+                    if attempt < max_retries - 1:
+                        print(f"数据库连接失败 (尝试 {attempt + 1}/{max_retries}): {e}. 正在重试...")
+                        time.sleep(retry_delay)
+                    else:
+                        print("数据库重试连接失败，请检查 CynosDB 实例状态或环境变量。")
+                        raise e
         return cls._connection
 
     @classmethod

@@ -18,22 +18,22 @@ const LOCALHOST = '127.0.0.1'
 const ENV_MAP = {
   develop: {
     ENV:        'dev',
-    apiBase:    `http://${isDevTools ? LOCALHOST : LOCAL_IP}:8000`,
-    imgBase:    `http://${isDevTools ? LOCALHOST : LOCAL_IP}:8000/static/images`,
+    apiBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com',
+    imgBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com/static/images',
     enableMock: true,
     enableLog:  true,
   },
   trial: {
     ENV:        'test',
-    apiBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com',
-    imgBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com/static/images',
+    apiBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com',
+    imgBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com/static/images',
     enableMock: true,
     enableLog:  true,
   },
   release: {
     ENV:        'prod',
-    apiBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com',
-    imgBase:    'https://time-capsule-surver-7cya285298de-1421670163.tcloudbaseapp.com/static/images',
+    apiBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com',
+    imgBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com/static/images',
     enableMock: false,
     enableLog:  false,
   },
