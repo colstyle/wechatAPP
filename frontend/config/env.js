@@ -11,8 +11,8 @@ const { envVersion } = wx.getAccountInfoSync().miniProgram
 const ENV_MAP = {
   develop: {
     ENV:        'dev',
-    apiBase:    'http://127.0.0.1:8000',
-    imgBase:    'http://127.0.0.1:8000/static/images',
+    apiBase:    'http://192.168.43.79:8000',
+    imgBase:    'http://192.168.43.79:8000/static/images',
     enableMock: true,
     enableLog:  true,
   },
