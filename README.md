@@ -1,246 +1,181 @@
 <div align="center">
+  <img src="https://img.icons8.com/isometric/512/dress.png" alt="TimeCapsule" width="120" />
+  <h1>👗 小时光租衣舍 (Time Capsule)</h1>
+  <p><strong>旗舰级 24 小时自助租衣小程序。日期预约、套餐优惠、AI 客服、高奢视觉。</strong></p>
 
-# 👗 小时光租衣舍 (Time Capsule)
+  <p>
+    <a href="#-快速启动"><strong>🚀 快速启动</strong></a> &middot;
+    <a href="README/deployment_diary.md"><strong>📖 部署指南</strong></a> &middot;
+    <a href="https://github.com/colstyle/wechatAPP"><strong>🔗 GitHub</strong></a>
+  </p>
 
-**旗舰级 24 小时自助租衣小程序。日期预约、套餐优惠、AI 穿搭、高奢视觉。**
+  <p>
+    <img src="https://img.shields.io/badge/状态-Phase%2011%20服务器部署完成-success?style=flat-square" alt="Status" />
+    <img src="https://img.shields.io/badge/平台-WeChat%20MP-blue?style=flat-square" alt="Platform" />
+    <img src="https://img.shields.io/badge/后端-FastAPI-green?style=flat-square" alt="Backend" />
+    <img src="https://img.shields.io/badge/部署-Docker-blueviolet?style=flat-square" alt="Deployment" />
 
-![Project Status](https://img.shields.io/badge/状态-Phase%2010%20工业级闭环收官-success?style=flat-square)
-![Platform](https://img.shields.io/badge/平台-WeChat%20Mini%20Program%20%7C%20FastAPI-blue?style=flat-square)
-![Tech Stack](https://img.shields.io/badge/技术栈-FastAPI%20%2B%20MySQL%20%2B%20DeepSeek-blueviolet?style=flat-square)
-![Package Size](https://img.shields.io/badge/包体积-仅_380KB_(静态外提)-brightgreen?style=flat-square)
-
+  </p>
 </div>
 
 ---
 
-## ✨ 核心特性
+## 📢 项目动态与开发编时史 (News & Changelog)
 
-- 💎 **高奢莫兰迪视觉** — 行业领先的沉浸式黑金/莫兰迪色系设计，全自定义胶囊导航，极致平滑过渡。
-- 📅 **智能排期体系** — 基于日历的实时档期选款，支持按单品、按套餐（3件69.9）灵活组合。
-- ⏲️ **可视化租赁链路** — 环形倒计时实时追踪，动态计算租赁天数与预计归还时间，自动计算逾期。
-- 🤖 **AI 穿搭灵感** — 集成 DeepSeek-V3/Gemini，提供 24h 业务咨询与专业服装搭配建议。
-- 🧑‍💼 **旗舰级管理后台** — 店主专属管理舱，支持异主订单详情查阅、退押金、手动扣费、换款及库存实时监控。
+### 🚀 24 小时：服务器生产环境大冲刺
+- **2026-04-14 14:30** ✅ **全链路通电**：手机真机扫码测试成功，正式打通 `https://www.celestialaiplus.com`。解决了小程序端由于缓存导致的域名不合法假警报。
+- **2026-04-14 10:00** 🔒 **HTTPS 攻坚战**：通过 Nginx Proxy Manager (Port 81) 一键申请 Let's Encrypt 证书，实现了 80/443 端口自动跳转 HTTPS，满足微信最严准入标准。
+- **2026-04-14 09:00** 🧬 **数据整备**：完成 `v1.0.0` 种子数据注入，批量修复了由于迁移导致的图片 404 死链，解决字符编码乱码问题。
+- **2026-04-13 23:00** 🐳 **Docker 部署**：完成 `FastAPI` + `MySQL 5.7` 的容器化编排。利用云服务器内网源（Tencent/Aliyun）加速拉取镜像，解决服务器网络“卡脖子”难题。
+- **2026-04-13 15:00** 🛡️ **架构转轨（弃用云托管）**：因微信云托管 VPC 隔离导致数据库 `Timeout 2003`，果断拍板将其剥离，转向自主可控的独立 Ubuntu 服务器。
 
-## 🛠️ 工程亮点（工业级优化）
+### 🛠️ 早期：从 0 到 1 的地基工程
+- **2026-04-12** ✨ **店主权力加冕**：店主管理端 (Admin) 核心逻辑联调完毕，支持管理员在手机端直接加减库存、处理退押金。
+- **2026-04-11** 📅 **算法闭环**：基于共享日历的“租期预约”算法上线，同步实现“3件69.9”等套餐最优原路费用计算模型。
+- **2026-04-10** 🎨 **品牌觉醒**：莫兰迪色系 UI 全面覆盖。引入沉浸式胶囊导航与 `cp-empty` 占位组件，从“框架”蜕变为“产品”。
 
-- 🚀 **源码体积突破** — 通过后端 FastAPI 静态挂载技术，将近 3MB 的高清 Banner 资源外提，使主包体积从超限降至 380KB，完美兼容真机调试。
-- 🛡️ **权限安全隔离** — 实现了基于 Role 的严格鉴权，解决了管理员管理他人订单时的权限隔离与详情加载难题。
-- 🌐 **全自动环境引擎** — 利用微信官方 API 自动识别 develop/trial/release 版本，实现 API 地址与静态资源库的无缝切换。
-- 🎨 **组件化开发** — 封装了 `cp-nav-bar`（自定义导航）、`cp-empty`（高奢空状态）、`cp-product-card`（骨架屏同步）等原子组件。
+<details>
+<summary>查看更早期的诞生足迹</summary>
+
+- **2026-04-09** 🤖 AI 客服集成：接入 DeepSeek/Gemini 实现业务咨询自动化。
+- **2026-04-08** 🌱 种子萌芽：项目初始化，确立 Python FastAPI + 原生小程序的轻量化路线。
+</details>
+
+## 🛒 核心功能清单
+
+### 👥 针对租客（用户端）
+1. **智能租期预约**：像订酒店一样选衣服。日历直接显示有货日期，系统自动算租金，到期前自动提醒。
+2. **灵活选购方案**：支持单件精租，也支持“3件69.9”等套餐，系统自动识别最省钱的组合。
+3. **快速筛选搜索**：支持按分类、关键词精准找衣服，还能看到“店长推荐”和最新到货。
+4. **一键联系与导航**：内置门店电话一键拨打，支持直接拉起地图导航到店。
+5. **个人中心管理**：实时追踪订单状态（待取货、租赁中、待结清），支持收藏心仪衣物。
+6. **AI 客服**：24小时在线解答尺码选择、租衣流程等常见问题。
+
+### 🧑‍💼 针对店主（管理端）
+1. **移动办公舱**：无需电脑，店主在手机上登录管理员账号即可管理全店。
+2. **极简库存管理**：拍张照就能上架新衣服，随时随地修改租金、押金和库存数量。
+3. **订单全局掌控**：查看全店预约订单，处理用户还衣、延期扣费及一键退还押金。
+4. **穿搭灵感预设**：支持设置“店长推荐”位和分类权重，引导用户选择热门款式。
+5. **店主私域 AI 客服**：支持店主上传专属“知识库”（比如特定衣服的洗护说明、店铺 ## 📂 详细目录结构
+---
+
+## ⚙️ 幕后技术支柱
+- **自动识别网络环境**：一套前端代码通吃。系统会自动判断当前是“电脑调试”、“手机体验”还是“正式线上”状态，自动帮你连到对应的后端地址，再也不用手动来回改代码了。
+- **极致加载优化**：高清大图全部挂在服务器，小程序主包极小，扫码秒开不转圈。
+- **权限安全护航**：严格的店主/用户身份验证，普通用户即便扫到后台地址也进不去。
 
 ---
 
-## 🚀 快速启动
+## 🚀 启动指引
 
-### 1. 后端启动 (FastAPI)
-```bash
-cd backend
-# 1. 安装依赖 (Python 3.9+)
-pip install -r requirements.txt
-# 2. 配置环境变量
-cp .env.example .env # 填写 DB、JWT 及 AI Key
-# 3. 启动（默认 8000 端口）
-python main.py
+### 1. 开发阶段 (本地开发模式)
+*   **后端**：
+    ```bash
+    cd backend
+    pip install -r requirements.txt
+    python main.py # API 默认运行在 127.0.0.1:8000
+    ```
+*   **前端**：微信开发者工具中勾选“不校验合法域名”。环境将自动切换为 `develop` 模式。
+
+### 2. 测试阶段 (真机调试模式)
+*   **后端**：确保局域网或公网 IP 可达。
+*   **前端**：修改 `frontend/config/env.js` 中的 `apiBase`，指向开发机的局域网 IP。在工具栏使用“真机调试”，手机与电脑需在同一 Wi-Fi。
+
+### 3. 发布阶段 (生产模式)
+*   **后端**：
+    ```bash
+    cd ~/wechatAPP
+    git pull origin test
+    docker compose up -d --build
+    ```
+*   **前端**：确认 `env.js` 指向 `https://www.celestialaiplus.com`。并在微信后台完成域名加白名单。然后在工具中点击“上传”。
+
+---
+
+## 📂 详细目录结构
+
+### 1. 后端项目 (backend/)
+```text
+backend/
+├── app/
+│   ├── api/                            ← 业务接口定义 (路由层)
+│   │   ├── admin.py                    ← 店主管理与订单查询
+│   │   ├── ai.py                       ← 24h 智能客服对话接口
+│   │   ├── appointment.py              ← 试穿预约与档期查询
+│   │   ├── order.py                    ← 租衣下单与计费引擎
+│   │   ├── product.py                  ← 服装库存、分类与检索
+│   │   ├── review.py                   ← 用户评价管理
+│   │   ├── subscription.py             ← 月卡/套餐订阅体系
+│   │   └── user.py                     ← 用户鉴权与角色分发
+│   ├── core/                           ← 安全加密与拦截中间件
+│   └── static/images/                  ← 静态资源库 (高清大图仓)
+├── config/                             ← 系统核心配置中心
+├── database/                           ← 数据库连接池与初始化 SQL
+├── main.py                             ← 程序入口 (FastAPI)
+├── Dockerfile                          ← 容器化打包描述
+└── requirements.txt                    ← 依赖环境快照
 ```
 
-### 2. 前端启动 (微信小程序原生)
-1. 使用**微信开发者工具**导入 `frontend/` 目录。
-2. **真机调试配置**：
-   - 确保手机与电脑在同一 WiFi 下。
-   - 在 `frontend/config/env.js` 中将 `apiBase` 更新为你的电脑局域网 IP（如 `192.168.43.79`）。
-   - 开发者工具设置中勾选「不校验合法域名」。
-
----
-
-## 📂 项目结构
-
-```
-202604@wechatAPP/
-├── backend/                            ← 后端框架
-│   ├── app/
-│   │   ├── api/                        ← 核心路由（user, product, order, admin...）
-│   │   └── static/images/              ← [NEW] 远端高清大图资源仓
-│   ├── config/settings.py               ← 多环境核心配置
-│   └── main.py                         ← 入口（含静态资源挂载 Mount）
-├── frontend/                           ← 前端原生小程序
-│   ├── components/                     ← 原子组件库 (NavBar, Empty, Card...)
-│   ├── config/env.js                   ← 环境自动化切换引擎
-│   ├── pages/
-│   │   ├── index/                      ← 首页 (日历选期/精选单品)
-│   │   ├── admin/                      ← [PRO] 店主管理全功能模块
-│   │   ├── order/                      ← 订单中心与 24h 追踪
-│   │   └── profile/                    ← 个人中心 (含门店定位、拨号)
-│   └── utils/api.js                    ← 工业级 API 聚合封装层
-├── docs/                               ← 正式产品文档
-└── README.md                           ← 本文件
+### 2. 小程序项目 (frontend/)
+```text
+frontend/
+├── components/                         ← 业务复用原子组件
+│   ├── cp-empty/                       ← 莫兰迪风格占位图
+│   ├── cp-nav-bar/                     ← 自定义沉浸式顶壳
+│   └── cp-product-card/                ← 瀑布流商品展示卡
+├── pages/                              ← 业务逻辑页面
+│   ├── index/                          ← 首页看点
+│   ├── category/                       ← 业务分类探索
+│   ├── detail/                         ← 服装详情与选期
+│   ├── chat/                           ← 智能客服对话窗口
+│   ├── pay/                            ← 费用与押金收银台
+│   ├── order/                          ← 下单确认页面
+│   ├── orders/                         ← 历史订单追踪
+│   ├── package/                        ← 优惠套餐选购
+│   ├── profile/                        ← 个人中心
+│   ├── admin/                          ← 店主移动控制台
+│   └── settings/                       ← 系统设置与偏好
+├── config/env.js                       ← 环境自动切换引擎
+└── utils/api.js                        ← 统一请求封装库
 ```
 
----
+### 3. 文档与辅助工具
+```text
+├── README/                             ← [核心] 运维与防坑实战手册
+├── docs/                               ← 产品原型与交互文档
+├── convert-icons.js                    ← 图标自动化转换工具
+└── wechatAPP上线步骤.docx               ← 官方备案与提审辅助指南
+```
 
-## 📅 路线图 (Milestones)
 
-| 阶段 | 状态 | 内容 |
-|---|---|---|
-| Phase 1-5 | ✅ 完成 | 业务闭环、AI 客服、黑金 UI、组件库建立 |
-| Phase 6-9 | ✅ 完成 | 多环境工程化、静态资源库分离、管理员权限加固 |
-| Phase 10 | ✅ 完成 | 真机调试优化、门店定位联络、空状态美化、Git 同步 |
-| **Phase 11** | 🚀 **进行中** | **服务器私有化部署、Docker 环境搭建、域名解析中** |
-| Phase 12 | ⏳ 规划 | 微信支付 V3 实装、真实 OpenID 认证、上架版本审核 |
+## 📚 详细指南
 
----
+### 🛠️ 部署与运维 (Operations)
+- 👗 **[生产环境实战部署日记](./README/deployment_diary.md)** —— 包含架构可视化图表，以及从零配置服务器、Docker 与 HTTPS 的全记录。
+- 📔 **[微信小程序上线全流程](./wechatAPP上线步骤.docx)** —— 官方备案、后台域名配置与正式提审指南。
 
-## 📜 开发实战日志 (Development Log)
+### 📜 开发实战日志 (Development Steps)
+<details>
+<summary>点击展开 10 个阶段的开发全记录</summary>
 
-记录“小时光租衣舍”从云端迁移到私有服务器的硬核历程：
+- **[Phase 1: 业务逻辑与 AI 初步](./README/20260409_Phase1_BusinessLogic_AI.md)**
+- **[Phase 2: 店主后台与支付模型](./README/20260409_Phase2_Admin_Payment.md)**
+- **[Phase 3: MVP 核心功能精简优化](./README/20260409_Phase3_MVP_Simplification.md)**
+- **[Phase 4: 身份验证与 Mock 联调](./README/20260409_Phase4_Identity_Role_Mock.md)**
+- **[Phase 5: 莫兰迪色系全量视觉重构](./README/20260410_Phase5_Aesthetic_Refactor.md)**
+- **[Phase 6-8: 架构升级与环境自动化](./README/20260413_Phase6_to_8_Architecture_Upgrade.md)**
+- **[Phase 10: 体验版性能与稳定性优化](./README/20260413_Phase10_TrialReady_Optimization.md)**
+</details>
 
-1.  **[弃暗投明]**：由于微信云托管与云数据库存在 VPC 隔离（Timeout 2003），果断放弃傻逼微信组件，转向自主可控的 **腾讯云轻量服务器**。
-2.  **[Docker 化]**：基于 `Docker` + `Docker-Compose` 重新打包后端与 MySQL，实现“一键搬家、永久稳定”。
-3.  **[网络破局]**：通过配置国内镜像源（Tencent/Aliyun），解决了服务器拉取镜像慢、容器内 `apt-get` 挂掉的难题。
-4.  **[数据回迁]**：成功在服务器初始化 15 张核心业务表，并手动植入了“夏日海鸥”女生系列开业数据。
-5.  **[接口通电]**：成功通过 **IP:8000** 实现了外网与服务器数据库的首次通信！
+### 🎨 产品设计与规范 (Design & Specs)
+- 📝 **[PRD 产品需求文档](./docs/PRD.md)** —— 核心业务场景与功能定义。
+- 📐 **[DESIGN 交互设计规范](./docs/DESIGN.md)** —— 莫兰迪视觉系统与 UI 组件准则。
+- 🌏 **[ENV 多环境配置方案](./docs/ENV.md)** —— develop / trial / release 的自动化映射逻辑。
+- 🗺️ **[PLAN 项目路线规划](./docs/PLAN.md)** —— 10天 项目起跑线的初步设想。
 
----
+<br/>
 
-## 🚀 上线冲刺清单 (Remaining Steps)
-
-目前的“发动机”已经点火，距离手机端正式看到成品还差最后 4 步：
-
-- [ ] **1. 全站 HTTPS (当前优先级最高)**
-  - 动作：通过 Port 81 (Nginx Proxy Manager) 为 `celestialaiplus.com` 申请 SSL 证书并转发至 8000 端口。
-  - 目的：满足微信小程序“必须使用 HTTPS 域名”的硬性规定。
-- [ ] **2. 前端代码同步**
-  - 动作：在 `frontend/config/env.js` 中将云托管地址修改为你的正式域名。
-- [ ] **3. 微信后台备案**
-  - 动作：登录微信公众平台，将 `https://celestialaiplus.com` 加入 `request 合法域名`。
-- [ ] **4. 正式版本上传**
-  - 动作：在开发者工具点击“上传”，进入审核队列。
+<br/>
 
 ---
-
-## 🛠️ 保姆级上线操作指南 (Operation Guide)
-
-
-我给你总结一下现在的终极战果：
-✅ 全部搞定
-服务器：110.40.168.138 ✅
-域名：www.celestialaiplus.com 正常解析 ✅
-后端：小时光租衣舍 v1.0.0 running ✅
-访问：http://www.celestialaiplus.com 可以打开 ✅
-数据库：有数据、接口能返回 ✅
-端口：80 / 443 已开放 ✅
-
-最终战果总结
-服务器：正常运行 ✅
-域名：www.celestialaiplus.com 解析正常 ✅
-后端：「小时光租衣舍」running ✅
-HTTPS 安全证书：已生效（带小锁） ✅
-自动跳转：http → https ✅
-如果你在操作中感到困惑，请严格执行以下步骤：
-
-### 第一步：域名“指路” (DNS 解析)
-1. 登录腾讯云，进入 **DNS 解析 DNSPod**。
-2. 为 `celestialaiplus.com` 添加 A 记录，指向你的服务器 IP `110.40.168.138`。
-3. **关键验证**: 在电脑终端运行 `ping celestialaiplus.com`。
-   - 看到 `来自 110.40.168.138 的回复` -> **成功 ✅**
-   - 看到 `198.18.x.x` -> **失败 ❌** (请关闭电脑上的梯子/VPN再试)。
-
-### 第二步：网关“守门” (Nginx Proxy Manager)
-1. 访问 `http://110.40.168.138:81`。
-2. 初始账号：`admin@example.com` / `changeme`。
-3. 进入 **Proxy Hosts -> Add Proxy Host**:
-   - **Domain Names**: `celestialaiplus.com`
-   - **Forward Port**: `8000`
-   - **Forward IP**: `127.0.0.1`
-4. 切换到 **SSL 标签页**:
-   - 下拉选 `Request a new SSL Certificate`
-   - 勾选 `Force SSL` 和 `Agree Terms`。
-   - 点击 **Save**。
-
-### 第三步：前端“通电” (微信端)
-1. 修改 `frontend/config/env.js`:
-   ```javascript
-   const config = {
-     apiBase: 'https://celestialaiplus.com', // 必须是 https
-     // ...
-   }
-   ```
-2. 登录 **微信公众平台**, 进入“开发管理 -> 开发设置 -> 服务器域名”。
-3. 在 `request 合法域名` 处填入 `https://celestialaiplus.com`。
-
-1. 买服务器（腾讯云轻量 Ubuntu）
-操作
-买轻量应用服务器，选 Ubuntu
-放通防火墙：22、80、443、8000
-记下公网 IP：110.40.168.138
-目的
-拥有一台 24 小时在线的 “远程电脑”
-运行小程序后端 + 数据库
-2. 买域名并解析（celestialaiplus.com）
-操作
-买域名
-DNS 添加 2 条 A 记录：
-www → 你的服务器 IP
-@ → 你的服务器 IP
-ping 验证通了
-目的
-用好记的域名代替难记的 IP
-让微信 / 浏览器能找到你的服务器
-3. 部署后端（FastAPI + MySQL）
-操作
-上传代码到服务器
-导入数据库 init.sql
-启动后端：端口 8000
-访问 IP:8000 看到 JSON 接口
-目的
-让小程序的接口真正运行起来
-4. 安装 Nginx（反向代理）
-操作
-apt install nginx
-配置域名指向 127.0.0.1:8000
-重启 Nginx
-目的
-把域名流量转发给后端
-实现用域名访问，不用带端口
-支持 HTTPS
-5. 申请 HTTPS（免费证书）
-操作
-apt install certbot python3-certbot-nginx
-certbot --nginx -d www.celestialaiplus.com
-选择自动跳转 HTTPS
-目的
-给域名加安全锁
-微信小程序强制要求必须 HTTPS
-6. 微信小程序后台配置
-操作
-开发设置 → request 合法域名
-填入：https://www.celestialaiplus.com
-目的
-让微信允许你的小程序访问接口
-7. 小程序前端改接口
-操作
-baseURL 改为
-https://www.celestialaiplus.com
-目的
-前端正式连接线上后端
-✅ 最终成果（你现在已经全部达成）
-https://www.celestialaiplus.com
-返回：
-{"app":"小时光租衣舍","version":"1.0.0","status":"running"}
-服务器 ✅
-域名 ✅
-解析 ✅
-后端 ✅
-数据库 ✅
-Nginx ✅
-HTTPS ✅
-微信可访问 ✅
-小程序可上线 ✅
-
----
-
-## 📄 执照
-MIT License · **小时光租衣舍 007/100** © 2026
-
-<div align="center">
-  <sub>使用 Antigravity AI 开发 · 高性能 · 高颜值 · 高可用</sub>
-</div>
+MIT License © 2026
