@@ -18,22 +18,22 @@ const LOCALHOST = '127.0.0.1'
 const ENV_MAP = {
   develop: {
     ENV:        'dev',
-    apiBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com',
-    imgBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com/static/images',
+    apiBase:    'https://www.celestialaiplus.com',
+    imgBase:    'https://www.celestialaiplus.com/static/images',
     enableMock: true,
     enableLog:  true,
   },
   trial: {
     ENV:        'test',
-    apiBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com',
-    imgBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com/static/images',
+    apiBase:    'https://www.celestialaiplus.com',
+    imgBase:    'https://www.celestialaiplus.com/static/images',
     enableMock: true,
     enableLog:  true,
   },
   release: {
     ENV:        'prod',
-    apiBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com',
-    imgBase:    'https://xiaoshiguang-245804-5-1421670163.sh.run.tcloudbase.com/static/images',
+    apiBase:    'https://www.celestialaiplus.com',
+    imgBase:    'https://www.celestialaiplus.com/static/images',
     enableMock: false,
     enableLog:  false,
   },
