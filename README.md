@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://img.icons8.com/isometric/512/dress.png" alt="TimeCapsule" width="120" />
   <h1>👗 小时光租衣舍 (Time Capsule)</h1>
   <p><strong>旗舰级 24 小时自助租衣小程序。日期预约、套餐优惠、AI 客服、高奢视觉。</strong></p>
 
