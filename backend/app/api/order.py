@@ -12,6 +12,7 @@ import time
 import random
 from database import db
 from app.utils.auth import get_current_user, require_admin
+from app.utils.audit import write_order_audit
 
 router = APIRouter()
 
@@ -87,7 +88,11 @@ def generate_order_no() -> str:
 # ============ 订单API ============
 
 @router.post("/orders")
-async def create_order(request: CreateOrderRequest, authorization: Optional[str] = Header(None)):
+async def create_order(
+    request: CreateOrderRequest,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     创建订单 (租赁)
     """
@@ -207,12 +212,33 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
                      item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
                 )
             # 锁定日期库存
-            db.execute_insert(
-                "INSERT INTO reservations (product_id, reserved_date, order_id, created_at) VALUES (%s, %s, %s, NOW())",
-                (item['product_id'], start_date, order_id)
-            )
+            try:
+                db.execute_insert(
+                    "INSERT INTO reservations (product_id, reserved_date, order_id, created_at) VALUES (%s, %s, %s, NOW())",
+                    (item['product_id'], start_date, order_id)
+                )
+            except Exception as e:
+                msg = str(e)
+                if "Duplicate entry" in msg or "1062" in msg:
+                    raise HTTPException(status_code=400, detail=f"衣物《{item['product_name']}》在 {request.start_date} 已被预订")
+                raise
 
         db.commit()
+        write_order_audit(
+            order_id=order_id,
+            action="create",
+            operator_role=str(user.get("role", "user")),
+            operator_id=user_id,
+            request_id=x_request_id,
+            amount=float(total_amount),
+            reason=request.remark,
+            before_status=None,
+            after_status=0,
+            extra={"order_no": order_no, "rental_type": request.rental_type},
+        )
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"创建订单失败: {str(e)}")
@@ -229,35 +255,75 @@ async def create_order(request: CreateOrderRequest, authorization: Optional[str]
     }
 
 @router.post("/orders/{order_id}/pickup")
-async def pickup_order(order_id: int, request: PickupOrderRequest, authorization: Optional[str] = Header(None)):
+async def pickup_order(
+    order_id: int,
+    request: PickupOrderRequest,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     用户点击「我已取衣」：状态由「已预订/已支付」变为「租赁中」
     """
     user = get_current_user(authorization)
     user_id = user['id']
 
+    now = datetime.now()
     order = db.execute_one(
         "SELECT * FROM orders WHERE id = %s AND user_id = %s",
         (order_id, user_id)
     )
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
-    
-    if order['status'] != 1: # 1 为已支付待取衣
+
+    if order['status'] == 2:
+        return {
+            "code": 0,
+            "message": "取衣成功，24小时计时开始",
+            "data": {
+                "pickup_time": order['pickup_time'].isoformat() if order.get('pickup_time') else None,
+                "expected_return_time": order['expected_return_time'].isoformat() if order.get('expected_return_time') else None
+            }
+        }
+
+    if order['status'] != 1:
         raise HTTPException(status_code=400, detail="当前订单状态不可执行取衣操作")
 
-    now = datetime.now()
     rent_hours = (order['rent_days'] or 1) * 24
     expected_return_time = now + timedelta(hours=rent_hours)
 
-    db.execute_update(
+    affected = db.execute_update(
         """UPDATE orders SET 
            status = 2, 
            pickup_time = %s, 
            expected_return_time = %s,
            remark = %s
-           WHERE id = %s""",
-        (now, expected_return_time, request.remark or "用户已取衣", order_id)
+           WHERE id = %s AND user_id = %s AND status = 1""",
+        (now, expected_return_time, request.remark or "用户已取衣", order_id, user_id)
+    )
+    if affected <= 0:
+        latest = db.execute_one("SELECT * FROM orders WHERE id = %s AND user_id = %s", (order_id, user_id))
+        if latest and latest.get('status') == 2:
+            return {
+                "code": 0,
+                "message": "取衣成功，24小时计时开始",
+                "data": {
+                    "pickup_time": latest['pickup_time'].isoformat() if latest.get('pickup_time') else None,
+                    "expected_return_time": latest['expected_return_time'].isoformat() if latest.get('expected_return_time') else None
+                }
+            }
+        raise HTTPException(status_code=400, detail="当前订单状态不可执行取衣操作")
+
+    write_order_audit(
+        order_id=order_id,
+        action="pickup",
+        operator_role=str(user.get("role", "user")),
+        operator_id=user_id,
+        request_id=x_request_id,
+        amount=None,
+        reason=request.remark or "用户已取衣",
+        before_status=1,
+        after_status=2,
+        extra={"expected_return_time": expected_return_time.isoformat()},
     )
 
     return {
@@ -271,32 +337,69 @@ async def pickup_order(order_id: int, request: PickupOrderRequest, authorization
 
 
 @router.post("/orders/{order_id}/return")
-async def return_order(order_id: int, request: ReturnOrderRequest, authorization: Optional[str] = Header(None)):
+async def return_order(
+    order_id: int,
+    request: ReturnOrderRequest,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     用户点击「我已还衣」：状态由「租赁中」或「逾期」变为「已归还待审核」
     """
     user = get_current_user(authorization)
     user_id = user['id']
 
+    now = datetime.now()
     order = db.execute_one(
         "SELECT * FROM orders WHERE id = %s AND user_id = %s",
         (order_id, user_id)
     )
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
-    
-    if order['status'] not in [2, 3]: # 2为租赁中，3为逾期
+
+    if order['status'] == 4:
+        return {
+            "code": 0,
+            "message": "归还申请成功，请等待店主核验",
+            "data": {
+                "return_time": order['return_time'].isoformat() if order.get('return_time') else None
+            }
+        }
+
+    if order['status'] not in [2, 3]:
         raise HTTPException(status_code=400, detail="当前订单状态不可执行还衣操作")
 
-    now = datetime.now()
-
-    db.execute_update(
+    affected = db.execute_update(
         """UPDATE orders SET 
            status = 4, 
            return_time = %s,
            remark = %s
-           WHERE id = %s""",
-        (now, request.remark or "用户已还衣，待店主审核", order_id)
+           WHERE id = %s AND user_id = %s AND status IN (2, 3)""",
+        (now, request.remark or "用户已还衣，待店主审核", order_id, user_id)
+    )
+    if affected <= 0:
+        latest = db.execute_one("SELECT * FROM orders WHERE id = %s AND user_id = %s", (order_id, user_id))
+        if latest and latest.get('status') == 4:
+            return {
+                "code": 0,
+                "message": "归还申请成功，请等待店主核验",
+                "data": {
+                    "return_time": latest['return_time'].isoformat() if latest.get('return_time') else None
+                }
+            }
+        raise HTTPException(status_code=400, detail="当前订单状态不可执行还衣操作")
+
+    write_order_audit(
+        order_id=order_id,
+        action="return",
+        operator_role=str(user.get("role", "user")),
+        operator_id=user_id,
+        request_id=x_request_id,
+        amount=None,
+        reason=request.remark or "用户已还衣，待店主审核",
+        before_status=int(order['status']),
+        after_status=4,
+        extra=None,
     )
 
     return {
@@ -521,72 +624,111 @@ async def get_order(order_id: int, authorization: Optional[str] = Header(None)):
 
 
 @router.post("/orders/{order_id}/pay")
-async def pay_order(order_id: int, authorization: Optional[str] = Header(None)):
+async def pay_order(
+    order_id: int,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     支付订单
     """
     user = get_current_user(authorization)
     user_id = user['id']
 
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s AND user_id = %s",
-        (order_id, user_id)
-    )
+    db.begin_transaction()
+    try:
+        order = db.execute_one(
+            "SELECT * FROM orders WHERE id = %s AND user_id = %s FOR UPDATE",
+            (order_id, user_id)
+        )
+        if not order:
+            raise HTTPException(status_code=404, detail="订单不存在")
 
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
+        if order['status'] == 5:
+            raise HTTPException(status_code=400, detail="订单已取消")
 
-    if order['status'] != 0:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
+        if order['status'] != 0:
+            db.commit()
+            return {
+                "code": 0,
+                "message": "已支付",
+                "data": {"order_id": order_id, "status": int(order['status'])}
+            }
 
-    # TODO: 调用微信支付
-    # 这里简化处理，直接标记为已支付
+        door_password = None
+        expected_return_time = None
+        new_status = 1
+        if order['rental_type'] in [2, 4, 5]:
+            door_password = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            expected_return_time = datetime.now() + timedelta(hours=24)
+            new_status = 1
 
-    # 生成门锁密码（租赁订单）
-    door_password = None
-    expected_return_time = None
-    new_status = 1  # 默认已支付
-    if order['rental_type'] in [2, 4, 5]:
-        # 生成6位数字密码
-        door_password = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-        expected_return_time = datetime.now() + timedelta(hours=24)
-        new_status = 1  # 已支付待取衣
+        update_fields = ["status = %s", "payment_time = NOW()"]
+        update_values = [new_status]
 
-    # 更新订单状态
-    update_fields = ["status = %s", "payment_time = NOW()"]
-    update_values = [new_status]
+        if door_password:
+            update_fields.append("door_lock_password = %s")
+            update_values.append(door_password)
 
-    if door_password:
-        update_fields.append("door_lock_password = %s")
-        update_values.append(door_password)
+        if expected_return_time:
+            update_fields.append("expected_return_time = %s")
+            update_values.append(expected_return_time)
 
-    if expected_return_time:
-        update_fields.append("expected_return_time = %s")
-        update_values.append(expected_return_time)
+        update_sql = f"UPDATE orders SET {', '.join(update_fields)} WHERE id = %s AND user_id = %s AND status = 0"
+        update_values.extend([order_id, user_id])
 
-    update_sql = f"UPDATE orders SET {', '.join(update_fields)} WHERE id = %s"
-    update_values.append(order_id)
+        affected = db.execute_update(update_sql, tuple(update_values))
+        if affected <= 0:
+            latest = db.execute_one("SELECT * FROM orders WHERE id = %s AND user_id = %s", (order_id, user_id))
+            db.commit()
+            if latest and int(latest.get('status', 0)) != 0:
+                return {
+                    "code": 0,
+                    "message": "已支付",
+                    "data": {"order_id": order_id, "status": int(latest['status'])}
+                }
+            raise HTTPException(status_code=400, detail="订单状态不正确")
 
-    db.execute_update(update_sql, tuple(update_values))
+        items = db.execute_query("SELECT product_id, quantity FROM order_items WHERE order_id = %s", (order_id,))
+        for item in items:
+            db.execute_update(
+                "UPDATE products SET rent_count = rent_count + %s WHERE id = %s",
+                (item['quantity'], item['product_id'])
+            )
 
-    # 增加商品租赁次数
-    items = db.execute_query("SELECT product_id, quantity FROM order_items WHERE order_id = %s", (order_id,))
-    for item in items:
-        db.execute_update(
-            "UPDATE products SET rent_count = rent_count + %s WHERE id = %s",
-            (item['quantity'], item['product_id'])
+        db.commit()
+        write_order_audit(
+            order_id=order_id,
+            action="pay",
+            operator_role=str(user.get("role", "user")),
+            operator_id=user_id,
+            request_id=x_request_id,
+            amount=float(order.get("total_amount") or 0),
+            reason=None,
+            before_status=0,
+            after_status=new_status,
+            extra={"door_lock_password": door_password, "expected_return_time": expected_return_time.isoformat() if expected_return_time else None},
         )
 
-    return {
-        "code": 0,
-        "message": "支付成功",
-        "data": {"order_id": order_id, "status": 1}
-    }
+        return {
+            "code": 0,
+            "message": "支付成功",
+            "data": {"order_id": order_id, "status": 1}
+        }
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"支付失败: {str(e)}")
 
 
 @router.post("/orders/{order_id}/cancel")
-async def cancel_order(order_id: int, authorization: Optional[str] = Header(None)):
+async def cancel_order(
+    order_id: int,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     取消订单
     """
@@ -602,20 +744,38 @@ async def cancel_order(order_id: int, authorization: Optional[str] = Header(None
     if not order:
         raise HTTPException(status_code=404, detail="订单不存在")
 
-    if order['status'] not in [0, 1]:
-        raise HTTPException(status_code=400, detail="订单状态不允许取消")
-
-    # 更新订单状态
     db.begin_transaction()
     try:
-        db.execute_update(
-            "UPDATE orders SET status = 5 WHERE id = %s",
-            (order_id,)
+        before_status = int(order.get('status', 0))
+        affected = db.execute_update(
+            "UPDATE orders SET status = 5 WHERE id = %s AND user_id = %s AND status IN (0, 1)",
+            (order_id, user_id)
         )
+        if affected <= 0:
+            latest = db.execute_one("SELECT * FROM orders WHERE id = %s AND user_id = %s", (order_id, user_id))
+            if latest and int(latest.get('status', 0)) == 5:
+                db.commit()
+                return {"code": 0, "message": "取消成功"}
+            raise HTTPException(status_code=400, detail="订单状态不允许取消")
 
         db.execute_update("DELETE FROM reservations WHERE order_id = %s", (order_id,))
-
         db.commit()
+
+        write_order_audit(
+            order_id=order_id,
+            action="cancel",
+            operator_role=str(user.get("role", "user")),
+            operator_id=user_id,
+            request_id=x_request_id,
+            amount=None,
+            reason=None,
+            before_status=before_status,
+            after_status=5,
+            extra=None,
+        )
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"取消订单失败: {str(e)}")
@@ -644,41 +804,73 @@ async def receive_order(order_id: int, authorization: Optional[str] = Header(Non
 
 
 @router.post("/admin/orders/{order_id}/confirm-return")
-async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = None, authorization: Optional[str] = Header(None)):
+async def admin_confirm_return(
+    order_id: int,
+    refund_amount: Optional[float] = None,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     店主核验无误，确认还衣：衣服自动恢复可租赁状态，一键退还押金
     """
-    require_admin(authorization)
-    order = db.execute_one("SELECT * FROM orders WHERE id = %s", (order_id,))
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-    
-    if order['status'] != 4:
-        raise HTTPException(status_code=400, detail="订单尚未申请还衣")
-
-    # 如果未传退款金额，默认退还全部押金
-    final_refund = Decimal(str(refund_amount)) if refund_amount is not None else Decimal(str(order['total_deposit']))
-    if final_refund <= 0:
-        raise HTTPException(status_code=400, detail="退款金额必须大于0")
-    if final_refund > Decimal(str(order['total_deposit'])):
-        raise HTTPException(status_code=400, detail="退款金额不能超过总押金")
+    admin = require_admin(authorization)
 
     db.begin_transaction()
     try:
-        # 1. 更新订单状态为已完成/已退款
-        db.execute_update(
-            "UPDATE orders SET status = 7, refund_amount = %s, refund_time = NOW() WHERE id = %s",
+        order = db.execute_one("SELECT * FROM orders WHERE id = %s FOR UPDATE", (order_id,))
+        if not order:
+            raise HTTPException(status_code=404, detail="订单不存在")
+
+        if int(order.get('status', 0)) == 7:
+            db.commit()
+            return {
+                "code": 0,
+                "message": "确认还衣成功，押金已原路退回",
+                "data": {"refund_amount": float(order.get('refund_amount') or 0)}
+            }
+
+        if order['status'] != 4:
+            raise HTTPException(status_code=400, detail="订单尚未申请还衣")
+
+        final_refund = Decimal(str(refund_amount)) if refund_amount is not None else Decimal(str(order['total_deposit']))
+        if final_refund <= 0:
+            raise HTTPException(status_code=400, detail="退款金额必须大于0")
+        if final_refund > Decimal(str(order['total_deposit'])):
+            raise HTTPException(status_code=400, detail="退款金额不能超过总押金")
+
+        affected = db.execute_update(
+            "UPDATE orders SET status = 7, refund_amount = %s, refund_time = NOW() WHERE id = %s AND status = 4",
             (final_refund, order_id)
         )
+        if affected <= 0:
+            latest = db.execute_one("SELECT * FROM orders WHERE id = %s", (order_id,))
+            db.commit()
+            if latest and int(latest.get('status', 0)) == 7:
+                return {
+                    "code": 0,
+                    "message": "确认还衣成功，押金已原路退回",
+                    "data": {"refund_amount": float(latest.get('refund_amount') or 0)}
+                }
+            raise HTTPException(status_code=400, detail="订单尚未申请还衣")
+
         db.execute_update("DELETE FROM reservations WHERE order_id = %s", (order_id,))
-        
-        # 2. 释放日期锁定 (其实还衣后全日期开放，这里可以删除该订单相关的未来锁定，或者简单标记为已释放)
-        # 根据需求：店主确认还衣后，自动恢复可租赁状态。
-        # 这里我们简单地保持 reservations 表记录，但 product 筛选时会根据状态判断。
-        
-        # TODO: 调用微信支付退款 API
-        
         db.commit()
+
+        write_order_audit(
+            order_id=order_id,
+            action="confirm_return",
+            operator_role=str(admin.get("role", "admin")),
+            operator_id=int(admin.get("id")) if admin.get("id") is not None else None,
+            request_id=x_request_id,
+            amount=float(final_refund),
+            reason=None,
+            before_status=4,
+            after_status=7,
+            extra=None,
+        )
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"确认还衣失败: {str(e)}")
@@ -691,42 +883,76 @@ async def admin_confirm_return(order_id: int, refund_amount: Optional[float] = N
 
 
 @router.post("/orders/{order_id}/refund")
-async def refund_order(order_id: int, authorization: Optional[str] = Header(None)):
+async def refund_order(
+    order_id: int,
+    authorization: Optional[str] = Header(None),
+    x_request_id: Optional[str] = Header(None, alias="X-Request-Id"),
+):
     """
     退款押金（管理员接口）
     """
-    require_admin(authorization)
-    # 查询订单
-    order = db.execute_one(
-        "SELECT * FROM orders WHERE id = %s",
-        (order_id,)
-    )
+    admin = require_admin(authorization)
 
-    if not order:
-        raise HTTPException(status_code=404, detail="订单不存在")
-
-    if order['status'] != 4:
-        raise HTTPException(status_code=400, detail="订单状态不正确")
-
-    if order['refund_amount'] > 0:
-        raise HTTPException(status_code=400, detail="已退款")
-
-    # TODO: 调用微信支付退款
-
-    # 更新订单状态
     db.begin_transaction()
     try:
-        # 退还押金
-        refund_amount = order['total_deposit']
-        db.execute_update(
-            """UPDATE orders SET status = 6, refund_amount = %s, refund_time = NOW()
-               WHERE id = %s""",
+        order = db.execute_one("SELECT * FROM orders WHERE id = %s FOR UPDATE", (order_id,))
+        if not order:
+            raise HTTPException(status_code=404, detail="订单不存在")
+
+        if int(order.get('status', 0)) == 7 and Decimal(str(order.get('refund_amount') or 0)) > 0:
+            db.commit()
+            return {
+                "code": 0,
+                "message": "退款成功",
+                "data": {"refund_amount": float(order.get('refund_amount') or 0)}
+            }
+
+        if order['status'] != 4:
+            raise HTTPException(status_code=400, detail="订单状态不正确")
+
+        if Decimal(str(order.get('refund_amount') or 0)) > 0:
+            db.commit()
+            return {
+                "code": 0,
+                "message": "退款成功",
+                "data": {"refund_amount": float(order.get('refund_amount') or 0)}
+            }
+
+        refund_amount = Decimal(str(order['total_deposit']))
+
+        affected = db.execute_update(
+            "UPDATE orders SET status = 6, refund_amount = %s, refund_time = NOW() WHERE id = %s AND status = 4",
             (refund_amount, order_id)
         )
+        if affected <= 0:
+            latest = db.execute_one("SELECT * FROM orders WHERE id = %s", (order_id,))
+            db.commit()
+            if latest and Decimal(str(latest.get('refund_amount') or 0)) > 0:
+                return {
+                    "code": 0,
+                    "message": "退款成功",
+                    "data": {"refund_amount": float(latest.get('refund_amount') or 0)}
+                }
+            raise HTTPException(status_code=400, detail="订单状态不正确")
 
         db.execute_update("DELETE FROM reservations WHERE order_id = %s", (order_id,))
-
         db.commit()
+
+        write_order_audit(
+            order_id=order_id,
+            action="refund",
+            operator_role=str(admin.get("role", "admin")),
+            operator_id=int(admin.get("id")) if admin.get("id") is not None else None,
+            request_id=x_request_id,
+            amount=float(refund_amount),
+            reason=None,
+            before_status=4,
+            after_status=6,
+            extra=None,
+        )
+    except HTTPException:
+        db.rollback()
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"退款失败: {str(e)}")

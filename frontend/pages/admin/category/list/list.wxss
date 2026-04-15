@@ -1,0 +1,172 @@
+.page-root {
+  height: 100vh;
+  background: #FDFCF9;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 24rpx;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.hint {
+  font-size: 28rpx;
+  color: #2E2B26;
+  font-weight: 600;
+}
+
+.sub {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #8E9775;
+}
+
+.btn-add {
+  padding: 14rpx 18rpx;
+  border-radius: 14rpx;
+  background: #2E2B26;
+  color: #fff;
+  font-size: 26rpx;
+}
+
+.list {
+  height: calc(100vh - 160rpx);
+  padding: 0 24rpx 24rpx;
+}
+
+.cat-item {
+  background: #fff;
+  border-radius: 18rpx;
+  padding: 18rpx;
+  margin-bottom: 16rpx;
+}
+
+.cat-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-name {
+  display: flex;
+  align-items: center;
+  font-size: 30rpx;
+  color: #2E2B26;
+  font-weight: 600;
+}
+
+.icon {
+  margin-right: 10rpx;
+}
+
+.cat-meta {
+  display: flex;
+  align-items: center;
+  font-size: 22rpx;
+  color: #9A958B;
+}
+
+.ml {
+  margin-left: 14rpx;
+}
+
+.cat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 14rpx;
+}
+
+.btn-outline {
+  border: 1rpx solid #E7E2DA;
+  padding: 10rpx 14rpx;
+  border-radius: 14rpx;
+  font-size: 24rpx;
+  color: #2E2B26;
+  margin-right: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.btn-outline.danger {
+  border-color: #E6B8B8;
+  color: #B94A48;
+}
+
+.empty, .loading {
+  padding: 60rpx 0;
+  text-align: center;
+  color: #9A958B;
+}
+
+.mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.editor {
+  position: fixed;
+  left: 24rpx;
+  right: 24rpx;
+  top: 30%;
+  background: #fff;
+  border-radius: 18rpx;
+  padding: 22rpx 20rpx;
+}
+
+.editor-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2E2B26;
+  margin-bottom: 18rpx;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.label {
+  width: 90rpx;
+  font-size: 26rpx;
+  color: #2E2B26;
+}
+
+.input {
+  flex: 1;
+  height: 70rpx;
+  border: 1rpx solid #E7E2DA;
+  border-radius: 14rpx;
+  padding: 0 16rpx;
+  font-size: 26rpx;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10rpx;
+}
+
+.btn {
+  padding: 14rpx 20rpx;
+  border-radius: 14rpx;
+  border: 1rpx solid #E7E2DA;
+  margin-left: 14rpx;
+  font-size: 26rpx;
+  color: #2E2B26;
+}
+
+.btn.primary {
+  background: #2E2B26;
+  color: #fff;
+  border-color: #2E2B26;
+}

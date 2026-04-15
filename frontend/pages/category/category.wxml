@@ -1,88 +1,132 @@
 <!-- pages/category/category.wxml -->
 <view class="page-root">
   <!-- 自定义导航栏 -->
-  <cp-nav-bar title="分类与探索" show-back="{{false}}" bg="white"></cp-nav-bar>
+  <cp-nav-bar title="分类与探索" show-back="{{false}}" bg="white">
+    <view slot="right" wx:if="{{isAdmin}}" bindtap="onEditTap" style="padding: 12rpx 10rpx;">
+      <text style="font-size: 26rpx; color: #2E2B26;">编辑</text>
+    </view>
+  </cp-nav-bar>
 
-  <!-- 搜索栏区 (带流线型圆角与浮凸感) -->
+  <view wx:if="{{groups.length === 0}}" style="padding: 40rpx 24rpx;">
+    <cp-empty text="暂无内容" subText="店主可在后台配置分类与探索内容"></cp-empty>
+  </view>
+
+  <view wx:else>
+  <!-- 搜索栏 -->
   <view class="search-wrap">
     <view class="search-bar">
-      <!-- 搜索图标 纯 CSS -->
       <view class="icon-search">
         <view class="search-circle"></view>
         <view class="search-handle"></view>
       </view>
-      <input 
-        class="search-input" 
-        placeholder="搜索优质好物" 
+      <input
+        class="search-input"
+        placeholder="搜索分类..."
         placeholder-class="search-ph"
-        bindconfirm="onSearchConfirm" 
-        confirm-type="search" 
-        value="{{keyword}}" 
+        bindinput="onSearchInput"
+        bindconfirm="onSearchConfirm"
+        confirm-type="search"
+        value="{{keyword}}"
       />
+      <view class="clear-btn" wx:if="{{keyword}}" bindtap="clearSearch">
+        <view class="clear-icon"></view>
+      </view>
     </view>
   </view>
 
   <view class="content-body">
-    
-    <!-- 侧边栏 (莫兰迪风格) -->
+
+    <!-- 左侧分组栏 -->
     <scroll-view class="sidebar" scroll-y>
-      <view 
-        class="sidebar-item {{selectedCategory === item.id ? 'active' : ''}}"
-        wx:for="{{categories}}"
+      <view
+        class="sidebar-item {{activeGroupId === item.id ? 'active' : ''}}"
+        wx:for="{{groups}}"
         wx:key="id"
-        bindtap="onCategoryTap"
+        bindtap="onGroupTap"
         data-id="{{item.id}}"
       >
-        <view class="active-indicator" wx:if="{{selectedCategory === item.id}}"></view>
-        <text class="sidebar-text">{{item.name}}</text>
+        <view class="active-bar" wx:if="{{activeGroupId === item.id}}"></view>
+        <text class="sidebar-emoji">{{item.emoji}}</text>
+        <text class="sidebar-name">{{item.name}}</text>
       </view>
     </scroll-view>
 
-    <!-- 右侧主体内容 -->
+    <!-- 右侧宫格区 -->
     <scroll-view class="main-content" scroll-y>
-      
-      <!-- 子分类宫格 (暂保留展示逻辑，如有数据可选) -->
-      <view class="sub-cats" wx:if="{{selectedCategory && subCategories.length > 0}}">
-        <view 
-          class="sub-cat-item" 
-          wx:for="{{subCategories}}" 
-          wx:key="id" 
-          bindtap="onSubCategoryTap" 
-          data-id="{{item.id}}"
-        >
-          <image class="sub-icon" src="{{item.icon}}" mode="aspectFill"></image>
-          <text class="sub-name">{{item.name}}</text>
+
+      <!-- 搜索模式 -->
+      <view wx:if="{{isSearching}}">
+        <view class="search-result-tip">
+          <text>找到 {{filteredItems.length}} 个结果</text>
+        </view>
+
+        <!-- 搜索结果空状态 -->
+        <view class="empty-state" wx:if="{{filteredItems.length === 0}}">
+          <text class="empty-emoji">🔍</text>
+          <text class="empty-text">没有找到相关分类</text>
+          <text class="empty-sub">换个关键词试试？</text>
+        </view>
+
+        <view class="item-grid" wx:else>
+          <view
+            class="grid-item"
+            wx:for="{{filteredItems}}"
+            wx:key="id"
+            bindtap="onItemTap"
+            data-page="{{item.page}}"
+          >
+            <view class="grid-item-inner" style="background: linear-gradient(135deg, {{item.color}}22, {{item.color}}44);">
+              <view class="badge-wrap" wx:if="{{item.badge}}">
+                <text class="badge-text" style="background: {{item.color}};">{{item.badge}}</text>
+              </view>
+              <text class="grid-emoji">{{item.emoji}}</text>
+              <text class="grid-name">{{item.name}}</text>
+              <text class="grid-group-hint">{{item._groupName}}</text>
+            </view>
+          </view>
         </view>
       </view>
 
-      <!-- 商品展示区 -->
-      <view class="product-grid" wx:if="{{products.length > 0}}">
-        <cp-product-card
-          style="width: 100%;"
-          wx:for="{{products}}"
-          wx:key="id"
-          product="{{item}}"
-          bindtap="onProductTap"
-          data-id="{{item.id}}"
-        ></cp-product-card>
-      </view>
-
-      <!-- 空状态 -->
-      <view class="empty-state" wx:if="{{products.length === 0 && !loading}}">
-        <view class="icon-empty-box">
-          <view class="box-lid"></view>
-          <view class="box-body"></view>
+      <!-- 正常分组浏览模式 -->
+      <view wx:else>
+        <!-- 分组标题 -->
+        <view class="group-header" wx:for="{{groups}}" wx:key="id" wx:if="{{activeGroupId === item.id}}">
+          <text class="group-emoji">{{item.emoji}}</text>
+          <text class="group-name">{{item.name}}</text>
         </view>
-        <text class="empty-text">该分类下暂无商品</text>
-        <text class="empty-sub">去看看别的分类吧？</text>
-      </view>
 
-      <view class="loading-state" wx:if="{{loading}}">
-        <view class="loading-dots">
-          <view class="dot"></view><view class="dot"></view><view class="dot"></view>
+        <!-- 宫格列表 -->
+        <view class="item-grid" wx:if="{{activeItems.length > 0}}">
+          <view
+            class="grid-item"
+            wx:for="{{activeItems}}"
+            wx:key="id"
+            bindtap="onItemTap"
+            data-page="{{item.page}}"
+          >
+            <view class="grid-item-inner" style="background: linear-gradient(135deg, {{item.color}}18, {{item.color}}38);">
+              <!-- 角标 -->
+              <view class="badge-wrap" wx:if="{{item.badge}}">
+                <text class="badge-text" style="background: {{item.color}};">{{item.badge}}</text>
+              </view>
+              <!-- 图标 -->
+              <text class="grid-emoji">{{item.emoji}}</text>
+              <!-- 名称 -->
+              <text class="grid-name">{{item.name}}</text>
+              <!-- 箭头 -->
+              <view class="grid-arrow"></view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 空分组 -->
+        <view class="empty-state" wx:if="{{activeItems.length === 0}}">
+          <text class="empty-emoji">📂</text>
+          <text class="empty-text">该分组暂无内容</text>
         </view>
       </view>
 
     </scroll-view>
   </view>
+</view>
 </view>

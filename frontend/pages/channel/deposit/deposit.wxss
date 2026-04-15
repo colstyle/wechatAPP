@@ -1,0 +1,77 @@
+/* pages/channel/deposit/deposit.wxss */
+@import '../sale999/sale999.wxss';
+
+/* ===== 内容型页面追加样式 ===== */
+.sections-wrap {
+  padding: 24rpx 20rpx 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.info-section {}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1C1C1C;
+  margin-bottom: 12rpx;
+  padding-left: 4rpx;
+}
+
+.section-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 8rpx 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(28,28,28,0.04);
+}
+
+.section-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 16rpx 0;
+  gap: 14rpx;
+  border-bottom: 1rpx solid rgba(28,28,28,0.05);
+}
+.section-item:last-child {
+  border-bottom: none;
+}
+
+.bullet-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #C5A059;
+  margin-top: 12rpx;
+  flex-shrink: 0;
+}
+
+.item-text {
+  font-size: 27rpx;
+  color: #3C3C3C;
+  line-height: 1.7;
+  flex: 1;
+}
+
+/* ===== 联系客服按钮 ===== */
+.contact-wrap {
+  padding: 40rpx 20rpx 16rpx;
+}
+.contact-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #7E8C8D, #5A6A6B);
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 24rpx rgba(126,140,141,0.35);
+}
+.contact-icon {
+  font-size: 36rpx;
+}
+.contact-text {
+  font-size: 30rpx;
+  color: #fff;
+  font-weight: 600;
+}

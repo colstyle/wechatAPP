@@ -1,0 +1,56 @@
+.page-root {
+  height: 100vh;
+  background: #FDFCF9;
+}
+
+.content {
+  height: 100vh;
+}
+
+.card {
+  margin: 24rpx;
+  background: #FFFFFF;
+  border-radius: 18rpx;
+  padding: 20rpx;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.label {
+  width: 96rpx;
+  font-size: 26rpx;
+  color: #2E2B26;
+}
+
+.input {
+  flex: 1;
+  height: 70rpx;
+  border: 1rpx solid #E7E2DA;
+  border-radius: 14rpx;
+  padding: 0 16rpx;
+  font-size: 26rpx;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10rpx;
+}
+
+.btn {
+  padding: 14rpx 22rpx;
+  border-radius: 14rpx;
+  border: 1rpx solid #E7E2DA;
+  font-size: 26rpx;
+  color: #2E2B26;
+}
+
+.btn.primary {
+  background: #2E2B26;
+  color: #FFFFFF;
+  border-color: #2E2B26;
+}

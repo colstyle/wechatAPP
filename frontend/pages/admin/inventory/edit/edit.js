@@ -21,14 +21,50 @@ Page({
       is_package_eligible: false,
       status: 1
     },
+    parentCategories: [],
+    childCategories: [],
+    parentIndex: 0,
+    childIndex: 0,
     submitting: false
   },
 
   onLoad(options) {
+    this.loadCategories()
     if (options.id) {
       this.setData({ id: parseInt(options.id) })
       this.loadProduct(options.id)
     }
+  },
+
+  loadCategories() {
+    productApi.getCategories(0)
+      .then(res => {
+        const parents = (res && res.code === 0 && res.data) ? res.data : []
+        this.setData({ parentCategories: parents, parentIndex: 0 }, () => {
+          const first = parents[0]
+          if (first && first.id) this.loadChildCategories(first.id)
+        })
+      })
+      .catch(() => {})
+  },
+
+  loadChildCategories(parentId, preferredCategoryId) {
+    productApi.getCategories(parentId)
+      .then(res => {
+        const children = (res && res.code === 0 && res.data) ? res.data : []
+        let childIndex = 0
+        if (preferredCategoryId) {
+          const idx = children.findIndex(c => String(c.id) === String(preferredCategoryId))
+          if (idx >= 0) childIndex = idx
+        }
+        this.setData({ childCategories: children, childIndex }, () => {
+          const chosen = children[childIndex]
+          if (chosen && chosen.id) {
+            this.setData({ 'formData.category_id': String(chosen.id) })
+          }
+        })
+      })
+      .catch(() => {})
   },
 
   loadProduct(id) {
@@ -60,12 +96,42 @@ Page({
             is_package_eligible: !!p.is_package_eligible,
             status: p.status !== undefined ? p.status : 1
           }
+        }, () => {
+          const catId = String(p.category_id || '')
+          if (!catId) return
+          const parents = this.data.parentCategories || []
+          const parent = parents.find(x => String(x.id) === catId)
+          if (parent) {
+            const parentIndex = parents.findIndex(x => x.id === parent.id)
+            this.setData({ parentIndex }, () => this.loadChildCategories(parent.id, catId))
+            return
+          }
+          const parentId = parents[0] ? parents[0].id : 0
+          if (parentId) this.loadChildCategories(parentId, catId)
         })
       }
     }).catch(() => {
       wx.hideLoading()
       wx.showToast({ title: '加载商品失败', icon: 'none' })
     })
+  },
+
+  onParentCategoryChange(e) {
+    const idx = Number(e.detail.value) || 0
+    const parent = (this.data.parentCategories || [])[idx]
+    this.setData({ parentIndex: idx, childCategories: [], childIndex: 0 })
+    if (parent && parent.id) {
+      this.loadChildCategories(parent.id)
+    }
+  },
+
+  onChildCategoryChange(e) {
+    const idx = Number(e.detail.value) || 0
+    const child = (this.data.childCategories || [])[idx]
+    this.setData({ childIndex: idx })
+    if (child && child.id) {
+      this.setData({ 'formData.category_id': String(child.id) })
+    }
   },
 
   onInput(e) {

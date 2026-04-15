@@ -49,6 +49,10 @@
   gap: 20rpx;
   background: #FFFFFF;
 }
+.dashboard-panel-single {
+  padding-top: 0;
+  padding-bottom: 22rpx;
+}
 .control-card {
   flex: 1;
   background: linear-gradient(135deg, #FDFCF9 0%, #F8F5EE 100%);
@@ -86,6 +90,34 @@
 }
 .icon-pkg-large::before {
   content: ''; position: absolute; top: 50%; left: -3rpx; right: -3rpx; height: 3rpx; background: #C5A059; transform: translateY(-50%);
+}
+.icon-cat {
+  width: 34rpx;
+  height: 34rpx;
+  border: 3rpx solid #C5A059;
+  border-radius: 10rpx;
+  position: relative;
+  box-sizing: border-box;
+}
+.icon-cat::after {
+  content: '';
+  position: absolute;
+  left: 6rpx;
+  right: 6rpx;
+  top: 11rpx;
+  height: 3rpx;
+  background: #C5A059;
+  border-radius: 2rpx;
+}
+.icon-cat::before {
+  content: '';
+  position: absolute;
+  left: 6rpx;
+  right: 6rpx;
+  bottom: 9rpx;
+  height: 3rpx;
+  background: #C5A059;
+  border-radius: 2rpx;
 }
 
 .card-text {

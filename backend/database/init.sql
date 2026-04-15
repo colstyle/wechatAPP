@@ -50,8 +50,36 @@ CREATE TABLE IF NOT EXISTS categories (
     icon VARCHAR(500) COMMENT '图标URL',
     sort_order INT DEFAULT 0 COMMENT '排序',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_parent_id (parent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分类表';
+
+CREATE TABLE IF NOT EXISTS store_profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    owner_user_id INT NOT NULL,
+    store_name VARCHAR(100) NULL,
+    phone VARCHAR(20) NULL,
+    address VARCHAR(200) NULL,
+    latitude DECIMAL(10,6) NULL,
+    longitude DECIMAL(10,6) NULL,
+    open_hours VARCHAR(100) NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_owner_user_id (owner_user_id),
+    INDEX idx_owner_user_id (owner_user_id),
+    FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS store_explore_configs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    owner_user_id INT NOT NULL,
+    config_json JSON NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_owner_user_id (owner_user_id),
+    INDEX idx_owner_user_id (owner_user_id),
+    FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 品牌表
 CREATE TABLE IF NOT EXISTS brands (
@@ -129,6 +157,8 @@ CREATE TABLE IF NOT EXISTS orders (
     return_time DATETIME COMMENT '归还时间',
     refund_time DATETIME COMMENT '退款时间',
     refund_amount DECIMAL(10,2) DEFAULT 0.00 COMMENT '退款金额',
+    last_refund_no VARCHAR(64) NULL,
+    last_refund_action VARCHAR(16) NULL,
     remark VARCHAR(500) COMMENT '备注',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     INDEX idx_user_id (user_id),
@@ -145,6 +175,8 @@ CREATE TABLE IF NOT EXISTS order_items (
     product_id INT NOT NULL COMMENT '商品ID',
     product_name VARCHAR(100) COMMENT '商品名称',
     product_image VARCHAR(500) COMMENT '商品图片',
+    snapshot_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    snapshot_deposit DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     size VARCHAR(20) COMMENT '尺码',
     color VARCHAR(50) COMMENT '颜色',
     rent_price DECIMAL(10,2) DEFAULT 0.00 COMMENT '租金',
@@ -164,11 +196,30 @@ CREATE TABLE IF NOT EXISTS reservations (
     reserved_date DATE NOT NULL COMMENT '预订日期',
     order_id INT NOT NULL COMMENT '订单ID',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    INDEX idx_product_date (product_id, reserved_date),
+    UNIQUE KEY uk_product_date (product_id, reserved_date),
     INDEX idx_order_id (order_id),
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='日期预订表';
+
+CREATE TABLE IF NOT EXISTS order_audit_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    action VARCHAR(32) NOT NULL,
+    operator_role VARCHAR(16) NULL,
+    operator_id INT NULL,
+    request_id VARCHAR(64) NULL,
+    amount DECIMAL(10,2) NULL,
+    reason VARCHAR(500) NULL,
+    before_status INT NULL,
+    after_status INT NULL,
+    extra_json JSON NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_order_id (order_id),
+    INDEX idx_request_id (request_id),
+    INDEX idx_action_created (action, created_at),
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 订阅会员表
 CREATE TABLE IF NOT EXISTS subscriptions (

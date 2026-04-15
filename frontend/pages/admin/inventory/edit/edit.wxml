@@ -12,8 +12,17 @@
       </view>
 
       <view class="form-item">
-        <text class="label required">分类ID</text>
-        <input class="input" type="number" placeholder="输入分类ID(数字)" value="{{formData.category_id}}" bindinput="onInput" data-field="category_id" />
+        <text class="label required">分类</text>
+        <picker mode="selector" range="{{parentCategories}}" range-key="name" value="{{parentIndex}}" bindchange="onParentCategoryChange">
+          <view class="input">{{parentCategories[parentIndex] ? parentCategories[parentIndex].name : '选择一级分类'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="label required">子分类</text>
+        <picker mode="selector" range="{{childCategories}}" range-key="name" value="{{childIndex}}" bindchange="onChildCategoryChange">
+          <view class="input">{{childCategories[childIndex] ? childCategories[childIndex].name : '选择子分类'}}</view>
+        </picker>
       </view>
 
       <view class="form-item">

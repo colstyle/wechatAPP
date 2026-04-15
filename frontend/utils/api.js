@@ -293,6 +293,45 @@ const adminApi = {
   deleteProduct: (id) => {
     return app.request(`/api/v1/product/products/${id}`, 'DELETE')
   }
+  ,
+  getCategories: (parentId = 0) => {
+    return app.request(`/api/v1/admin/categories?parent_id=${parentId}`, 'GET')
+  },
+  createCategory: (data) => {
+    return app.request('/api/v1/admin/categories', 'POST', data)
+  },
+  updateCategory: (id, data) => {
+    return app.request(`/api/v1/admin/categories/${id}`, 'PUT', data)
+  },
+  deleteCategory: (id) => {
+    return app.request(`/api/v1/admin/categories/${id}`, 'DELETE')
+  },
+  reorderCategories: (parentId, orderedIds) => {
+    return app.request('/api/v1/admin/categories/reorder', 'POST', { parent_id: parentId, ordered_ids: orderedIds })
+  }
+}
+
+const storeApi = {
+  getProfile: (ownerUserId) => {
+    const qs = ownerUserId ? `?owner_user_id=${ownerUserId}` : ''
+    return app.request(`/api/v1/store/profile${qs}`, 'GET', {})
+  },
+  getExploreConfig: (ownerUserId) => {
+    const qs = ownerUserId ? `?owner_user_id=${ownerUserId}` : ''
+    return app.request(`/api/v1/store/explore-config${qs}`, 'GET', {})
+  },
+  adminGetProfile: () => {
+    return app.request('/api/v1/store/admin/profile', 'GET', {})
+  },
+  adminSaveProfile: (data) => {
+    return app.request('/api/v1/store/admin/profile', 'PUT', data)
+  },
+  adminGetExploreConfig: () => {
+    return app.request('/api/v1/store/admin/explore-config', 'GET', {})
+  },
+  adminSaveExploreConfig: (groups) => {
+    return app.request('/api/v1/store/admin/explore-config', 'PUT', { groups })
+  }
 }
 
 module.exports = {
@@ -302,5 +341,6 @@ module.exports = {
   subscriptionApi,
   appointmentApi,
   reviewApi,
-  adminApi
+  adminApi,
+  storeApi
 }

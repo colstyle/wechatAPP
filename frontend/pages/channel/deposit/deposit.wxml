@@ -1,0 +1,38 @@
+<!-- pages/channel/deposit/deposit.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="{{title}}" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <!-- 顶部Banner -->
+  <view class="channel-banner" style="background: linear-gradient(135deg, {{accentColor}}CC, {{accentColor}}88);">
+    <text class="banner-emoji">{{emoji}}</text>
+    <view class="banner-info">
+      <text class="banner-title">{{title}}</text>
+      <text class="banner-desc">请仔细阅读以下内容\n保障您的租衣体验 💕</text>
+    </view>
+  </view>
+
+  <!-- 内容主体 -->
+  <scroll-view class="scroll-body" scroll-y>
+    <view class="sections-wrap">
+      <view class="info-section" wx:for="{{sections}}" wx:key="id">
+        <view class="section-title">{{item.title}}</view>
+        <view class="section-card">
+          <view class="section-item" wx:for="{{item.items}}" wx:key="*this" wx:for-item="note">
+            <view class="bullet-dot"></view>
+            <text class="item-text">{{note}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系客服按钮 -->
+    <view class="contact-wrap">
+      <view class="contact-btn" bindtap="onContactTap">
+        <text class="contact-icon">💬</text>
+        <text class="contact-text">有疑问？联系客服</text>
+      </view>
+    </view>
+
+    <view style="height: calc(40rpx + env(safe-area-inset-bottom));"></view>
+  </scroll-view>
+</view>

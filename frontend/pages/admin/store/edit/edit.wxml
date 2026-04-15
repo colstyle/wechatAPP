@@ -1,0 +1,37 @@
+<view class="page-root">
+  <cp-nav-bar title="门店信息" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <scroll-view class="content" scroll-y>
+    <view class="card">
+      <view class="field">
+        <text class="label">门店名</text>
+        <input class="input" value="{{form.store_name}}" bindinput="onInput" data-field="store_name" placeholder="例如：小时光租衣舍" />
+      </view>
+      <view class="field">
+        <text class="label">电话</text>
+        <input class="input" value="{{form.phone}}" bindinput="onInput" data-field="phone" placeholder="用于一键拨号" />
+      </view>
+      <view class="field">
+        <text class="label">地址</text>
+        <input class="input" value="{{form.address}}" bindinput="onInput" data-field="address" placeholder="用于地图/复制" />
+      </view>
+      <view class="field">
+        <text class="label">营业</text>
+        <input class="input" value="{{form.open_hours}}" bindinput="onInput" data-field="open_hours" placeholder="例如：10:00-21:00 (周一至周日)" />
+      </view>
+      <view class="field">
+        <text class="label">纬度</text>
+        <input class="input" value="{{form.latitude}}" bindinput="onInput" data-field="latitude" placeholder="可选：36.09689" />
+      </view>
+      <view class="field">
+        <text class="label">经度</text>
+        <input class="input" value="{{form.longitude}}" bindinput="onInput" data-field="longitude" placeholder="可选：120.37053" />
+      </view>
+
+      <view class="btn-row">
+        <view class="btn primary" bindtap="onSave" loading="{{saving}}">保存</view>
+      </view>
+    </view>
+    <view style="height: 60rpx;"></view>
+  </scroll-view>
+</view>

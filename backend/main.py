@@ -38,7 +38,7 @@ if not os.path.exists(static_dir):
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # 导入路由
-from app.api import user, product, order, subscription, appointment, review, ai, admin
+from app.api import user, product, order, subscription, appointment, review, ai, admin, store
 from app.middleware.error_handler import register_exception_handlers
 
 # 注册全局异常处理器
@@ -54,6 +54,7 @@ app.include_router(appointment.router, prefix="/api/v1/appointment", tags=["预�
 app.include_router(review.router, prefix="/api/v1/review", tags=["评价"])
 app.include_router(ai.router, prefix="/api/v1/ai", tags=["AI智能客服"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["店主后台"])
+app.include_router(store.router, prefix="/api/v1/store", tags=["门店与配置"])
 
 
 @app.get("/")

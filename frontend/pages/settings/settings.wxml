@@ -48,7 +48,7 @@
         <input 
           class="dev-input" 
           value="{{apiBase}}"
-          placeholder="例如：http://192.168.1.10:8000"
+          placeholder="例如：https://www.celestialaiplus.com"
           bindinput="onApiBaseInput"
           confirm-type="done"
         />

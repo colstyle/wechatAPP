@@ -1,6 +1,23 @@
 // app.js
 const envConfig = require('./config/env.js')
 
+function normalizeApiBase(raw) {
+  let value = String(raw || '').trim()
+  if (!value) return ''
+  if (value.endsWith('/')) value = value.slice(0, -1)
+  return value
+}
+
+function isApiBaseAllowed(value) {
+  const platform = (wx.getSystemInfoSync && wx.getSystemInfoSync().platform) || ''
+  const isDevTools = platform === 'devtools'
+  const env = (envConfig && envConfig.ENV) || ''
+  if (env === 'dev' && isDevTools) {
+    return /^https?:\/\/[^/\s]+/i.test(value)
+  }
+  return /^https:\/\/[^/\s]+$/i.test(value)
+}
+
 App({
   // API基础地址：从多环境配置读取，不再硬编码
   // 详见 frontend/config/env.js — develop(dev) / trial(test) / release(prod) 自动切换
@@ -28,9 +45,12 @@ App({
     // dev 环境：允许从本地存储读取手动覆盖的 apiBase（真机调试换 IP 用）
     // test / prod 环境：强制使用 env.js 中配置的地址，忽略本地存储
     if (envConfig.ENV === 'dev') {
-      const savedApiBase = wx.getStorageSync('apiBase')
-      if (savedApiBase) {
+      const savedApiBase = normalizeApiBase(wx.getStorageSync('apiBase'))
+      if (savedApiBase && isApiBaseAllowed(savedApiBase)) {
         this.apiBase = savedApiBase
+      } else if (savedApiBase) {
+        // 清理历史无效配置，回退到 env.js 默认地址
+        wx.removeStorageSync('apiBase')
       }
     }
     this.globalData.apiBase = this.apiBase
@@ -52,9 +72,9 @@ App({
 
 
   setApiBase(apiBase) {
-    let value = (apiBase || '').trim()
+    let value = normalizeApiBase(apiBase)
     if (!value) return
-    if (value.endsWith('/')) value = value.slice(0, -1)
+    if (!isApiBaseAllowed(value)) return
     this.apiBase = value
     this.globalData.apiBase = value
     wx.setStorageSync('apiBase', value)

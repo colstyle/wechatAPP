@@ -87,66 +87,68 @@ graph LR
 
 ---
 
-## 🚀 0 到 1 部署实战清单
+## 🚀 从技术到商业：0 到 1 部署全链路映射
 
-### 第一步：地基整备（服务器与 DNS）
-1. **购置服务器**：购买腾讯云轻量应用服务器（Ubuntu 22.04），并放行 `22`, `80`, `443`, `8000`, `81` 端口。
-2. **域名解析**：在 DNSPod 中将 `@` 和 `www` 两个 A 记录指向服务器 IP `110.40.168.138`。
-3. **连通验证**：关闭本地代理后用 `ping` 命令确认域名已正确指向目标 IP。
+下面的流程图展示了本项目从一行代码到正式商业运营的必经之路，以及关键的核心步骤与要点：
 
-### 第二步：Docker 环境与加速配置
-若拉取镜像缓慢或 `apt` 进度卡死，务必配置国内源加速：
-```bash
-# 安装 Docker 工具集
-sudo apt update && sudo apt install -y docker.io docker-compose-v2
-
-# 配置国内镜像源缓解同步超时
-sudo tee /etc/docker/daemon.json <<-'EOF'
-{ "registry-mirrors": ["https://mirror.ccs.tencentyun.com", "https://hub-mirror.c.163.com"] }
-EOF
-sudo systemctl restart docker
+```text
+【开发阶段】          【部署阶段】                 【合规阶段】            【准入阶段】          【运营阶段】
+  GitHub -----------→ 云服务器 (Docker) --------→ ICP 备案 (工信部) ----→ 小程序备案(微信)-----→ 商户号 (微信)
+    |                      |                         |                      |                    |
+    ↓                      ↓                         ↓                      ↓                    ↓
+ ✅1. GitHub 源码同步  ✅1. Docker 容器构建    1. 工信部ICP备案      ✅1. 微信小程序备案     1. 营业执照资质
+ ✅2. env 环境切换     ✅2. 数据库初始化       2. 域名实名认证          2. 服务类目审核       2. 微信支付商户号
+ ✅3. 本地联调测试     ✅3. Nginx 反向代理   ✅3. HTTPS 证书配置     ✅3. 域名白名单绑定     3. 支付接口配置
+ ✅4. 代码规范检查     ✅4. 防火墙开放         4. 公安联网备案          4. 接口权限校验       4. 体验版/正式发布
+ ✅5. 真机预览调试                             5. 主体资质核验          5. 合规内容检查       5. 版本迭代更新
 ```
-
-### 第三步：应用上线与数据注入
-通过 `docker-compose.yml` 联合启动 backend 和 mysql：
-```bash
-cd ~/wechatAPP
-docker compose up -d --build
-```
-**🚨 防坑重点（字符集乱码）：** 导入初始 SQL 脚本前，必须在 MySQL 终端执行 `SET NAMES utf8mb4;`，否则中文描述会变成不可读乱码。
-
-### 第四步：网关加锁（Nginx & HTTPS）
-由于微信强制要求 `https://` 且不能带端口号：
-1. **反向代理**：配置 Nginx 监听 80，并将 `celestialaiplus.com` 的流量分派给 `127.0.0.1:8000`。
-2. **自动化 SSL**：
-   ```bash
-   apt install certbot python3-certbot-nginx
-   certbot --nginx -d www.celestialaiplus.com
-   ```
-3. **准入同步**：在微信公众平台将该 HTTPS 域名加入 `request 合法域名` 列表。
-
 ---
 
-## 🔄 日常热修补与维护规范
+## 📝 0 到 1 详细指南 (商业级避坑版)
 
-### 1. 代码一键热更新
-当你修改了代码并推送到 GitHub 后，去服务器执行这三行：
-```bash
-cd ~/wechatAPP
-git pull origin test
-docker compose up -d --build # 容器会自动重启并应用新代码
-```
+### 第一阶段：服务器 (基础设施)
+*   **目的**：在公网上租用一台属于自己的“ 24 小时永不关机”的电脑。
+*   **动作**：
+    1.  **购置资源**：前往 [腾讯云轻量控制台](https://console.cloud.tencent.com/lighthouse)，购买 Ubuntu 22.04 实例。
+    2.  **防火墙开门**：在控制台点击 **“防火墙”** -> **“添加规则”**。
+        *   放行 `22`(SSH 登录), `80/443`(HTTPS 门户), `8000`(后端 API), `81`(管理面板)。
+*   **避坑指南**：很多新人改了 Nginx 却连不通，通常是因为**没在云控制台页面**开 443 端口，只在系统内开了是不行的。
 
-### 2. 数据库图片链接热修正
-如果由于域名更换导致历史图片的链接变黑，请进数据库执行批量替换：
-```sql
-UPDATE products 
-SET cover_image = REPLACE(cover_image, '旧域名/地址', 'https://www.celestialaiplus.com/static/images/');
-```
+### 第二阶段：数据库
+*   **目的**：确保你的衣服名称、租金、描述中的中文和 Emoji 能被正确存储，而不变成乱码。
+*   **动作**：
+    1.  **启动环境**：在项目根目录执行 `docker compose up -d`。
+    2.  **精准导入**：进入 MySQL 容器导入数据时，**必须先声明编码**：
+        ```bash
+        docker exec -it time-capsule-db mysql -u root -p
+        mysql> SET NAMES utf8mb4;  # 核心动作：支持四字节字符（如 Emoji）
+        mysql> source /app/backup.sql;
+        ```
+*   **相关网址**：[MySQL 官方文档](https://dev.mysql.com/doc/refman/5.7/en/)。
 
-### 3. 前后端更新边界 (💡)
-- **改界面/按钮**：本地上传小程序代码即可，**不要动服务器**。
-- **改接口/数据库**：必须操作服务器执行 Git Pull 与 Docker 重建。
+### 第三阶段：域名
+*   **目的**：获取中国互联网的“准入证”。在大陆机房，不备案域名就无法使用 443 端口。
+*   **动作**：
+    1.  **DNS 设置**：前往 [DNSPod (腾讯云 DNS)](https://console.cloud.tencent.com/cns) 添加 A 记录指向服务器 IP。
+    2.  **ICP 备案**：前往 [腾讯云备案系统](https://console.cloud.tencent.com/beian) 或微信小程序 **「腾讯云办备案」** 提交申请。
+*   **避坑指南**：一旦发现域名解析到大陆 IP 且未备案，运营商会触发 `PR_END_OF_FILE_ERROR` 硬件阻断。开发阶段请勾选微信 IDE 的 **“不校验域名”** 并直接使用 `http://IP:8000` 绕行。
 
+### 第四阶段：网关加锁 (HTTPS 闭环)
+*   **目的**：满足微信“非 HTTPS 不通”的安全强制要求，给数据传输穿上防弹衣。
+*   **动作**：
+    1.  **Nginx 配置**：确保 `/etc/nginx/sites-enabled/api` 文件的 `server_name` 正确指向你的域名。
+    2.  **获取证书**：使用 [Certbot](https://certbot.eff.org/) 一键获取免费证书。
+        ```bash
+        sudo certbot --nginx -d www.celestialaiplus.com
+        ```
+*   **官网入口**：[Let's Encrypt 官网](https://letsencrypt.org/)。
+
+### 第五阶段：商业转身 (支付与资质)
+*   **目的**：从小程序“个人玩玩”升级成“真实收钱”的店铺。
+*   **动作**：
+    1.  **主体升级**：前往 [微信公众平台](https://mp.weixin.qq.com)，认证为主体为“个体户”或“企业”。
+    2.  **开通支付**：前往 [微信支付商户平台](https://pay.weixin.qq.com) 关联小程序 AppID。
+    3.  **公安备案**：ICP 备案通过 30 天内，去 [全国互联网安全管理平台](http://www.beian.gov.cn/) 做最后的补充登记。
+*   **核心限制**：**个人主体小程序不支持“租赁”类目**，也无法直接调用支付接口。若要真收钱，必须办营业执照。
 ---
 MIT License © *2026 04* · 小时光租衣舍 007/100

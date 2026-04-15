@@ -1,6 +1,8 @@
 // pages/profile/profile.js
 const app = getApp()
 const orderApi = require('../../utils/api').orderApi
+const storeApi = require('../../utils/api').storeApi
+const auth = require('../../utils/auth')
 
 Page({
   data: {
@@ -10,15 +12,18 @@ Page({
       renting: 0,
       pendingAudit: 0
     },
+    storeProfile: null,
     imgBase: app.imgBase
   },
 
   onLoad() {
     this.refreshUser()
+    this.loadStoreProfile()
   },
 
   onShow() {
     this.refreshUser()
+    this.loadStoreProfile()
   },
 
   refreshUser() {
@@ -62,6 +67,16 @@ Page({
         }
       })
     })
+  },
+
+  loadStoreProfile() {
+    storeApi.getProfile()
+      .then(res => {
+        if (res && res.code === 0) {
+          this.setData({ storeProfile: res.data || null })
+        }
+      })
+      .catch(() => {})
   },
 
   // 登录处理
@@ -116,6 +131,11 @@ Page({
     wx.navigateTo({ url: '/pages/settings/settings' })
   },
 
+  onStoreEditTap() {
+    if (!auth.hasRole('admin')) return
+    wx.navigateTo({ url: '/pages/admin/store/edit/edit' })
+  },
+
   // 店主管理
   onAdminTap() {
     wx.navigateTo({
@@ -155,21 +175,49 @@ Page({
 
   // 一键拨号
   callStore() {
+    const p = this.data.storeProfile || {}
+    const phone = (p.phone || '').trim()
+    if (!phone) {
+      wx.showToast({ title: '店主未配置电话', icon: 'none' })
+      return
+    }
     wx.makePhoneCall({
-      phoneNumber: '18661771101' // 真实店主联络
+      phoneNumber: phone
     })
   },
 
   // 打开地图 (模拟，实际发布时需配置坐标)
   openMap() {
+    const p = this.data.storeProfile || {}
+    const address = (p.address || '').trim()
+    const lat = p.latitude
+    const lng = p.longitude
+    const name = (p.store_name || '线下体验中心').trim()
+
+    if (typeof lat === 'number' && typeof lng === 'number') {
+      wx.openLocation({
+        latitude: lat,
+        longitude: lng,
+        name,
+        address: address || name,
+        scale: 18
+      })
+      return
+    }
+
+    if (!address) {
+      wx.showToast({ title: '店主未配置地址', icon: 'none' })
+      return
+    }
+
     wx.showModal({
       title: '门店位置',
-      content: '青岛市市北区青建太阳岛 2201室。点击确定可复制地址',
+      content: `${address}\n点击确定可复制地址`,
       confirmText: '复制地址',
       success: (res) => {
         if (res.confirm) {
           wx.setClipboardData({
-            data: '青岛市市北区青建太阳岛 2201',
+            data: address,
             success: () => wx.showToast({ title: '地址已复制', icon: 'none' })
           })
         }

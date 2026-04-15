@@ -78,12 +78,21 @@
     <!-- 门店联络 -->
     <view class="location-info-card">
       <view class="lic-content" bindtap="openMap">
-        <view class="lic-title">线下体验中心 • 小时光租衣舍</view>
-        <view class="lic-addr">青岛市市北区青建太阳岛 2201</view>
-        <view class="lic-time">营业时间：10:00 - 21:00 (周一至周日)</view>
+        <view class="lic-title">线下体验中心 • {{storeProfile && storeProfile.store_name ? storeProfile.store_name : '小时光租衣舍'}}</view>
+        <view class="lic-addr">{{storeProfile && storeProfile.address ? storeProfile.address : '店主尚未配置地址'}}</view>
+        <view class="lic-time">营业时间：{{storeProfile && storeProfile.open_hours ? storeProfile.open_hours : '店主尚未配置营业时间'}}</view>
       </view>
       <view class="lic-btn-call" bindtap="callStore">
         <view class="icon-phone-m"></view>
+      </view>
+    </view>
+    <view class="menu-list-card" wx:if="{{userInfo.role === 'admin' || userInfo.role === 2 || userInfo.role === '2'}}">
+      <view class="menu-row" bindtap="onStoreEditTap">
+        <view class="mi-icon-sq bg-sage">
+          <view class="icon-info"></view>
+        </view>
+        <text class="mi-name">编辑门店信息</text>
+        <view class="mi-chevron-box"></view>
       </view>
     </view>
 

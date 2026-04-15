@@ -1,0 +1,60 @@
+<view class="page-root">
+  <cp-nav-bar title="{{navTitle}}" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <view class="admin-header">
+    <view class="header-left">
+      <text class="hint">{{parentId === 0 ? '一级分类' : '子分类'}}</text>
+      <text class="sub" wx:if="{{parentId !== 0}}">父级：{{parentName}}</text>
+    </view>
+    <view class="btn-add" bindtap="openCreate">
+      <text>+ 新增分类</text>
+    </view>
+  </view>
+
+  <scroll-view class="list" scroll-y>
+    <view class="cat-item" wx:for="{{categories}}" wx:key="id">
+      <view class="cat-main">
+        <view class="cat-name">
+          <text class="icon" wx:if="{{item.icon}}">{{item.icon}}</text>
+          <text>{{item.name}}</text>
+        </view>
+        <view class="cat-meta">
+          <text class="meta">#{{item.id}}</text>
+          <text class="meta ml">排序 {{item.sort_order}}</text>
+        </view>
+      </view>
+
+      <view class="cat-actions">
+        <view class="btn-outline" bindtap="enterChildren" data-id="{{item.id}}" data-name="{{item.name}}">子分类</view>
+        <view class="btn-outline" bindtap="moveUp" data-index="{{index}}" wx:if="{{index > 0}}">上移</view>
+        <view class="btn-outline" bindtap="moveDown" data-index="{{index}}" wx:if="{{index < categories.length - 1}}">下移</view>
+        <view class="btn-outline" bindtap="openEdit" data-id="{{item.id}}" data-name="{{item.name}}" data-icon="{{item.icon}}">编辑</view>
+        <view class="btn-outline danger" bindtap="onDelete" data-id="{{item.id}}">删除</view>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{!loading && categories.length === 0}}">
+      <text>暂无分类</text>
+    </view>
+    <view class="loading" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </scroll-view>
+
+  <view class="mask" wx:if="{{showEditor}}" bindtap="closeEditor"></view>
+  <view class="editor" wx:if="{{showEditor}}">
+    <view class="editor-title">{{editorMode === 'create' ? '新增分类' : '编辑分类'}}</view>
+    <view class="field">
+      <text class="label">名称</text>
+      <input class="input" placeholder="请输入分类名称" value="{{form.name}}" bindinput="onNameInput" />
+    </view>
+    <view class="field">
+      <text class="label">图标</text>
+      <input class="input" placeholder="可选：emoji 或短文本" value="{{form.icon}}" bindinput="onIconInput" />
+    </view>
+    <view class="editor-actions">
+      <view class="btn" bindtap="closeEditor">取消</view>
+      <view class="btn primary" bindtap="saveCategory" loading="{{saving}}">保存</view>
+    </view>
+  </view>
+</view>

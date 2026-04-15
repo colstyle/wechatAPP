@@ -18,9 +18,9 @@ const LOCALHOST = '127.0.0.1'
 const ENV_MAP = {
   develop: {
     ENV: 'dev',
-    apiBase: 'https://www.celestialaiplus.com',
-    imgBase: 'https://www.celestialaiplus.com/static/images',
-    enableMock: true,
+    apiBase: 'http://110.40.168.138:8000',
+    imgBase: 'http://110.40.168.138:8000/static/images',
+    enableMock: false,
     enableLog: true,
   },
   trial: {

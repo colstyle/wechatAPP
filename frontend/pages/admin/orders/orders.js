@@ -139,5 +139,9 @@ Page({
   
   goToInventoryManage() {
     wx.navigateTo({ url: '/pages/admin/inventory/list/list' })
+  },
+
+  goToCategoryManage() {
+    wx.navigateTo({ url: '/pages/admin/category/list/list' })
   }
 })

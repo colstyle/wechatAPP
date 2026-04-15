@@ -1,5 +1,39 @@
 // pages/settings/settings.js
 const app = getApp()
+const ALLOWED_API_BASES = [
+  'https://www.celestialaiplus.com',
+  'https://7469-time-capsule-surver-7cya285298de-1421670163.tcb.qcloud.la',
+  'https://tcb-api.tencentcloudapi.com'
+]
+
+function normalizeApiBase(raw) {
+  let value = String(raw || '').trim()
+  if (!value) return ''
+  if (value.endsWith('/')) value = value.slice(0, -1)
+  return value
+}
+
+function isHttpsBase(value) {
+  return /^https:\/\/[^/\s]+$/i.test(value)
+}
+
+function isDevTools() {
+  try {
+    const info = wx.getSystemInfoSync()
+    return info && info.platform === 'devtools'
+  } catch (e) {
+    return false
+  }
+}
+
+function isDevEnv() {
+  try {
+    const gd = (app && app.globalData) ? app.globalData : {}
+    return gd && gd.ENV === 'dev'
+  } catch (e) {
+    return false
+  }
+}
 
 Page({
   data: {
@@ -9,7 +43,7 @@ Page({
   },
 
   onLoad() {
-    const savedApiBase = wx.getStorageSync('apiBase') || app.apiBase
+    const savedApiBase = normalizeApiBase(wx.getStorageSync('apiBase') || app.apiBase)
     const mockOpenid = wx.getStorageSync('mockOpenid') || ''
     this.setData({ apiBase: savedApiBase, mockOpenid })
   },
@@ -97,20 +131,41 @@ Page({
   },
 
   saveApiBase() {
-    const apiBase = (this.data.apiBase || '').trim()
+    const apiBase = normalizeApiBase(this.data.apiBase)
     if (!apiBase) {
       wx.showToast({ title: '请输入后端地址', icon: 'none' })
       return
     }
+    if (!(isDevEnv() && isDevTools())) {
+      if (!isHttpsBase(apiBase)) {
+        wx.showToast({ title: '小程序仅支持 HTTPS 域名', icon: 'none' })
+        return
+      }
+      if (!ALLOWED_API_BASES.includes(apiBase)) {
+        wx.showToast({ title: '不在合法域名白名单', icon: 'none' })
+        return
+      }
+    }
     app.setApiBase(apiBase)
+    this.setData({ apiBase })
     wx.showToast({ title: '已保存', icon: 'success' })
   },
 
   testApiBase() {
-    const apiBase = (this.data.apiBase || '').trim()
+    const apiBase = normalizeApiBase(this.data.apiBase)
     if (!apiBase) {
       wx.showToast({ title: '请输入后端地址', icon: 'none' })
       return
+    }
+    if (!(isDevEnv() && isDevTools())) {
+      if (!isHttpsBase(apiBase)) {
+        wx.showToast({ title: '小程序仅支持 HTTPS 域名', icon: 'none' })
+        return
+      }
+      if (!ALLOWED_API_BASES.includes(apiBase)) {
+        wx.showToast({ title: '不在合法域名白名单', icon: 'none' })
+        return
+      }
     }
     wx.showLoading({ title: '测试中...' })
     wx.request({
