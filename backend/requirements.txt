@@ -23,7 +23,7 @@ python-multipart
 alembic
 
 # AI
-google-generativeai
+google-generativeai>=0.8.0
 openai
 
 # 调试

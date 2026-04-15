@@ -17,25 +17,25 @@ const LOCALHOST = '127.0.0.1'
 
 const ENV_MAP = {
   develop: {
-    ENV:        'dev',
-    apiBase:    'https://www.celestialaiplus.com',
-    imgBase:    'https://www.celestialaiplus.com/static/images',
+    ENV: 'dev',
+    apiBase: 'https://www.celestialaiplus.com',
+    imgBase: 'https://www.celestialaiplus.com/static/images',
     enableMock: true,
-    enableLog:  true,
+    enableLog: true,
   },
   trial: {
-    ENV:        'test',
-    apiBase:    'https://www.celestialaiplus.com',
-    imgBase:    'https://www.celestialaiplus.com/static/images',
-    enableMock: true,
-    enableLog:  true,
+    ENV: 'test',
+    apiBase: 'https://www.celestialaiplus.com',
+    imgBase: 'https://www.celestialaiplus.com/static/images',
+    enableMock: false,
+    enableLog: true,
   },
   release: {
-    ENV:        'prod',
-    apiBase:    'https://www.celestialaiplus.com',
-    imgBase:    'https://www.celestialaiplus.com/static/images',
+    ENV: 'prod',
+    apiBase: 'https://www.celestialaiplus.com',
+    imgBase: 'https://www.celestialaiplus.com/static/images',
     enableMock: false,
-    enableLog:  false,
+    enableLog: false,
   },
 }
 

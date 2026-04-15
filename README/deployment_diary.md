@@ -41,7 +41,7 @@ graph TD
     
 ```
 下面是租客 / 店主业务流程图：
-
+![alt text](image-2.png)
 ```mermaid
 graph LR
     classDef user fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
