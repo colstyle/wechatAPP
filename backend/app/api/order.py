@@ -54,7 +54,7 @@ class OrderItemResponse(BaseModel):
     product_image: str
     size: str
     color: str
-    rent_price: float
+    price: float
     deposit: float
     quantity: int
 
@@ -62,7 +62,7 @@ class OrderItemResponse(BaseModel):
 class OrderResponse(BaseModel):
     """订单响应"""
     id: int
-    order_no: str
+    order_sn: str
     rental_type: int
     total_rent: float
     total_deposit: float
@@ -142,9 +142,9 @@ async def create_order(
 
         # ===== 快照固化：下单时记录当前价格，与商品表解耦 =====
         # 后续修改商品价格不影响历史订单金额
-        snapshot_price   = Decimal(str(product.get('daily_rent', 0)))
+        snapshot_price   = Decimal(str(product.get('price', 0)))
         snapshot_deposit = Decimal(str(product.get('deposit', 0)))
-        snapshot_image   = product.get('cover_image') or product.get('main_image') or ''
+        snapshot_image   = product.get('main_image') or ''
 
         deposit = snapshot_deposit
         total_deposit += deposit * item.get('quantity', 1)
@@ -163,7 +163,7 @@ async def create_order(
             'snapshot_deposit': snapshot_deposit, # 押金快照
             'size':             item.get('size', ''),
             'color':            item.get('color', ''),
-            'rent_price':       rent_price,
+            'price':            rent_price,
             'deposit':          deposit,
             'quantity':         item.get('quantity', 1)
         })
@@ -178,11 +178,12 @@ async def create_order(
 
     db.begin_transaction()
     try:
+        order_sn = generate_order_no()
         order_id = db.execute_insert(
-            """INSERT INTO orders (order_no, user_id, rental_type, total_rent, total_deposit, total_amount,
+            """INSERT INTO orders (order_sn, user_id, rental_type, total_rent, total_deposit, total_amount,
                rent_days, start_date, end_date, status, remark, created_at)
                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-            (order_no, user_id, request.rental_type, total_rent, total_deposit, total_amount,
+            (order_sn, user_id, request.rental_type, total_rent, total_deposit, total_amount,
              rent_days, start_date, end_date, 0, request.remark)
         )
 
@@ -192,22 +193,10 @@ async def create_order(
                 db.execute_insert(
                     """INSERT INTO order_items
                        (order_id, product_id, product_name, product_image,
-                        snapshot_price, snapshot_deposit,
-                        size, color, rent_price, deposit, quantity, created_at)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+                        price, deposit, quantity)
+                       VALUES (%s, %s, %s, %s, %s, %s, %s)""",
                     (order_id, item['product_id'], item['product_name'], item['product_image'],
-                     item['snapshot_price'], item['snapshot_deposit'],
-                     item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
-                )
-            except Exception:
-                # 旧表无 snapshot 字段时降级写入（迁移过渡期兼容）
-                db.execute_insert(
-                    """INSERT INTO order_items
-                       (order_id, product_id, product_name, product_image,
-                        size, color, rent_price, deposit, quantity, created_at)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-                    (order_id, item['product_id'], item['product_name'], item['product_image'],
-                     item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
+                     item['price'], item['deposit'], item['quantity'])
                 )
             # 锁定日期库存
             try:
@@ -246,7 +235,7 @@ async def create_order(
         "message": "订单预定成功",
         "data": {
             "order_id": order_id,
-            "order_no": order_no,
+            "order_sn": order_sn,
             "total_amount": float(total_amount),
             "total_deposit": float(total_deposit)
         }
@@ -468,7 +457,7 @@ async def get_orders(
                 "product_image": item['product_image'],
                 "size": item['size'],
                 "color": item['color'],
-                "rent_price": float(item['rent_price']),
+                "price": float(item['price']),
                 "deposit": float(item['deposit']),
                 "quantity": item['quantity']
             })
@@ -491,7 +480,7 @@ async def get_orders(
             "list": [
                 {
                     "id": o['id'],
-                    "order_no": o['order_no'],
+                    "order_sn": o['order_sn'],
                     "rental_type": o['rental_type'],
                     "total_rent": float(o['total_rent']),
                     "total_deposit": float(o['total_deposit']),

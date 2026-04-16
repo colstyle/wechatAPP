@@ -38,11 +38,11 @@ class ProductResponse(BaseModel):
     name: str
     category_id: int
     brand_id: int
-    cover_image: str
+    main_image: str
     images: list
     description: str
     deposit: float
-    daily_rent: float
+    price: float
     single_rent: float
     month_card_rent: float
     stock: int
@@ -167,9 +167,8 @@ async def get_brand(brand_id: int):
                 {
                     "id": p['id'],
                     "name": p['name'],
-                    "cover_image": p['cover_image'],
-                    "daily_rent": float(p['daily_rent']),
-                    "single_rent": float(p['single_rent']),
+                    "main_image": p['main_image'],
+                    "price": float(p['price']),
                     "deposit": float(p['deposit'])
                 }
                 for p in products
@@ -252,7 +251,7 @@ async def get_products(
     where_clause = " AND ".join(conditions)
 
     # 查询总数
-    count_sql = f"SELECT COUNT(*) as total FROM products p WHERE {where_clause}"
+    count_sql = f"SELECT COUNT(*) as total FROM products p WHERE {where_clause or '1=1'}"
     total_result = db.execute_one(count_sql, tuple(params))
     total = total_result['total'] if total_result else 0
 
@@ -282,10 +281,8 @@ async def get_products(
                 {
                     "id": p['id'],
                     "name": p['name'],
-                    "cover_image": p['cover_image'],
-                    "daily_rent": float(p['daily_rent']),
-                    "single_rent": float(p['single_rent']),
-                    "month_card_rent": float(p['month_card_rent']),
+                    "main_image": p['main_image'],
+                    "price": float(p['price']),
                     "deposit": float(p['deposit']),
                     "stock": p['stock'],
                     "is_hot": p['is_hot'],
@@ -338,9 +335,8 @@ async def get_hot_products(
             {
                 "id": p['id'],
                 "name": p['name'],
-                "cover_image": p['cover_image'],
-                "daily_rent": float(p['daily_rent']),
-                "single_rent": float(p['single_rent']),
+                "main_image": p['main_image'],
+                "price": float(p['price']),
                 "deposit": float(p['deposit']),
                 "is_hot": p['is_hot']
             }
@@ -440,7 +436,7 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
 
     # 获取商品评价
     reviews = db.execute_query(
-        """SELECT r.*, u.nickname, u.avatar
+        """SELECT r.*, u.nickname, u.avatar_url
            FROM reviews r
            LEFT JOIN users u ON r.user_id = u.id
            WHERE r.product_id = %s
@@ -476,13 +472,11 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "name": product['name'],
             "category_id": product['category_id'],
             "brand_id": product['brand_id'],
-            "cover_image": product['cover_image'],
+            "main_image": product['main_image'],
             "images": images,
             "description": product['description'],
             "deposit": float(product['deposit']),
-            "daily_rent": float(product['daily_rent']),
-            "single_rent": float(product['single_rent']),
-            "month_card_rent": float(product['month_card_rent']),
+            "price": float(product['price']),
             "stock": product['stock'],
             "sizes": sizes,
             "colors": colors,
@@ -501,7 +495,7 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
                     "is_anonymous": r['is_anonymous'],
                     "user": {
                         "nickname": r['nickname'] if not r['is_anonymous'] else "匿名用户",
-                        "avatar": r['avatar'] if not r['is_anonymous'] else ""
+                        "avatar_url": r['avatar_url'] if not r['is_anonymous'] else ""
                     },
                     "created_at": r['created_at'].isoformat() if r['created_at'] else None
                 }
@@ -535,13 +529,13 @@ async def create_product(request: ProductSaveRequest, authorization: Optional[st
     
     product_id = db.execute_insert(
         """INSERT INTO products 
-           (name, category_id, brand_id, cover_image, images, description, 
-            deposit, daily_rent, single_rent, month_card_rent, stock, 
-            sizes, colors, is_hot, is_new, is_package_eligible, status, created_at)
-           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-        (request.name, request.category_id, request.brand_id, request.cover_image, images_str, request.description,
-         request.deposit, request.daily_rent, request.single_rent, request.month_card_rent, request.stock,
-         sizes_str, colors_str, int(request.is_hot), int(request.is_new), int(request.is_package_eligible), request.status)
+           (name, category_id, main_image, images, description, 
+            deposit, price, stock, 
+            sizes, colors, is_hot, is_new, status, created_at)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+        (request.name, request.category_id, request.cover_image, images_str, request.description,
+         request.deposit, request.daily_rent, request.stock,
+         sizes_str, colors_str, int(request.is_hot), int(request.is_new), request.status)
     )
     return {"code": 0, "message": "添加成功", "data": {"id": product_id}}
 

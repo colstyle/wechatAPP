@@ -20,7 +20,7 @@ router = APIRouter()
 
 class AdminOrderResponse(BaseModel):
     id: int
-    order_no: str
+    order_sn: str
     user_id: int
     nickname: Optional[str]
     total_amount: float
@@ -226,7 +226,7 @@ async def get_all_orders(
     # 查询列表
     offset = (page - 1) * page_size
     list_sql = f"""
-        SELECT o.*, u.nickname, u.avatar
+        SELECT o.*, u.nickname, u.avatar_url
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.id
         {where_clause}
@@ -248,10 +248,10 @@ async def get_all_orders(
             "list": [
                 {
                     "id": o['id'],
-                    "order_no": o['order_no'],
+                    "order_sn": o['order_sn'],
                     "user_id": o['user_id'],
                     "nickname": o['nickname'],
-                    "avatar": o['avatar'],
+                    "avatar_url": o['avatar_url'],
                     "total_amount": float(o['total_amount']),
                     "status": o['status'],
                     "status_text": status_text_map.get(o['status'], '未知'),
@@ -273,7 +273,7 @@ async def get_order_detail(order_id: int, authorization: Optional[str] = Header(
     require_admin(authorization)
     
     order = db.execute_one(
-        """SELECT o.*, u.nickname, u.avatar 
+        """SELECT o.*, u.nickname, u.avatar_url 
            FROM orders o 
            LEFT JOIN users u ON o.user_id = u.id 
            WHERE o.id = %s""", 
@@ -319,7 +319,7 @@ async def get_order_detail(order_id: int, authorization: Optional[str] = Header(
                     "product_image": i['product_image'],
                     "size": i['size'],
                     "color": i['color'],
-                    "rent_price": float(i['rent_price']),
+                    "price": float(i['price']),
                     "deposit": float(i['deposit']),
                     "quantity": i['quantity']
                 }
@@ -527,9 +527,9 @@ async def update_order_items(
 
             db.execute_insert(
                 """INSERT INTO order_items (order_id, product_id, product_name, product_image, size, color,
-                   rent_price, deposit, quantity, created_at)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-                (request.order_id, item['product_id'], product['name'], product['cover_image'],
+                   price, deposit, quantity)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                (request.order_id, item['product_id'], product['name'], product['main_image'],
                  item.get('size', ''), item.get('color', ''), 0, deposit, 1)
             )
             
@@ -614,10 +614,10 @@ async def get_package_products(
     offset = (page - 1) * page_size
     params.extend([page_size, offset])
     products = db.execute_query(
-        f"""SELECT p.id, p.name, p.cover_image, p.deposit, p.is_package_eligible
+        f"""SELECT p.id, p.name, p.main_image, p.deposit
             FROM products p
             {where_clause}
-            ORDER BY p.is_package_eligible DESC, p.id DESC
+            ORDER BY p.id DESC
             LIMIT %s OFFSET %s""",
         tuple(params)
     )
@@ -630,9 +630,8 @@ async def get_package_products(
                 {
                     "id": p['id'],
                     "name": p['name'],
-                    "cover_image": p['cover_image'],
+                    "main_image": p['main_image'],
                     "deposit": float(p['deposit']),
-                    "is_package_eligible": bool(p.get('is_package_eligible'))
                 }
                 for p in products
             ],

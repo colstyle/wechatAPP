@@ -121,7 +121,7 @@ async def get_reviews(
     # 查询评价列表
     offset = (page - 1) * page_size
     list_sql = """
-        SELECT r.*, u.nickname, u.avatar
+        SELECT r.*, u.nickname, u.avatar_url
         FROM reviews r
         LEFT JOIN users u ON r.user_id = u.id
         WHERE r.product_id = %s
@@ -157,10 +157,10 @@ async def get_reviews(
                     "user_id": r['user_id'],
                     "user": {
                         "nickname": r['nickname'] if not r['is_anonymous'] else "匿名用户",
-                        "avatar": r['avatar'] if not r['is_anonymous'] else ""
+                        "avatar_url": r['avatar_url'] if not r['is_anonymous'] else ""
                     } if not r['is_anonymous'] else {
                         "nickname": "匿名用户",
-                        "avatar": ""
+                        "avatar_url": ""
                     },
                     "rating": r['rating'],
                     "content": r['content'],
@@ -192,7 +192,7 @@ async def get_review(review_id: int):
     获取评价详情
     """
     review = db.execute_one(
-        """SELECT r.*, u.nickname, u.avatar
+        """SELECT r.*, u.nickname, u.avatar_url
            FROM reviews r
            LEFT JOIN users u ON r.user_id = u.id
            WHERE r.id = %s""",
@@ -204,7 +204,7 @@ async def get_review(review_id: int):
 
     # 获取商品信息
     product = db.execute_one(
-        "SELECT id, name, cover_image FROM products WHERE id = %s",
+        "SELECT id, name, main_image FROM products WHERE id = %s",
         (review['product_id'],)
     )
 
@@ -215,7 +215,7 @@ async def get_review(review_id: int):
             "id": review['id'],
             "user": {
                 "nickname": review['nickname'] if not review['is_anonymous'] else "匿名用户",
-                "avatar": review['avatar'] if not review['is_anonymous'] else ""
+                "avatar_url": review['avatar_url'] if not review['is_anonymous'] else ""
             },
             "product": product,
             "rating": review['rating'],
@@ -247,7 +247,7 @@ async def get_my_reviews(
     # 查询评价列表
     offset = (page - 1) * page_size
     list_sql = """
-        SELECT r.*, p.name as product_name, p.cover_image as product_image
+        SELECT r.*, p.name as product_name, p.main_image as product_image
         FROM reviews r
         LEFT JOIN products p ON r.product_id = p.id
         WHERE r.user_id = %s

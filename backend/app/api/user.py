@@ -28,7 +28,7 @@ class LoginRequest(BaseModel):
 class UpdateProfileRequest(BaseModel):
     """更新用户信息请求"""
     nickname: Optional[str] = None
-    avatar: Optional[str] = None
+    avatar_url: Optional[str] = None
     phone: Optional[str] = None
     real_name: Optional[str] = None
     id_card: Optional[str] = None
@@ -48,7 +48,7 @@ class UserResponse(BaseModel):
     id: int
     openid: str
     nickname: Optional[str]
-    avatar: Optional[str]
+    avatar_url: Optional[str]
     phone: Optional[str]
     real_name: Optional[str]
     height: Optional[int]
@@ -129,7 +129,7 @@ async def login(request: LoginRequest):
         # 创建新用户
         role = desired_role or "1"
         user_id = db.execute_insert(
-            """INSERT INTO users (openid, nickname, avatar, role, created_at, updated_at)
+            """INSERT INTO users (openid, nickname, avatar_url, role, created_at, updated_at)
                VALUES (%s, %s, %s, %s, NOW(), NOW())""",
             (openid, f"用户{openid[:6]}", "", role)
         )
@@ -146,7 +146,7 @@ async def login(request: LoginRequest):
                 "id": user['id'],
                 "openid": user['openid'],
                 "nickname": user['nickname'],
-                "avatar": user['avatar'],
+                "avatar_url": user['avatar_url'],
                 "phone": user['phone'],
                 "real_name": user['real_name'],
                 "height": user['height'],
@@ -175,7 +175,7 @@ async def get_profile(authorization: Optional[str] = Header(None)):
             "id": user['id'],
             "openid": user['openid'],
             "nickname": user['nickname'],
-            "avatar": user['avatar'],
+            "avatar_url": user['avatar_url'],
             "phone": user['phone'],
             "real_name": user['real_name'],
             "height": user['height'],
@@ -204,9 +204,9 @@ async def update_profile(request: UpdateProfileRequest, authorization: Optional[
     if request.nickname is not None:
         update_fields.append("nickname = %s")
         params.append(request.nickname)
-    if request.avatar is not None:
-        update_fields.append("avatar = %s")
-        params.append(request.avatar)
+    if request.avatar_url is not None:
+        update_fields.append("avatar_url = %s")
+        params.append(request.avatar_url)
     if request.phone is not None:
         update_fields.append("phone = %s")
         params.append(request.phone)

@@ -348,10 +348,10 @@ async def create_subscription_order(
         order_items.append({
             'product_id': product_id,
             'product_name': product['name'],
-            'product_image': product['cover_image'],
+            'product_image': product['main_image'],
             'size': '',
             'color': '',
-            'rent_price': Decimal('0.00'),  # 订阅订单租金为0
+            'price': Decimal('0.00'),  # 订阅订单租金为0
             'deposit': Decimal(str(product['deposit'])),
             'quantity': 1
         })
@@ -361,16 +361,16 @@ async def create_subscription_order(
 
     # 生成订单号
     from app.api.order import generate_order_no
-    order_no = generate_order_no()
+    order_sn = generate_order_no()
 
     # 创建订单
     db.begin_transaction()
     try:
         order_id = db.execute_insert(
-            """INSERT INTO orders (order_no, user_id, rental_type, total_rent, total_deposit, total_amount,
-               rent_days, start_date, end_date, status, remark, created_at)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-            (order_no, user_id, 3, Decimal('0.00'), total_deposit, total_deposit, 0, None, None,
+            """INSERT INTO orders (order_sn, user_id, rental_type, total_rent, total_deposit, total_amount,
+               rent_days, status, remark, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+            (order_sn, user_id, 3, Decimal('0.00'), total_deposit, total_deposit, 0,
              0, remark)
         )
 
@@ -378,10 +378,10 @@ async def create_subscription_order(
         for item in order_items:
             db.execute_insert(
                 """INSERT INTO order_items (order_id, product_id, product_name, product_image, size, color,
-                   rent_price, deposit, quantity, created_at)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+                   price, deposit, quantity)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (order_id, item['product_id'], item['product_name'], item['product_image'],
-                 item['size'], item['color'], item['rent_price'], item['deposit'], item['quantity'])
+                 item['size'], item['color'], item['price'], item['deposit'], item['quantity'])
             )
 
         # 扣减库存
@@ -408,7 +408,7 @@ async def create_subscription_order(
         "message": "订单创建成功",
         "data": {
             "order_id": order_id,
-            "order_no": order_no,
+            "order_sn": order_sn,
             "total_deposit": float(total_deposit),
             "subscription_id": active_subscription['id'],
             "remaining_times": active_subscription['remaining_times'] - len(product_ids)

@@ -121,7 +121,7 @@ async def get_appointments(
     # 查询预约列表
     offset = (page - 1) * page_size
     list_sql = f"""
-        SELECT a.*, p.name as product_name, p.cover_image, p.daily_rent
+        SELECT a.*, p.name as product_name, p.main_image, p.price
         FROM appointments a
         LEFT JOIN products p ON a.product_id = p.id
         WHERE {where_clause}
@@ -141,8 +141,8 @@ async def get_appointments(
                     "id": a['id'],
                     "product_id": a['product_id'],
                     "product_name": a['product_name'],
-                    "product_image": a['cover_image'],
-                    "product_daily_rent": float(a['daily_rent']) if a['daily_rent'] else 0,
+                    "product_image": a['main_image'],
+                    "product_price": float(a['price']) if a['price'] else 0,
                     "appointment_date": a['appointment_date'].isoformat() if a['appointment_date'] else None,
                     "appointment_time": a['appointment_time'],
                     "status": a['status'],
@@ -169,8 +169,8 @@ async def get_appointment(appointment_id: int, authorization: Optional[str] = He
 
     # 查询预约
     appointment = db.execute_one(
-        """SELECT a.*, p.name as product_name, p.cover_image, p.description, p.daily_rent,
-           p.single_rent, p.deposit, p.sizes, p.colors
+        """SELECT a.*, p.name as product_name, p.main_image, p.description, p.price,
+           p.deposit, p.sizes, p.colors
            FROM appointments a
            LEFT JOIN products p ON a.product_id = p.id
            WHERE a.id = %s AND a.user_id = %s""",
@@ -197,10 +197,9 @@ async def get_appointment(appointment_id: int, authorization: Optional[str] = He
             "product_id": appointment['product_id'],
             "product": {
                 "name": appointment['product_name'],
-                "cover_image": appointment['cover_image'],
+                "main_image": appointment['main_image'],
                 "description": appointment['description'],
-                "daily_rent": float(appointment['daily_rent']) if appointment['daily_rent'] else 0,
-                "single_rent": float(appointment['single_rent']) if appointment['single_rent'] else 0,
+                "price": float(appointment['price']) if appointment['price'] else 0,
                 "deposit": float(appointment['deposit']) if appointment['deposit'] else 0,
                 "sizes": sizes,
                 "colors": colors
