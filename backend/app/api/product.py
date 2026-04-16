@@ -45,7 +45,6 @@ class ProductResponse(BaseModel):
     stock: int
     sizes: list
     colors: list
-    view_count: int
     rent_count: int
 
 class ProductSaveRequest(BaseModel):
@@ -261,7 +260,6 @@ async def get_products(
                     "deposit": float(p['deposit']),
                     "stock": p['stock'],
                     "status": p.get('status', 1),
-                    "view_count": p['view_count'],
                     "rent_count": p['rent_count'],
                     "is_rented": bool(p['id'] in reserved_ids)
                 }
@@ -372,11 +370,8 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
     if not product:
         raise HTTPException(status_code=404, detail="商品不存在")
 
-    # 增加浏览量
-    db.execute_update(
-        "UPDATE products SET view_count = view_count + 1 WHERE id = %s",
-        (product_id,)
-    )
+    # 增加租用计数（模拟浏览计数的旧逻辑已移除）
+    pass
 
     # 如果用户已登录，记录浏览历史
     if authorization:
@@ -450,7 +445,6 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "sizes": sizes,
             "colors": colors,
             "status": product.get('status', 1),
-            "view_count": product['view_count'],
             "rent_count": product['rent_count'],
             "reviews": [
                 {
