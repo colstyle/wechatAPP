@@ -8,7 +8,7 @@
       <cp-nav-bar title="小时光租衣舍" show-back="{{false}}" bg="transparent" title-theme="light"></cp-nav-bar>
     </view>
     <image class="hero-img" src="{{imgBase}}/hero_fashion.png" mode="aspectFill"></image>
-    <view class="hero-mask"></view>
+
   </view>
 
   <view class="main-body">

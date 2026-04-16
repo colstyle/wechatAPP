@@ -3,7 +3,7 @@
   <!-- 沉浸式顶部背景 -->
   <view class="hero-bg">
     <image class="hero-img" src="{{imgBase}}/profile_header_banner.png" mode="aspectFill"></image>
-    <view class="hero-mask"></view>
+
   </view>
 
   <!-- 自定义导航（置顶透明） -->
