@@ -30,13 +30,6 @@ class UpdateProfileRequest(BaseModel):
     nickname: Optional[str] = None
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
-    real_name: Optional[str] = None
-    id_card: Optional[str] = None
-    height: Optional[int] = None
-    weight: Optional[int] = None
-    bust: Optional[int] = None
-    waist: Optional[int] = None
-    hips: Optional[int] = None
 
 
 
@@ -50,9 +43,6 @@ class UserResponse(BaseModel):
     nickname: Optional[str]
     avatar_url: Optional[str]
     phone: Optional[str]
-    real_name: Optional[str]
-    height: Optional[int]
-    weight: Optional[int]
     role: str
     created_at: datetime
 
@@ -174,12 +164,6 @@ async def get_profile(authorization: Optional[str] = Header(None)):
             "nickname": user['nickname'],
             "avatar_url": user['avatar_url'],
             "phone": user['phone'],
-            "real_name": user['real_name'],
-            "height": user['height'],
-            "weight": user['weight'],
-            "bust": user['bust'],
-            "waist": user['waist'],
-            "hips": user['hips'],
             "role": user.get('role', 'user'),
             "created_at": user['created_at'].isoformat() if user['created_at'] else None
         }
@@ -207,28 +191,6 @@ async def update_profile(request: UpdateProfileRequest, authorization: Optional[
     if request.phone is not None:
         update_fields.append("phone = %s")
         params.append(request.phone)
-    if request.real_name is not None:
-        update_fields.append("real_name = %s")
-        params.append(request.real_name)
-    if request.id_card is not None:
-        update_fields.append("id_card = %s")
-        params.append(request.id_card)
-    if request.height is not None:
-        update_fields.append("height = %s")
-        params.append(request.height)
-    if request.weight is not None:
-        update_fields.append("weight = %s")
-        params.append(request.weight)
-    if request.bust is not None:
-        update_fields.append("bust = %s")
-        params.append(request.bust)
-    if request.waist is not None:
-        update_fields.append("waist = %s")
-        params.append(request.waist)
-    if request.hips is not None:
-        update_fields.append("hips = %s")
-        params.append(request.hips)
-
     if update_fields:
         update_fields.append("updated_at = NOW()")
         params.append(user_id)
