@@ -521,13 +521,13 @@ async def update_product(product_id: int, request: ProductSaveRequest, authoriza
     
     db.execute_update(
         """UPDATE products SET 
-           name=%s, category_id=%s, brand_id=%s, cover_image=%s, images=%s, description=%s,
-           deposit=%s, daily_rent=%s, single_rent=%s, month_card_rent=%s, stock=%s,
-           sizes=%s, colors=%s, is_hot=%s, is_new=%s, is_package_eligible=%s, status=%s
+           name=%s, category_id=%s, main_image=%s, images=%s, description=%s,
+           deposit=%s, price=%s, stock=%s,
+           sizes=%s, colors=%s, status=%s
            WHERE id = %s""",
-        (request.name, request.category_id, request.brand_id, request.cover_image, images_str, request.description,
-         request.deposit, request.daily_rent, request.single_rent, request.month_card_rent, request.stock,
-         sizes_str, colors_str, int(request.is_hot), int(request.is_new), int(request.is_package_eligible), request.status,
+        (request.name, request.category_id, request.cover_image, images_str, request.description,
+         request.deposit, request.daily_rent, request.stock,
+         sizes_str, colors_str, request.status,
          product_id)
     )
     return {"code": 0, "message": "更新成功"}
