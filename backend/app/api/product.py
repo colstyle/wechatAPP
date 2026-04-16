@@ -260,7 +260,7 @@ async def get_products(
     list_sql = f"""
         SELECT p.* FROM products p
         WHERE {where_clause}
-        ORDER BY p.is_hot DESC, p.id DESC
+        ORDER BY p.id DESC
         LIMIT %s OFFSET %s
     """
     params.extend([page_size, offset])
@@ -285,9 +285,6 @@ async def get_products(
                     "price": float(p['price']),
                     "deposit": float(p['deposit']),
                     "stock": p['stock'],
-                    "is_hot": p['is_hot'],
-                    "is_new": p['is_new'],
-                    "is_package_eligible": bool(p.get('is_package_eligible')),
                     "status": p.get('status', 1),
                     "view_count": p['view_count'],
                     "rent_count": p['rent_count'],
@@ -310,7 +307,7 @@ async def get_hot_products(
     """
     获取热门商品
     """
-    conditions = ["status = 1", "is_hot = 1"]
+    conditions = ["status = 1"]
     params = []
 
     if available_date:
@@ -337,8 +334,7 @@ async def get_hot_products(
                 "name": p['name'],
                 "main_image": p['main_image'],
                 "price": float(p['price']),
-                "deposit": float(p['deposit']),
-                "is_hot": p['is_hot']
+                "deposit": float(p['deposit'])
             }
             for p in products
         ]
@@ -353,7 +349,7 @@ async def get_new_products(
     """
     获取新品商品
     """
-    conditions = ["status = 1", "is_new = 1"]
+    conditions = ["status = 1"]
     params = []
 
     if available_date:
@@ -378,11 +374,9 @@ async def get_new_products(
             {
                 "id": p['id'],
                 "name": p['name'],
-                "cover_image": p['cover_image'],
-                "daily_rent": float(p['daily_rent']),
-                "single_rent": float(p['single_rent']),
-                "deposit": float(p['deposit']),
-                "is_new": p['is_new']
+                "main_image": p['main_image'],
+                "price": float(p['price']),
+                "deposit": float(p['deposit'])
             }
             for p in products
         ]
@@ -480,10 +474,7 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "stock": product['stock'],
             "sizes": sizes,
             "colors": colors,
-            "is_hot": product['is_hot'],
-            "is_new": product['is_new'],
             "status": product.get('status', 1),
-            "is_package_eligible": bool(product.get('is_package_eligible')),
             "view_count": product['view_count'],
             "rent_count": product['rent_count'],
             "reviews": [
@@ -531,11 +522,11 @@ async def create_product(request: ProductSaveRequest, authorization: Optional[st
         """INSERT INTO products 
            (name, category_id, main_image, images, description, 
             deposit, price, stock, 
-            sizes, colors, is_hot, is_new, status, created_at)
-           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+            sizes, colors, status, created_at)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
         (request.name, request.category_id, request.cover_image, images_str, request.description,
          request.deposit, request.daily_rent, request.stock,
-         sizes_str, colors_str, int(request.is_hot), int(request.is_new), request.status)
+         sizes_str, colors_str, request.status)
     )
     return {"code": 0, "message": "添加成功", "data": {"id": product_id}}
 

@@ -593,10 +593,6 @@ async def get_package_products(
     conditions = []
     params = []
 
-    if eligible is not None:
-        conditions.append("p.is_package_eligible = %s")
-        params.append(1 if eligible else 0)
-
     if keyword:
         conditions.append("p.name LIKE %s")
         params.append(f"%{keyword}%")
@@ -654,9 +650,5 @@ async def set_package_product_eligible(
     if not product:
         raise HTTPException(status_code=404, detail="商品不存在")
 
-    db.execute_update(
-        "UPDATE products SET is_package_eligible = %s WHERE id = %s",
-        (1 if request.is_package_eligible else 0, product_id)
-    )
-
-    return {"code": 0, "message": "更新成功", "data": {"id": product_id, "is_package_eligible": request.is_package_eligible}}
+    # Feature removed due to database simplification.
+    return {"code": 0, "message": "该功能已被安全移除，不需要处理套餐状态", "data": {"id": product_id}}
