@@ -211,6 +211,22 @@ App({
     return `${year}-${month}-${day} ${hour}:${minute}`
   },
 
+  /**
+   * 智能图片路径处理
+   * 1. 自动根据 imgBase 拼接绝对路径
+   * 2. (可选) 可在此处扩展 WebP 判定逻辑
+   */
+  imageUrl(path) {
+    if (!path) return ''
+    if (path.startsWith('http')) return path
+    
+    // 基础路径处理
+    const base = this.globalData.imgBase || ''
+    const fullPath = path.startsWith('/') ? `${base}${path}` : `${base}/${path}`
+    
+    return fullPath
+  },
+
   // 获取自定义导航栏所需的基础数据（使用新 API，避免 getSystemInfoSync 废弃警告）
   getNavBarData() {
     try {

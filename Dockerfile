@@ -8,6 +8,12 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+# --- 优化点：切换到腾讯云镜像源 ---
+RUN sed -i 's/deb.debian.org/mirrors.tencentyun.com/g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's/deb.debian.org/mirrors.tencentyun.com/g' /etc/apt/sources.list && \
+    sed -i 's/security.debian.org/mirrors.tencentyun.com/g' /etc/apt/sources.list.d/debian.sources 2>/dev/null || \
+    sed -i 's/security.debian.org/mirrors.tencentyun.com/g' /etc/apt/sources.list
+
 # 安装系统依赖 (MySQL 编译需要)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
@@ -16,7 +22,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# 安装项目依赖
+# 安装项目依赖 (设置全局镜像源，防止强制更新 pip 时超时)
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/ && \
+    pip config set global.trusted-host mirrors.aliyun.com
+
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt

@@ -40,18 +40,18 @@
 .folder-front {
   position: absolute;
   top: 10rpx; left: -5rpx; right: 5rpx; bottom: -5rpx;
-  background: #FFF;
-  border: 2rpx solid #E8E5DF;
+  background: #FEFDFB;
+  border: 1rpx solid #E8E5DF;
   border-radius: 8rpx;
-  transform: skewX(-5deg);
+  transform: skewX(-4deg);
   display: flex;
   flex-direction: column;
-  padding: 12rpx;
-  gap: 8rpx;
-  box-shadow: 4rpx 4rpx 12rpx rgba(0,0,0,0.02);
+  padding: 14rpx;
+  gap: 10rpx;
+  box-shadow: 8rpx 8rpx 20rpx rgba(142, 151, 117, 0.08);
 }
-.folder-line { height: 4rpx; background: rgba(197, 160, 89, 0.2); border-radius: 2rpx; width: 80%; }
-.folder-line.short { width: 50%; }
+.folder-line { height: 3rpx; background: rgba(197, 160, 89, 0.15); border-radius: 2rpx; width: 80%; }
+.folder-line.short { width: 45%; }
 
 .pulse-ring {
   position: absolute;

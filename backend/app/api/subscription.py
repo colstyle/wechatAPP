@@ -300,7 +300,6 @@ async def cancel_subscription(subscription_id: int, authorization: Optional[str]
 async def create_subscription_order(
     product_ids: list,
     subscription_id: Optional[int] = None,
-    address_id: int = None,
     remark: Optional[str] = None,
     authorization: Optional[str] = Header(None)
 ):
@@ -329,13 +328,6 @@ async def create_subscription_order(
     if subscription_id and subscription_id != active_subscription['id']:
         raise HTTPException(status_code=400, detail="订阅ID不正确")
 
-    # 检查地址
-    address = db.execute_one(
-        "SELECT * FROM addresses WHERE id = %s AND user_id = %s",
-        (address_id, user_id)
-    )
-    if not address:
-        raise HTTPException(status_code=404, detail="地址不存在")
 
     # 获取商品信息
     products_query = "SELECT * FROM products WHERE id IN (%s)" % ','.join(['%s'] * len(product_ids))
@@ -376,10 +368,10 @@ async def create_subscription_order(
     try:
         order_id = db.execute_insert(
             """INSERT INTO orders (order_no, user_id, rental_type, total_rent, total_deposit, total_amount,
-               rent_days, start_date, end_date, address_id, status, remark, created_at)
-               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
+               rent_days, start_date, end_date, status, remark, created_at)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
             (order_no, user_id, 3, Decimal('0.00'), total_deposit, total_deposit, 0, None, None,
-             address_id, 0, remark)
+             0, remark)
         )
 
         # 创建订单商品

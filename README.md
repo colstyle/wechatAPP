@@ -81,13 +81,21 @@
 *   **前端**：修改 `frontend/config/env.js` 中的 `apiBase`，指向开发机的局域网 IP。在工具栏使用“真机调试”，手机与电脑需在同一 Wi-Fi。
 
 ### 3. 发布阶段 (生产模式)
-*   **后端**：
+*   **后端 (极简热更新流程)**：
     ```bash
     cd ~/wechatAPP
     git pull origin test
+    # 场景 A: 仅修改业务逻辑 (秒级生效)
+    docker compose restart api
+    
+    # 场景 B: 增加了新的 pip 依赖或修改了镜像配置 (重新构建)
     docker compose up -d --build
     ```
-*   **前端**：确认 `env.js` 指向 `https://www.celestialaiplus.com`。并在微信后台完成域名加白名单。然后在工具中点击“上传”。
+*   **监控与排障**：
+    ```bash
+    docker compose logs -f api  # 实时查看日志输出
+    ```
+*   **前端**：确认 `env.js` 自动识别为 `release` 并指向 `https://www.celestialaiplus.com`。在工具中点击“上传”并提交审核。
 
 ---
 

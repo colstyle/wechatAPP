@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: mysql:5.7
@@ -7,7 +5,9 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root_password}
-      MYSQL_DATABASE: ${DB_NAME:-celestial_prod}
+      MYSQL_DATABASE: ${DB_NAME:-time_capsule_db}
+    env_file:
+      - backend/.env
     ports:
       - "3306:3306"
     volumes:
@@ -34,6 +34,8 @@ services:
       - db
     env_file:
       - backend/.env
+    volumes:
+      - ./backend:/app  # 核心优化：代码热挂载，git pull 后重启容器即可生效，无需重新 build
     networks:
       - app-network
 

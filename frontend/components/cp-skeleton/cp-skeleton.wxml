@@ -1,0 +1,5 @@
+<!-- components/cp-skeleton/cp-skeleton.wxml -->
+<view 
+  class="skeleton-item {{animate ? 'animate' : ''}} {{type}}" 
+  style="width: {{width}}; height: {{height}}; margin: {{margin}}; border-radius: {{radius}};"
+></view>

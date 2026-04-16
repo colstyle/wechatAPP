@@ -25,7 +25,6 @@ class CreateOrderRequest(BaseModel):
     items: List[dict]  # 商品列表 [{"product_id": 1, "size": "M", "color": "白色", "quantity": 1}]
     rent_days: Optional[int] = None  # 租赁天数(按天模式需要)
     start_date: Optional[str] = None  # 开始日期 (租赁模式需要)
-    address_id: Optional[int] = None
     remark: Optional[str] = None
 
 
@@ -72,7 +71,6 @@ class OrderResponse(BaseModel):
     start_date: str
     end_date: str
     status: int
-    address: Optional[dict]
     items: list
 
 
@@ -442,9 +440,8 @@ async def get_orders(
     # 查询订单列表
     offset = (page - 1) * page_size
     list_sql = f"""
-        SELECT o.*, a.receiver_name, a.receiver_phone, a.province, a.city, a.district, a.detail_address
+        SELECT o.*
         FROM orders o
-        LEFT JOIN addresses a ON o.address_id = a.id
         WHERE {where_clause}
         ORDER BY o.created_at DESC
         LIMIT %s OFFSET %s
@@ -507,14 +504,6 @@ async def get_orders(
                     "overdue_duration": o['overdue_duration'],
                     "status": o['status'],
                     "status_text": status_text_map.get(o['status'], '未知'),
-                    "address": {
-                        "receiver_name": o['receiver_name'],
-                        "receiver_phone": o['receiver_phone'],
-                        "province": o['province'],
-                        "city": o['city'],
-                        "district": o['district'],
-                        "detail_address": o['detail_address']
-                    } if o['receiver_name'] else None,
                     "items": items_map.get(o['id'], []),
                     "payment_time": o['payment_time'].isoformat() if o['payment_time'] else None,
                     "ship_time": o['ship_time'].isoformat() if o['ship_time'] else None,
@@ -543,9 +532,8 @@ async def get_order(order_id: int, authorization: Optional[str] = Header(None)):
 
     # 查询订单
     order = db.execute_one(
-        """SELECT o.*, a.receiver_name, a.receiver_phone, a.province, a.city, a.district, a.detail_address
+        """SELECT o.*
            FROM orders o
-           LEFT JOIN addresses a ON o.address_id = a.id
            WHERE o.id = %s AND o.user_id = %s""",
         (order_id, user_id)
     )
@@ -589,14 +577,6 @@ async def get_order(order_id: int, authorization: Optional[str] = Header(None)):
             "door_lock_password": order['door_lock_password'],
             "overdue_duration": order['overdue_duration'],
             "status": order['status'],
-            "address": {
-                "receiver_name": order['receiver_name'],
-                "receiver_phone": order['receiver_phone'],
-                "province": order['province'],
-                "city": order['city'],
-                "district": order['district'],
-                "detail_address": order['detail_address']
-            } if order['receiver_name'] else None,
             "items": [
                 {
                     "id": item['id'],
