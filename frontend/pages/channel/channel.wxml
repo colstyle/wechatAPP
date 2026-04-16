@@ -1,0 +1,20 @@
+<view class="channel-container">
+  <view class="header-banner">
+    <text class="banner-title">{{title}}</text>
+  </view>
+  
+  <view class="product-grid">
+    <view class="product-card" wx:for="{{productList}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <image class="cover" src="{{item.main_image}}" mode="aspectFill"></image>
+      <view class="info">
+        <text class="p-name">{{item.name}}</text>
+        <view class="p-bottom">
+          <text class="p-price">￥{{item.price}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <view class="loading-state" wx:if="{{loading}}">加载中...</view>
+  <view class="empty-state" wx:if="{{!loading && productList.length === 0}}">该频道暂无商品</view>
+</view>

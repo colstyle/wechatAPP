@@ -27,7 +27,7 @@ module.exports = [
         name: '押金及注意事项',
         emoji: '📋',
         color: '#7E8C8D',
-        page: '/pages/channel/deposit/deposit',
+        page: '/pages/channel/channel?type=deposit',
         badge: ''
       },
       {
@@ -43,7 +43,7 @@ module.exports = [
         name: '约拍',
         emoji: '📸',
         color: '#8E6BA8',
-        page: '/pages/channel/photo/photo',
+        page: '/pages/channel/channel?type=photo',
         badge: '新'
       },
       {
@@ -51,7 +51,7 @@ module.exports = [
         name: '化妆造型',
         emoji: '💄',
         color: '#C5658A',
-        page: '/pages/channel/makeup/makeup',
+        page: '/pages/channel/channel?type=makeup',
         badge: ''
       }
     ]
@@ -66,7 +66,7 @@ module.exports = [
         name: '9.9特惠/微瑕',
         emoji: '🔥',
         color: '#E85D5D',
-        page: '/pages/channel/sale999/sale999',
+        page: '/pages/channel/channel?type=sale999',
         badge: '热'
       },
       {
@@ -74,7 +74,7 @@ module.exports = [
         name: '活动59.9二件',
         emoji: '🎉',
         color: '#E87B3A',
-        page: '/pages/channel/activity599/activity599',
+        page: '/pages/channel/channel?type=activity599',
         badge: '折'
       }
     ]
@@ -89,7 +89,7 @@ module.exports = [
         name: '开衫/外套',
         emoji: '🧣',
         color: '#8B7355',
-        page: '/pages/channel/cardigan/cardigan',
+        page: '/pages/channel/channel?type=cardigan',
         badge: ''
       }
     ]
@@ -104,7 +104,7 @@ module.exports = [
         name: '蓝色系服装',
         emoji: '💙',
         color: '#4A90D9',
-        page: '/pages/channel/color_blue/color_blue',
+        page: '/pages/channel/channel?type=color_blue',
         badge: ''
       },
       {
@@ -112,7 +112,7 @@ module.exports = [
         name: '白色系服装',
         emoji: '🤍',
         color: '#B0A99A',
-        page: '/pages/channel/color_white/color_white',
+        page: '/pages/channel/channel?type=color_white',
         badge: ''
       },
       {
@@ -120,7 +120,7 @@ module.exports = [
         name: '黄色系服装',
         emoji: '💛',
         color: '#D4A827',
-        page: '/pages/channel/color_yellow/color_yellow',
+        page: '/pages/channel/channel?type=color_yellow',
         badge: ''
       },
       {
@@ -128,7 +128,7 @@ module.exports = [
         name: '紫色系服装',
         emoji: '💜',
         color: '#8E44AD',
-        page: '/pages/channel/color_purple/color_purple',
+        page: '/pages/channel/channel?type=color_purple',
         badge: ''
       },
       {
@@ -136,7 +136,7 @@ module.exports = [
         name: '绿色系服装',
         emoji: '💚',
         color: '#27AE60',
-        page: '/pages/channel/color_green/color_green',
+        page: '/pages/channel/channel?type=color_green',
         badge: ''
       },
       {
@@ -144,7 +144,7 @@ module.exports = [
         name: '粉红色系服装',
         emoji: '🩷',
         color: '#E91E8C',
-        page: '/pages/channel/color_pink/color_pink',
+        page: '/pages/channel/channel?type=color_pink',
         badge: '美'
       }
     ]
@@ -159,7 +159,7 @@ module.exports = [
         name: '项链头饰',
         emoji: '📿',
         color: '#C5A059',
-        page: '/pages/channel/jewelry/jewelry',
+        page: '/pages/channel/channel?type=jewelry',
         badge: ''
       },
       {
@@ -167,7 +167,7 @@ module.exports = [
         name: '帽子包包',
         emoji: '👜',
         color: '#9B7653',
-        page: '/pages/channel/hat_bag/hat_bag',
+        page: '/pages/channel/channel?type=hat_bag',
         badge: ''
       },
       {
@@ -175,7 +175,7 @@ module.exports = [
         name: '胸贴/安全裤',
         emoji: '🩲',
         color: '#A0707A',
-        page: '/pages/channel/undergarment/undergarment',
+        page: '/pages/channel/channel?type=undergarment',
         badge: ''
       }
     ]

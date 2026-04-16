@@ -46,6 +46,25 @@ const auth = {
     if (app && app.globalData) {
       app.globalData.userInfo = current
     }
+  },
+
+  // 检查是否具有真实昵称和头像授权，由于微信现在需组件显式授权
+  // 配合 pages/login/login 使用
+  requireAuth() {
+    const userInfo = this.getUserInfo()
+    const isAuthed = userInfo && userInfo.nickname && userInfo.avatar_url && !userInfo.avatar_url.includes('cat.jpeg')
+    if (!isAuthed) {
+      const pages = getCurrentPages()
+      let currentPath = ''
+      if (pages.length > 0) {
+        currentPath = encodeURIComponent('/' + pages[pages.length - 1].route)
+      }
+      wx.navigateTo({
+        url: `/pages/login/login?redirect=${currentPath}`
+      })
+      return false
+    }
+    return true
   }
 }
 

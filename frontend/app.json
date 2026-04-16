@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/login/login",
     "pages/package/package",
     "pages/chat/chat",
     "pages/category/category",
@@ -22,21 +23,7 @@
     "pages/admin/category/list/list",
     "pages/admin/store/edit/edit",
     "pages/category_products/list/list",
-    "pages/channel/sale999/sale999",
-    "pages/channel/activity599/activity599",
-    "pages/channel/deposit/deposit",
-    "pages/channel/photo/photo",
-    "pages/channel/makeup/makeup",
-    "pages/channel/cardigan/cardigan",
-    "pages/channel/color_blue/color_blue",
-    "pages/channel/color_white/color_white",
-    "pages/channel/color_yellow/color_yellow",
-    "pages/channel/color_purple/color_purple",
-    "pages/channel/color_green/color_green",
-    "pages/channel/color_pink/color_pink",
-    "pages/channel/jewelry/jewelry",
-    "pages/channel/hat_bag/hat_bag",
-    "pages/channel/undergarment/undergarment"
+    "pages/channel/channel"
   ],
   "window": {
     "backgroundTextStyle": "light",

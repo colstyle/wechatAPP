@@ -1,0 +1,30 @@
+<view class="login-container">
+  <view class="logo-area">
+    <image class="logo" src="/images/tab-profile-active.png" mode="aspectFit"></image>
+    <text class="title">小时光租衣舍</text>
+    <text class="subtitle">记录你的闪耀时刻</text>
+  </view>
+
+  <view class="info-notice">
+    为提供完整的服务体验，请完善您的个人主页信息
+  </view>
+
+  <view class="form-area">
+    <view class="form-item border-bottom">
+      <text class="label">头像</text>
+      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image class="avatar" src="{{avatarUrl || defaultAvatar}}"></image>
+        <view class="arrow"></view>
+      </button>
+    </view>
+    <view class="form-item">
+      <text class="label">昵称</text>
+      <input type="nickname" class="nickname-input" placeholder="请输入你的昵称" bindinput="onInputNickname" value="{{nickname}}" />
+    </view>
+  </view>
+
+  <view class="action-area">
+    <button class="auth-btn" bindtap="onSubmit" loading="{{submitting}}">授权并进入</button>
+    <view class="cancel-text" bindtap="onCancel">暂不授权</view>
+  </view>
+</view>

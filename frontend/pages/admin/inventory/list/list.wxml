@@ -17,14 +17,14 @@
 
   <scroll-view class="product-list" scroll-y bindscrolltolower="onLoadMore" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="product-item" wx:for="{{products}}" wx:key="id">
-      <image class="cover" src="{{item.cover_image}}" mode="aspectFill"></image>
+      <image class="cover" src="{{item.main_image}}" mode="aspectFill"></image>
       <view class="info">
         <view class="name-row">
           <text class="name">{{item.name}}</text>
           <text class="tag-status {{item.status === 1 ? 'status-up' : 'status-down'}}">{{item.status === 1 ? '上架中' : '已下架'}}</text>
         </view>
         <view class="price-row">
-          <text class="price-label">日租</text> <text class="price-val">¥{{item.daily_rent}}</text>
+          <text class="price-label">日租</text> <text class="price-val">¥{{item.price}}</text>
           <text class="price-label ml">押金</text> <text class="price-val">¥{{item.deposit}}</text>
         </view>
         <view class="stats-row">

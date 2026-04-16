@@ -1,7 +1,0 @@
-/* pages/channel/makeup/makeup.wxss */
-@import '../deposit/deposit.wxss';
-
-.contact-btn {
-  background: linear-gradient(135deg, #C5658A, #A0446B) !important;
-  box-shadow: 0 8rpx 24rpx rgba(197,101,138,0.35) !important;
-}

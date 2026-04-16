@@ -50,11 +50,11 @@ class ProductResponse(BaseModel):
 class ProductSaveRequest(BaseModel):
     name: str
     category_id: int = 0
-    cover_image: str
+    main_image: str
     images: list = []
     description: str = ""
     deposit: float = 0.0
-    daily_rent: float = 0.0
+    price: float = 0.0
     stock: int = 1
     sizes: list = []
     colors: list = []
@@ -493,8 +493,8 @@ async def create_product(request: ProductSaveRequest, authorization: Optional[st
             deposit, price, stock, 
             sizes, colors, status, created_at)
            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())""",
-        (request.name, request.category_id, request.cover_image, images_str, request.description,
-         request.deposit, request.daily_rent, request.stock,
+        (request.name, request.category_id, request.main_image, images_str, request.description,
+         request.deposit, request.price, request.stock,
          sizes_str, colors_str, request.status)
     )
     return {"code": 0, "message": "添加成功", "data": {"id": product_id}}
@@ -519,8 +519,8 @@ async def update_product(product_id: int, request: ProductSaveRequest, authoriza
            deposit=%s, price=%s, stock=%s,
            sizes=%s, colors=%s, status=%s
            WHERE id = %s""",
-        (request.name, request.category_id, request.cover_image, images_str, request.description,
-         request.deposit, request.daily_rent, request.stock,
+        (request.name, request.category_id, request.main_image, images_str, request.description,
+         request.deposit, request.price, request.stock,
          sizes_str, colors_str, request.status,
          product_id)
     )

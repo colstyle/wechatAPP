@@ -25,10 +25,6 @@
         </picker>
       </view>
 
-      <view class="form-item">
-        <text class="label required">品牌ID</text>
-        <input class="input" type="number" placeholder="输入品牌ID(数字)" value="{{formData.brand_id}}" bindinput="onInput" data-field="brand_id" />
-      </view>
 
       <view class="form-item">
         <text class="label">商品描述</text>
@@ -41,13 +37,9 @@
       
       <view class="form-item">
         <text class="label required">日租金(¥)</text>
-        <input class="input" type="digit" placeholder="0.00" value="{{formData.daily_rent}}" bindinput="onInput" data-field="daily_rent" />
+        <input class="input" type="digit" placeholder="0.00" value="{{formData.price}}" bindinput="onInput" data-field="price" />
       </view>
       
-      <view class="form-item">
-        <text class="label">单次租金(¥)</text>
-        <input class="input" type="digit" placeholder="可选填" value="{{formData.single_rent}}" bindinput="onInput" data-field="single_rent" />
-      </view>
 
       <view class="form-item">
         <text class="label required">押金(¥)</text>
@@ -84,20 +76,7 @@
         <switch checked="{{formData.status === 1}}" color="#C5A059" bindchange="onSwitch" data-field="status" />
       </view>
       
-      <view class="form-item switch-item">
-        <text class="label">热门商品</text>
-        <switch checked="{{formData.is_hot}}" color="#C5A059" bindchange="onSwitch" data-field="is_hot" />
-      </view>
 
-      <view class="form-item switch-item">
-        <text class="label">新品标记</text>
-        <switch checked="{{formData.is_new}}" color="#C5A059" bindchange="onSwitch" data-field="is_new" />
-      </view>
-
-      <view class="form-item switch-item">
-        <text class="label">参与 3件69.9套餐</text>
-        <switch checked="{{formData.is_package_eligible}}" color="#C5A059" bindchange="onSwitch" data-field="is_package_eligible" />
-      </view>
     </view>
 
     <view class="bottom-holder"></view>

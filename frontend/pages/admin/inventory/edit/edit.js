@@ -9,16 +9,12 @@ Page({
       name: '',
       category_id: '',
       brand_id: '',
-      cover_image: '',
+      main_image: '',
       images: [],
       description: '',
       deposit: '',
-      daily_rent: '',
-      single_rent: '',
+      price: '',
       stock: '1',
-      is_hot: false,
-      is_new: false,
-      is_package_eligible: false,
       status: 1
     },
     parentCategories: [],
@@ -75,25 +71,21 @@ Page({
         const p = res.data
         // 将封面图加入 images 第一个，如果 images 为空
         let images = p.images || []
-        if (images.length === 0 && p.cover_image) {
-          images = [p.cover_image]
+        if (images.length === 0 && p.main_image) {
+          images = [p.main_image]
         }
         
         this.setData({
           formData: {
             name: p.name,
             category_id: String(p.category_id),
-            brand_id: String(p.brand_id),
-            cover_image: p.cover_image,
+            brand_id: String(p.brand_id || ''),
+            main_image: p.main_image,
             images: images,
             description: p.description || '',
             deposit: String(p.deposit),
-            daily_rent: String(p.daily_rent),
-            single_rent: String(p.single_rent || ''),
+            price: String(p.price),
             stock: String(p.stock),
-            is_hot: !!p.is_hot,
-            is_new: !!p.is_new,
-            is_package_eligible: !!p.is_package_eligible,
             status: p.status !== undefined ? p.status : 1
           }
         }, () => {
@@ -199,28 +191,21 @@ Page({
     // 校验
     if (!fd.name.trim()) return wx.showToast({ title: '请输入商品名称', icon: 'none' })
     if (!fd.category_id) return wx.showToast({ title: '请输入分类ID', icon: 'none' })
-    if (!fd.brand_id) return wx.showToast({ title: '请输入品牌ID', icon: 'none' })
-    if (!fd.daily_rent) return wx.showToast({ title: '请输入日租金', icon: 'none' })
+    if (!fd.price) return wx.showToast({ title: '请输入日租金', icon: 'none' })
     if (!fd.deposit) return wx.showToast({ title: '请输入押金', icon: 'none' })
     if (fd.images.length === 0) return wx.showToast({ title: '请至少上传一张图片', icon: 'none' })
 
     const payload = {
       name: fd.name.trim(),
       category_id: parseInt(fd.category_id) || 0,
-      brand_id: parseInt(fd.brand_id) || 0,
-      cover_image: fd.images[0], // 首张图作为封面
+      main_image: fd.images[0], // 首张图作为封面
       images: fd.images,
       description: fd.description.trim(),
       deposit: parseFloat(fd.deposit) || 0,
-      daily_rent: parseFloat(fd.daily_rent) || 0,
-      single_rent: parseFloat(fd.single_rent) || 0,
-      month_card_rent: 0,
+      price: parseFloat(fd.price) || 0,
       stock: parseInt(fd.stock) || 1,
       sizes: [],
       colors: [],
-      is_hot: !!fd.is_hot,
-      is_new: !!fd.is_new,
-      is_package_eligible: !!fd.is_package_eligible,
       status: fd.status
     }
 
