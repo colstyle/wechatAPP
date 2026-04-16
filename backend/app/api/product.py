@@ -37,39 +37,28 @@ class ProductResponse(BaseModel):
     id: int
     name: str
     category_id: int
-    brand_id: int
     main_image: str
     images: list
     description: str
     deposit: float
     price: float
-    single_rent: float
-    month_card_rent: float
     stock: int
     sizes: list
     colors: list
-    is_hot: bool
-    is_new: bool
     view_count: int
     rent_count: int
 
 class ProductSaveRequest(BaseModel):
     name: str
     category_id: int = 0
-    brand_id: int = 0
     cover_image: str
     images: list = []
     description: str = ""
     deposit: float = 0.0
     daily_rent: float = 0.0
-    single_rent: float = 0.0
-    month_card_rent: float = 0.0
     stock: int = 1
     sizes: list = []
     colors: list = []
-    is_hot: bool = False
-    is_new: bool = False
-    is_package_eligible: bool = False
     status: int = 1
 
 
@@ -182,10 +171,7 @@ async def get_brand(brand_id: int):
 @router.get("/products")
 async def get_products(
     category_id: Optional[int] = None,
-    brand_id: Optional[int] = None,
     keyword: Optional[str] = None,
-    is_hot: Optional[bool] = None,
-    package_only: Optional[bool] = None,
     available_date: Optional[str] = None,  # YYYY-MM-DD format
     show_rented: Optional[bool] = False,   # 是否显示已借出商品
     page: int = Query(1, ge=1),
@@ -228,20 +214,9 @@ async def get_products(
         conditions.append("p.category_id = %s")
         params.append(category_id)
 
-    if brand_id:
-        conditions.append("p.brand_id = %s")
-        params.append(brand_id)
-
     if keyword:
         conditions.append("p.name LIKE %s")
         params.append(f"%{keyword}%")
-
-    if is_hot is not None:
-        conditions.append("p.is_hot = %s")
-        params.append(is_hot)
-
-    if package_only:
-        conditions.append("p.is_package_eligible = 1")
 
     # 如果指定日期并且没有强制要求显示已租商品，则过滤掉已预订的商品
     if available_date and not show_rented:
