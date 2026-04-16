@@ -26,18 +26,6 @@
       <view class="card-arrow"></view>
     </view>
   </view>
-  <view class="dashboard-panel dashboard-panel-single">
-    <view class="control-card" bindtap="goToCategoryManage">
-      <view class="card-icon-wrap">
-        <view class="icon-cat"></view>
-      </view>
-      <view class="card-text">
-        <text class="card-title">分类管理</text>
-        <text class="card-sub">增删改与排序</text>
-      </view>
-      <view class="card-arrow"></view>
-    </view>
-  </view>
 
   <view class="admin-header">
     <view class="search-bar">

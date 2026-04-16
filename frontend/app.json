@@ -20,7 +20,6 @@
     "pages/admin/package/package",
     "pages/admin/inventory/list/list",
     "pages/admin/inventory/edit/edit",
-    "pages/admin/category/list/list",
     "pages/admin/store/edit/edit",
     "pages/category_products/list/list",
     "pages/channel/channel"
