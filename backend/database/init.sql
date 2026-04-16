@@ -116,6 +116,74 @@ CREATE TABLE IF NOT EXISTS `store_explore_configs` (
   FOREIGN KEY (`owner_user_id`) REFERENCES `users`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 9. 商品预订表 (用于锁定使用日期)
+CREATE TABLE IF NOT EXISTS `reservations` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `product_id` INT NOT NULL,
+  `reserved_date` DATE NOT NULL,
+  `order_id` INT NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `uk_product_date` (`product_id`, `reserved_date`),
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`),
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 10. 商品评价表
+CREATE TABLE IF NOT EXISTS `reviews` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `product_id` INT NOT NULL,
+  `order_id` INT DEFAULT NULL,
+  `rating` TINYINT NOT NULL DEFAULT 5,
+  `content` TEXT,
+  `images` JSON DEFAULT NULL,
+  `is_anonymous` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`),
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 11. 订单审计表 (操作日志)
+CREATE TABLE IF NOT EXISTS `order_audit` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `order_id` INT NOT NULL,
+  `action` VARCHAR(50) NOT NULL,
+  `operator_role` VARCHAR(20) NOT NULL,
+  `operator_id` INT DEFAULT NULL,
+  `request_id` VARCHAR(64) DEFAULT NULL,
+  `amount` DECIMAL(10, 2) DEFAULT NULL,
+  `reason` VARCHAR(255) DEFAULT NULL,
+  `before_status` TINYINT DEFAULT NULL,
+  `after_status` TINYINT DEFAULT NULL,
+  `extra` JSON DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 12. 订阅套餐与记录表
+CREATE TABLE IF NOT EXISTS `subscription_packages` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(50) NOT NULL,
+  `price` DECIMAL(10, 2) NOT NULL,
+  `days` INT NOT NULL,
+  `max_times` INT NOT NULL COMMENT '可用次数(0为无限制)',
+  `description` VARCHAR(255) DEFAULT NULL,
+  `is_active` TINYINT(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `subscriptions` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `subscription_no` VARCHAR(64) NOT NULL UNIQUE,
+  `package_id` INT NOT NULL,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  `remaining_times` INT NOT NULL,
+  `status` TINYINT DEFAULT 1 COMMENT '1-有效, 3-已取消',
+  `payment_time` DATETIME DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 注入演示数据 (可选)

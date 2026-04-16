@@ -148,9 +148,6 @@ async def login(request: LoginRequest):
                 "nickname": user['nickname'],
                 "avatar_url": user['avatar_url'],
                 "phone": user['phone'],
-                "real_name": user['real_name'],
-                "height": user['height'],
-                "weight": user['weight'],
                 "role": user.get('role', 'user'),
                 "created_at": user['created_at'].isoformat() if user['created_at'] else None
             }
