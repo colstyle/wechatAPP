@@ -189,15 +189,14 @@ async def create_order(
 
         for item in order_items:
             # 尝试写入含快照字段的版本，若表中无该字段则回退（兼容旧表结构）
-            try:
-                db.execute_insert(
-                    """INSERT INTO order_items
-                       (order_id, product_id, product_name, product_image,
-                        price, deposit, quantity)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                    (order_id, item['product_id'], item['product_name'], item['product_image'],
-                     item['price'], item['deposit'], item['quantity'])
-                )
+            db.execute_insert(
+                """INSERT INTO order_items
+                   (order_id, product_id, product_name, product_image,
+                    price, deposit, quantity)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (order_id, item['product_id'], item['product_name'], item['product_image'],
+                 item['price'], item['deposit'], item['quantity'])
+            )
             # 锁定日期库存
             try:
                 db.execute_insert(
@@ -221,7 +220,7 @@ async def create_order(
             reason=request.remark,
             before_status=None,
             after_status=0,
-            extra={"order_no": order_no, "rental_type": request.rental_type},
+            extra={"order_sn": order_sn, "rental_type": request.rental_type},
         )
     except HTTPException:
         db.rollback()
