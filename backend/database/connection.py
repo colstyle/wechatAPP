@@ -19,6 +19,15 @@ class Database:
         max_retries = 3
         retry_delay = 2  # 秒
 
+        # 检查现有连接是否依然有效
+        if cls._connection:
+            try:
+                cls._connection.ping(reconnect=True)
+                return cls._connection
+            except Exception:
+                # 连接已失效，尝试重新简历连接
+                cls._connection = None
+
         if cls._connection is None:
             for attempt in range(max_retries):
                 try:
