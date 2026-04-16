@@ -57,6 +57,19 @@ app.include_router(admin.router, prefix="/api/v1/admin", tags=["店主后台"])
 app.include_router(store.router, prefix="/api/v1/store", tags=["门店与配置"])
 
 
+@app.on_event("startup")
+async def startup_event():
+    """生产环境数据库字段无缝迁移"""
+    from database import db
+    try:
+        db.execute_update("ALTER TABLE products CHANGE cover_image main_image VARCHAR(255) DEFAULT NULL")
+    except Exception:
+        pass
+    try:
+        db.execute_update("ALTER TABLE products CHANGE daily_rent price DECIMAL(10,2) NOT NULL")
+    except Exception:
+        pass
+
 @app.get("/")
 async def root():
     """根路径"""
