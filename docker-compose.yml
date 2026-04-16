@@ -24,12 +24,12 @@ services:
     ports:
       - "8000:80"
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=${DB_PASSWORD:-root_password}
-      - DB_NAME=${DB_NAME:-celestial_prod}
-      - APP_ENV=prod
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root_password
+      DB_NAME: time_capsule_db
+      APP_ENV: prod
     depends_on:
       - db
     env_file:
