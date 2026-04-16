@@ -82,7 +82,7 @@ Page({
   },
 
   goToCategory() {
-    wx.navigateTo({ url: '/pages/category_db/category_db' })
+    wx.switchTab({ url: '/pages/category/category' })
   },
 
   goToPackage() {

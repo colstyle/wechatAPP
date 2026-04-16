@@ -73,13 +73,12 @@ class OutfitResponse(BaseModel):
 # ============ 分类API ============
 
 @router.get("/categories")
-async def get_categories(parent_id: Optional[int] = 0):
+async def get_categories():
     """
     获取分类列表
     """
     categories = db.execute_query(
-        "SELECT * FROM categories WHERE parent_id = %s ORDER BY sort_order ASC, id ASC",
-        (parent_id,)
+        "SELECT * FROM categories ORDER BY sort_order ASC, id ASC"
     )
 
     return {
@@ -89,7 +88,6 @@ async def get_categories(parent_id: Optional[int] = 0):
             {
                 "id": cat['id'],
                 "name": cat['name'],
-                "parent_id": cat['parent_id'],
                 "icon": cat['icon'],
                 "sort_order": cat['sort_order']
             }
