@@ -542,11 +542,15 @@ async def delete_product(product_id: int, authorization: Optional[str] = Header(
         db.execute_update("UPDATE products SET status = 0 WHERE id = %s", (product_id,))
         return {"code": 0, "message": "该商品有关联订单，已做下架处理。"}
     else:
-        # 无关联订单，硬删除
-        db.execute_update("DELETE FROM products WHERE id = %s", (product_id,))
-        # 清理关联的收藏记录、预约记录等
-        db.execute_update("DELETE FROM favorites WHERE product_id = %s", (product_id,))
+        # 无关联订单，硬删除（需先处理关联数据）
+        # 1. 清空预约表中对此商品的意向关联
+        db.execute_update("UPDATE appointments SET product_id = NULL WHERE product_id = %s", (product_id,))
+        # 2. 删除评价表关联
+        db.execute_update("DELETE FROM reviews WHERE product_id = %s", (product_id,))
+        # 3. 删除预订锁定关联
         db.execute_update("DELETE FROM reservations WHERE product_id = %s", (product_id,))
+        # 4. 最后删除商品本身
+        db.execute_update("DELETE FROM products WHERE id = %s", (product_id,))
         return {"code": 0, "message": "商品及相关记录已永久删除。"}
 
 
