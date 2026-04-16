@@ -1,5 +1,5 @@
 <!-- components/cp-nav-bar/cp-nav-bar.wxml -->
-<view class="nav-bar-wrap" style="height: {{navBarData.navBarHeight}}px; padding-top: {{navBarData.statusBarHeight}}px; background: {{bgStyle}};">
+<view class="nav-bar-wrap {{bg === 'transparent' ? 'is-transparent' : ''}}" style="height: {{navBarData.navBarHeight}}px; padding-top: {{navBarData.statusBarHeight}}px; background: {{bgStyle}};">
   <!-- 返回按钮区 -->
   <view class="nav-bar-inner">
     <view class="nav-btn-group" wx:if="{{showBack}}">
