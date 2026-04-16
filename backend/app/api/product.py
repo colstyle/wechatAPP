@@ -371,21 +371,6 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
     # 增加租用计数（模拟浏览计数的旧逻辑已移除）
     pass
 
-    # 如果用户已登录，记录浏览历史
-    if authorization:
-        # TODO: 从 authorization 解析 token 并获取 user_id
-        user_id = 1  # 模拟
-        # 检查是否已记录
-        exists = db.execute_one(
-            "SELECT id FROM browsing_history WHERE user_id = %s AND product_id = %s",
-            (user_id, product_id)
-        )
-        if not exists:
-            db.execute_insert(
-                "INSERT INTO browsing_history (user_id, product_id, created_at) VALUES (%s, %s, NOW())",
-                (user_id, product_id)
-            )
-
     # 解析JSON字段
     try:
         images = json.loads(product['images']) if product['images'] else []
@@ -407,18 +392,9 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
         (product_id,)
     )
 
-    # 获取搭配推荐
-    outfits = db.execute_query(
-        """SELECT * FROM outfits
-           WHERE product_ids LIKE %s
-           ORDER BY id DESC
-           LIMIT 5""",
-        (f"%{product_id}%",)
-    )
-
-    # 获取同类推荐
+    # 获取同类推荐 (修正为 main_image 和 price)
     similar_products = db.execute_query(
-        """SELECT id, name, cover_image, daily_rent, single_rent, deposit
+        """SELECT id, name, main_image, price, deposit
            FROM products
            WHERE category_id = %s AND id != %s AND status = 1
            ORDER BY rent_count DESC
@@ -433,7 +409,6 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
             "id": product['id'],
             "name": product['name'],
             "category_id": product['category_id'],
-            "brand_id": product['brand_id'],
             "main_image": product['main_image'],
             "images": images,
             "description": product['description'],
@@ -458,16 +433,6 @@ async def get_product(product_id: int, authorization: Optional[str] = Header(Non
                     "created_at": r['created_at'].isoformat() if r['created_at'] else None
                 }
                 for r in reviews
-            ],
-            "outfits": [
-                {
-                    "id": o['id'],
-                    "name": o['name'],
-                    "image": o['image'],
-                    "description": o['description'],
-                    "product_ids": json.loads(o['product_ids']) if o['product_ids'] else []
-                }
-                for o in outfits
             ],
             "similar_products": similar_products
         }
