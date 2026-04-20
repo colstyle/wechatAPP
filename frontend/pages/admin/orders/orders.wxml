@@ -3,19 +3,6 @@
   <!-- 自定义导航栏 -->
   <cp-nav-bar title="店主后台" show-back="{{true}}" bg="white"></cp-nav-bar>
 
-  <!-- 核心控制面板 -->
-  <view class="dashboard-panel">
-    <view class="control-card" bindtap="goToCatalog">
-      <view class="card-icon-wrap">
-        <view class="icon-stock"></view>
-      </view>
-      <view class="card-text">
-        <text class="card-title">分类管理</text>
-        <text class="card-sub">库存总管 · 套餐配置</text>
-      </view>
-      <view class="card-arrow"></view>
-    </view>
-  </view>
 
   <view class="admin-header">
     <view class="search-bar">
