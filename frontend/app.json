@@ -5,7 +5,6 @@
     "pages/package/package",
     "pages/chat/chat",
     "pages/category/category",
-    "pages/category_db/category_db",
     "pages/detail/detail",
     "pages/order/order",
     "pages/order/detail/detail",
@@ -13,7 +12,6 @@
     "pages/pay/pay",
     "pages/profile/profile",
     "pages/settings/settings",
-    "pages/category_explore_edit/edit",
     "pages/orders/confirm",
     "pages/admin/orders/orders",
     "pages/admin/detail/detail",
@@ -23,7 +21,6 @@
     "pages/admin/store/edit/edit",
     "pages/admin/catalog/catalog",
     "pages/admin/catalog/inventory/inventory",
-    "pages/category_products/list/list",
     "pages/channel/channel"
   ],
   "window": {
