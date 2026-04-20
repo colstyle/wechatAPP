@@ -74,6 +74,52 @@
       </view>
     </view>
 
+    <!-- 专属会员服务 -->
+    <view class="member-section shadow-card">
+      <view class="member-header">
+        <view class="member-header-left">
+          <view class="member-crown-icon">
+            <view class="crown-top"></view>
+            <view class="crown-base"></view>
+          </view>
+          <text class="member-title">专属会员服务</text>
+        </view>
+        <text class="member-sub">为您精心定制</text>
+      </view>
+
+      <view class="member-grid">
+        <view class="mg-item" bindtap="goToCategory">
+          <view class="mg-icon-box bg-gold-lite">
+            <view class="mri-bars">
+              <view class="mri-bar"></view>
+              <view class="mri-bar short"></view>
+            </view>
+          </view>
+          <text class="mg-label">即刻选款</text>
+        </view>
+
+        <view class="mg-item" bindtap="onAppointmentTap">
+          <view class="mg-icon-box bg-blue-lite">
+            <view class="mri-calendar">
+              <view class="cal-head"></view>
+              <view class="cal-body"></view>
+            </view>
+          </view>
+          <text class="mg-label">到店试穿</text>
+        </view>
+
+        <view class="mg-item" bindtap="onSubscribeTap">
+          <view class="mg-icon-box bg-pearl-lite">
+            <view class="mri-crown">
+              <view class="crown-arc"></view>
+              <view class="crown-strip"></view>
+            </view>
+          </view>
+          <text class="mg-label">会员订阅</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 商品列表区 -->
     <view class="products-section">
       <view class="section-head">

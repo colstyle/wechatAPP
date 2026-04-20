@@ -552,41 +552,42 @@ async def get_order(order_id: int, authorization: Optional[str] = Header(None)):
         "message": "获取成功",
         "data": {
             "id": order['id'],
-            "order_no": order['order_no'],
+            "order_no": order.get('order_sn') or order.get('order_no', ''),
+            "order_sn": order.get('order_sn') or order.get('order_no', ''),
             "rental_type": order['rental_type'],
-            "total_rent": float(order['total_rent']),
-            "total_deposit": float(order['total_deposit']),
-            "total_amount": float(order['total_amount']),
-            "rent_days": order['rent_days'],
-            "start_date": order['start_date'].isoformat() if order['start_date'] else None,
-            "end_date": order['end_date'].isoformat() if order['end_date'] else None,
-            "pickup_time": order['pickup_time'].isoformat() if order['pickup_time'] else None,
-            "expected_return_time": order['expected_return_time'].isoformat() if order['expected_return_time'] else None,
-            "door_lock_password": order['door_lock_password'],
-            "overdue_duration": order['overdue_duration'],
+            "total_rent": float(order.get('total_rent') or 0),
+            "total_deposit": float(order.get('total_deposit') or 0),
+            "total_amount": float(order.get('total_amount') or 0),
+            "rent_days": order.get('rent_days'),
+            "start_date": order['start_date'].isoformat() if order.get('start_date') else None,
+            "end_date": order['end_date'].isoformat() if order.get('end_date') else None,
+            "pickup_time": order['pickup_time'].isoformat() if order.get('pickup_time') else None,
+            "expected_return_time": order['expected_return_time'].isoformat() if order.get('expected_return_time') else None,
+            "door_lock_password": order.get('door_lock_password'),
+            "overdue_duration": order.get('overdue_duration'),
             "status": order['status'],
             "items": [
                 {
                     "id": item['id'],
                     "product_id": item['product_id'],
                     "product_name": item['product_name'],
-                    "product_image": item['product_image'],
-                    "size": item['size'],
-                    "color": item['color'],
-                    "rent_price": float(item['rent_price']),
-                    "deposit": float(item['deposit']),
-                    "quantity": item['quantity']
+                    "product_image": item.get('product_image'),
+                    "size": item.get('size'),
+                    "color": item.get('color'),
+                    "rent_price": float(item.get('rent_price') or item.get('price') or 0),
+                    "deposit": float(item.get('deposit') or 0),
+                    "quantity": item.get('quantity', 1)
                 }
                 for item in items
             ],
-            "payment_time": order['payment_time'].isoformat() if order['payment_time'] else None,
-            "ship_time": order['ship_time'].isoformat() if order['ship_time'] else None,
-            "receive_time": order['receive_time'].isoformat() if order['receive_time'] else None,
-            "return_time": order['return_time'].isoformat() if order['return_time'] else None,
-            "refund_time": order['refund_time'].isoformat() if order['refund_time'] else None,
-            "refund_amount": float(order['refund_amount']) if order['refund_amount'] else 0,
-            "remark": order['remark'],
-            "created_at": order['created_at'].isoformat() if order['created_at'] else None
+            "payment_time": order['payment_time'].isoformat() if order.get('payment_time') else None,
+            "ship_time": order['ship_time'].isoformat() if order.get('ship_time') else None,
+            "receive_time": order['receive_time'].isoformat() if order.get('receive_time') else None,
+            "return_time": order['return_time'].isoformat() if order.get('return_time') else None,
+            "refund_time": order['refund_time'].isoformat() if order.get('refund_time') else None,
+            "refund_amount": float(order['refund_amount']) if order.get('refund_amount') else 0,
+            "remark": order.get('remark'),
+            "created_at": order['created_at'].isoformat() if order.get('created_at') else None
         }
     }
 

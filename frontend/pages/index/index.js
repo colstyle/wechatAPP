@@ -119,5 +119,13 @@ Page({
     }, () => {
       this.loadData()
     })
+  },
+
+  onAppointmentTap() {
+    wx.navigateTo({ url: '/pages/chat/chat' }) // 暫时跳转AI客服来预约
+  },
+
+  onSubscribeTap() {
+    wx.navigateTo({ url: '/pages/package/package' }) // 跳转套餐页
   }
 })

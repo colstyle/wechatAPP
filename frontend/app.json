@@ -49,12 +49,6 @@
         "text": "分类"
       },
       {
-        "pagePath": "pages/order/order",
-        "iconPath": "images/tab-order.png",
-        "selectedIconPath": "images/tab-order-active.png",
-        "text": "订单"
-      },
-      {
         "pagePath": "pages/profile/profile",
         "iconPath": "images/tab-profile.png",
         "selectedIconPath": "images/tab-profile-active.png",

@@ -8,83 +8,139 @@
   overflow: hidden;
 }
 
-/* ===== 店主管理功能栏 ===== */
+/* ===== 店主管理功能栏（Premium Card Style） ===== */
 .admin-toolbar {
   display: flex;
-  align-items: center;
-  background: #FFF8EE;
-  border-bottom: 1.5rpx solid rgba(197,160,89,0.18);
-  padding: 16rpx 28rpx;
-  gap: 0;
+  flex-direction: row;
+  gap: 16rpx;
+  padding: 18rpx 24rpx;
+  background: linear-gradient(180deg, #FDF9F2 0%, #FDFCF9 100%);
+  border-bottom: 1.5rpx solid rgba(197,160,89,0.12);
 }
 
-.admin-tool-btn {
+/* 每张管理卡片 */
+.admin-card {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14rpx;
-  padding: 16rpx 0;
+  gap: 16rpx;
+  background: #FFFFFF;
+  border-radius: 18rpx;
+  padding: 18rpx 20rpx;
+  box-shadow:
+    0 2rpx 8rpx rgba(197,160,89,0.08),
+    0 6rpx 20rpx rgba(28,28,28,0.05);
+  border: 1.5rpx solid rgba(197,160,89,0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.admin-tool-divider {
-  width: 1.5rpx;
-  height: 48rpx;
-  background: rgba(197,160,89,0.25);
+/* 左侧光晕装饰 */
+.admin-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6rpx;
+  border-radius: 20rpx 0 0 20rpx;
+}
+.admin-card:first-child::before {
+  background: linear-gradient(180deg, #D4B06A, #C5A059);
+}
+.admin-card:last-child::before {
+  background: linear-gradient(180deg, #8EC4A0, #6BA88A);
+}
+
+/* 圆形图标徽章 */
+.admin-card-badge {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
-
-.tool-label {
-  font-size: 26rpx;
-  color: #C5A059;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+.badge-gold {
+  background: linear-gradient(135deg, rgba(212,176,106,0.2) 0%, rgba(197,160,89,0.12) 100%);
+}
+.badge-sage {
+  background: linear-gradient(135deg, rgba(142,196,160,0.2) 0%, rgba(107,168,138,0.12) 100%);
 }
 
-/* 三道杠库存图标 */
-.tool-icon {
-  width: 36rpx;
-  height: 30rpx;
+/* 三道杠 badge 内图标 */
+.badge-bars {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 7rpx;
   align-items: flex-start;
-  flex-shrink: 0;
 }
-.stock-bar {
-  width: 36rpx;
+.badge-bar {
+  width: 32rpx;
   height: 5rpx;
   background: #C5A059;
   border-radius: 4rpx;
 }
-.stock-bar.mid {
-  width: 26rpx;
+.badge-bar.short {
+  width: 22rpx;
+  opacity: 0.65;
 }
 
-/* 套餐包图标 */
-.icon-pkg {
+/* 套餐 badge 内图标 */
+.badge-pkg {
   position: relative;
-  width: 32rpx;
-  height: 30rpx;
+  width: 36rpx;
+  height: 34rpx;
 }
-.pkg-box {
-  width: 30rpx;
+.pkg-rect {
+  width: 32rpx;
   height: 26rpx;
-  border: 3.5rpx solid #C5A059;
-  border-radius: 5rpx;
+  border: 3.5rpx solid #6BA88A;
+  border-radius: 6rpx;
   position: absolute;
   bottom: 0;
   left: 0;
   box-sizing: border-box;
 }
-.pkg-dot {
-  width: 12rpx;
-  height: 12rpx;
-  background: #C5A059;
+.pkg-star {
+  width: 14rpx;
+  height: 14rpx;
+  background: #6BA88A;
   border-radius: 50%;
   position: absolute;
   top: 0;
   right: 0;
+  border: 2rpx solid #FFF;
+}
+
+/* 文字区 */
+.admin-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5rpx;
+}
+.admin-card-title {
+  font-size: 27rpx;
+  font-weight: 700;
+  color: #1C1C1C;
+  letter-spacing: 0.5px;
+}
+.admin-card-sub {
+  font-size: 20rpx;
+  color: #B0A89A;
+  letter-spacing: 0.3px;
+}
+
+/* 右侧箭头 */
+.admin-card-chevron {
+  width: 14rpx;
+  height: 14rpx;
+  border-right: 3rpx solid #C5C0B8;
+  border-top: 3rpx solid #C5C0B8;
+  transform: rotate(45deg);
+  flex-shrink: 0;
 }
 
 /* ===== 搜索栏 ===== */

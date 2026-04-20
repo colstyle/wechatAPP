@@ -10,21 +10,37 @@
 
     <!-- 店主管理功能栏（仅管理员可见） -->
     <view class="admin-toolbar" wx:if="{{isAdmin}}">
-      <view class="admin-tool-btn" bindtap="goToInventory">
-        <view class="tool-icon icon-stock">
-          <view class="stock-bar"></view>
-          <view class="stock-bar mid"></view>
-          <view class="stock-bar"></view>
+      <view class="admin-card" bindtap="goToInventory">
+        <!-- 图标圆形徽章 -->
+        <view class="admin-card-badge badge-gold">
+          <!-- 三道杠 -->
+          <view class="badge-bars">
+            <view class="badge-bar"></view>
+            <view class="badge-bar short"></view>
+            <view class="badge-bar"></view>
+          </view>
         </view>
-        <text class="tool-label">库存管理</text>
+        <view class="admin-card-text">
+          <text class="admin-card-title">库存管理</text>
+          <text class="admin-card-sub">上架 · 调价 · 排序</text>
+        </view>
+        <view class="admin-card-chevron"></view>
       </view>
-      <view class="admin-tool-divider"></view>
-      <view class="admin-tool-btn" bindtap="goToPackage">
-        <view class="tool-icon icon-pkg">
-          <view class="pkg-box"></view>
-          <view class="pkg-dot"></view>
+
+      <view class="admin-card" bindtap="goToPackage">
+        <!-- 图标圆形徽章 -->
+        <view class="admin-card-badge badge-sage">
+          <!-- 星形包简化图标 -->
+          <view class="badge-pkg">
+            <view class="pkg-rect"></view>
+            <view class="pkg-star"></view>
+          </view>
         </view>
-        <text class="tool-label">套餐入选</text>
+        <view class="admin-card-text">
+          <text class="admin-card-title">套餐入选</text>
+          <text class="admin-card-sub">配置营销套餐</text>
+        </view>
+        <view class="admin-card-chevron"></view>
       </view>
     </view>
 

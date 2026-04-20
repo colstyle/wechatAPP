@@ -233,7 +233,141 @@
   letter-spacing: 1rpx;
 }
 
+/* === 专属会员服务区 === */
+.member-section {
+  padding: 0;
+  overflow: hidden;
+}
+
+.member-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 32rpx 20rpx;
+  background: linear-gradient(135deg, #FDF9F2 0%, #FFF 100%);
+  border-bottom: 1rpx solid rgba(197,160,89,0.08);
+}
+
+.member-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+/* 皇冠小图标 纯CSS */
+.member-crown-icon {
+  width: 28rpx;
+  height: 24rpx;
+  position: relative;
+}
+.crown-top {
+  width: 100%;
+  height: 16rpx;
+  border-left: 5rpx solid #C5A059;
+  border-right: 5rpx solid #C5A059;
+  border-top: 5rpx solid #C5A059;
+  border-radius: 4rpx 4rpx 0 0;
+  box-sizing: border-box;
+}
+.crown-base {
+  width: 100%;
+  height: 8rpx;
+  background: #C5A059;
+  border-radius: 0 0 3rpx 3rpx;
+  margin-top: 1rpx;
+}
+
+.member-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1C1C1C;
+  letter-spacing: 0.5px;
+}
+
+.member-sub {
+  font-size: 22rpx;
+  color: #C5A059;
+  letter-spacing: 0.3px;
+}
+
+/* 横向三格布局 */
+.member-grid {
+  display: flex;
+  padding: 20rpx 16rpx 24rpx;
+  justify-content: space-around;
+}
+
+.mg-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.mg-icon-box {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mg-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #1C1C1C;
+  letter-spacing: 0.3px;
+}
+
+.bg-gold-lite  { background: rgba(197,160,89,0.1); }
+.bg-blue-lite  { background: rgba(100,149,237,0.1); }
+.bg-pearl-lite { background: rgba(197,160,89,0.07); }
+
+/* 图标 — 两道杠（选款） */
+.mri-bars { display: flex; flex-direction: column; gap: 7rpx; }
+.mri-bar  { width: 32rpx; height: 5rpx; background: #C5A059; border-radius: 4rpx; }
+.mri-bar.short { width: 22rpx; opacity: 0.6; }
+
+/* 图标 — 日历（试穿） */
+.mri-calendar { width: 32rpx; height: 28rpx; }
+.cal-head {
+  width: 100%;
+  height: 10rpx;
+  background: #6495ED;
+  border-radius: 4rpx 4rpx 0 0;
+}
+.cal-body {
+  width: 100%;
+  height: 18rpx;
+  border: 2.5rpx solid #6495ED;
+  border-top: none;
+  border-radius: 0 0 4rpx 4rpx;
+  box-sizing: border-box;
+}
+
+/* 图标 — 皇冠（会员） */
+.mri-crown { width: 32rpx; height: 26rpx; }
+.crown-arc {
+  width: 32rpx;
+  height: 18rpx;
+  border-left: 4rpx solid #C5A059;
+  border-right: 4rpx solid #C5A059;
+  border-top: 4rpx solid #C5A059;
+  border-radius: 4rpx 4rpx 0 0;
+  box-sizing: border-box;
+}
+.crown-strip {
+  width: 32rpx;
+  height: 8rpx;
+  background: #C5A059;
+  border-radius: 0 0 3rpx 3rpx;
+  margin-top: 1rpx;
+}
+
 /* === 商品区 === */
+
 .products-section {
   padding: 0 8rpx;
 }
@@ -326,46 +460,81 @@
   40%            { transform: scale(1);   opacity: 1; }
 }
 
-/* === AI 客服悬浮球 === */
+/* === AI 客服悬浮球（磨砂半透明） === */
 .ai-fab {
   position: fixed;
-  right: 32rpx;
-  bottom: 180rpx;
+  right: 28rpx;
+  bottom: 160rpx;
   z-index: 500;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 8rpx;
 }
+
 .fab-inner {
-  width: 96rpx;
-  height: 96rpx;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
-  background: #1C1C1C;
+  background: rgba(28, 24, 20, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5rpx solid rgba(197, 160, 89, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8rpx 32rpx rgba(28, 28, 28, 0.25);
-}
-.fab-chat-bubble {
-  width: 40rpx;
-  height: 36rpx;
-  border: 3rpx solid #FFFFFF;
-  border-radius: 10rpx;
+  box-shadow:
+    0 8rpx 32rpx rgba(28, 28, 28, 0.22),
+    0 0 0 6rpx rgba(197, 160, 89, 0.08);
   position: relative;
 }
+
+/* 脉冲光晕 */
+.fab-inner::before {
+  content: '';
+  position: absolute;
+  inset: -8rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(197, 160, 89, 0.22);
+  animation: fab-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes fab-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50%       { transform: scale(1.12); opacity: 0; }
+}
+
+.fab-chat-icon {
+  position: relative;
+  width: 44rpx;
+  height: 40rpx;
+}
+
+.fab-chat-bubble {
+  width: 44rpx;
+  height: 36rpx;
+  border: 2.5rpx solid rgba(255,255,255,0.85);
+  border-radius: 12rpx;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .fab-chat-tail {
   width: 0;
   height: 0;
   border-left: 8rpx solid transparent;
   border-right: 0 solid transparent;
-  border-top: 10rpx solid #FFFFFF;
+  border-top: 10rpx solid rgba(255,255,255,0.85);
   position: absolute;
-  bottom: -13rpx;
-  left: 10rpx;
+  bottom: -10rpx;
+  left: 14rpx;
 }
+
 .fab-hint {
-  font-size: 18rpx;
-  color: #6B6660;
-  margin-top: 6rpx;
-  letter-spacing: 1px;
+  font-size: 19rpx;
+  color: rgba(197, 160, 89, 0.9);
+  letter-spacing: 1.5px;
+  text-shadow: 0 1rpx 6rpx rgba(0,0,0,0.3);
+  font-weight: 600;
 }
