@@ -1,0 +1,113 @@
+<!-- pages/admin/catalog/inventory/inventory.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="库存总管" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <!-- Tab: 分类 / 商品 -->
+  <view class="tab-bar">
+    <view class="tab {{activeTab === 'category' ? 'active' : ''}}" bindtap="switchTab" data-tab="category">分类管理</view>
+    <view class="tab {{activeTab === 'product' ? 'active' : ''}}" bindtap="switchTab" data-tab="product">商品管理</view>
+  </view>
+
+  <!-- ======= 分类TAB ======= -->
+  <view wx:if="{{activeTab === 'category'}}" class="tab-body">
+    <!-- 新增按钮 -->
+    <view class="toolbar">
+      <text class="tip-text">三道杠拖拽可排序</text>
+      <view class="btn-add" bindtap="onAddCategory">+ 新增分类</view>
+    </view>
+
+    <scroll-view class="sortable-list" scroll-y>
+      <view
+        class="sort-item {{dragging && dragIdx === index ? 'item-drag' : ''}} {{dragging && overIdx === index ? 'item-over' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="id"
+      >
+        <!-- 三道杠拖拽手柄 -->
+        <view
+          class="drag-handle"
+          data-index="{{index}}"
+          catchtouchstart="onDragStart"
+          catchtouchmove="onDragMove"
+          catchtouchend="onDragEnd"
+        >
+          <view class="handle-bar"></view>
+          <view class="handle-bar"></view>
+          <view class="handle-bar"></view>
+        </view>
+
+        <text class="item-name">{{item.name}}</text>
+        <text class="item-badge">{{item.product_count}}件</text>
+
+        <view class="item-actions">
+          <view class="btn-sm" bindtap="onEditCategory" data-id="{{item.id}}" data-name="{{item.name}}">改名</view>
+          <view class="btn-sm danger" bindtap="onDeleteCategory" data-id="{{item.id}}" data-name="{{item.name}}">删除</view>
+        </view>
+      </view>
+
+      <view class="no-more" wx:if="{{categories.length === 0}}">暂无分类，点击右上角新增</view>
+      <view class="list-bottom"></view>
+    </scroll-view>
+  </view>
+
+  <!-- ======= 商品TAB ======= -->
+  <view wx:if="{{activeTab === 'product'}}" class="tab-body">
+    <!-- Header: 搜索 + 新增 -->
+    <view class="toolbar toolbar-search">
+      <view class="search-bar">
+        <input class="search-input" placeholder="搜索商品名称" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" confirm-type="search" />
+      </view>
+      <view class="btn-add" bindtap="onAddProduct">+ 添加</view>
+    </view>
+
+    <!-- 分类筛选横向滑动 -->
+    <scroll-view class="cat-filter" scroll-x>
+      <view class="cat-chip {{filterCatId === 0 ? 'active' : ''}}" bindtap="onFilterCat" data-id="0">全部</view>
+      <view
+        class="cat-chip {{filterCatId === item.id ? 'active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="id"
+        bindtap="onFilterCat"
+        data-id="{{item.id}}"
+      >{{item.name}}</view>
+    </scroll-view>
+
+    <scroll-view class="sortable-list" scroll-y bindscrolltolower="onLoadMore">
+      <view
+        class="sort-item product-item {{dragging && dragIdx === index ? 'item-drag' : ''}} {{dragging && overIdx === index ? 'item-over' : ''}}"
+        wx:for="{{products}}"
+        wx:key="id"
+      >
+        <!-- 三道杠拖拽手柄 -->
+        <view
+          class="drag-handle"
+          data-index="{{index}}"
+          catchtouchstart="onProductDragStart"
+          catchtouchmove="onProductDragMove"
+          catchtouchend="onProductDragEnd"
+        >
+          <view class="handle-bar"></view>
+          <view class="handle-bar"></view>
+          <view class="handle-bar"></view>
+        </view>
+
+        <image class="prod-thumb" src="{{item.main_image}}" mode="aspectFill"></image>
+        <view class="prod-info">
+          <text class="prod-name">{{item.name}}</text>
+          <text class="prod-meta">¥{{item.price}}/天 · {{item.status === 1 ? '在售' : '下架'}}</text>
+        </view>
+
+        <view class="item-actions">
+          <view class="btn-sm" bindtap="onEditProduct" data-id="{{item.id}}">编辑</view>
+          <view class="btn-sm danger" bindtap="onDeleteProduct" data-id="{{item.id}}">删除</view>
+        </view>
+      </view>
+
+      <view class="loading-state" wx:if="{{loading}}">
+        <view class="loading-dots"><view class="dot"></view><view class="dot"></view><view class="dot"></view></view>
+      </view>
+      <view class="no-more" wx:if="{{!loading && products.length === 0}}">暂无商品</view>
+      <view class="no-more" wx:if="{{!hasMore && products.length > 0}}">没有更多了</view>
+      <view class="list-bottom"></view>
+    </scroll-view>
+  </view>
+</view>

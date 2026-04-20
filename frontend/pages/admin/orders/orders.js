@@ -133,10 +133,10 @@ Page({
     })
   },
 
-  goToPackageManage() {
-    wx.navigateTo({ url: '/pages/admin/package/package' })
+  goToCatalog() {
+    wx.navigateTo({ url: '/pages/admin/catalog/catalog' })
   },
-  
+
   goToInventoryManage() {
     wx.navigateTo({ url: '/pages/admin/inventory/list/list' })
   },

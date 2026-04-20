@@ -21,6 +21,8 @@
     "pages/admin/inventory/list/list",
     "pages/admin/inventory/edit/edit",
     "pages/admin/store/edit/edit",
+    "pages/admin/catalog/catalog",
+    "pages/admin/catalog/inventory/inventory",
     "pages/category_products/list/list",
     "pages/channel/channel"
   ],

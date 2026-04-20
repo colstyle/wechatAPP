@@ -1,0 +1,108 @@
+/* pages/admin/catalog/catalog.wxss */
+.page-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #F7F5F1;
+}
+.body {
+  flex: 1;
+  padding: 24rpx 28rpx 60rpx;
+}
+.section-title {
+  font-size: 24rpx;
+  color: #B0A89A;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0 4rpx 16rpx;
+}
+/* ==== Function Cards ==== */
+.card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.func-card {
+  background: #FFF;
+  border-radius: 20rpx;
+  padding: 28rpx 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  box-shadow: 0 2rpx 16rpx rgba(28,28,28,0.04);
+}
+.func-card-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.inventory-icon { background: rgba(197,160,89,0.12); }
+.package-icon   { background: rgba(120,180,140,0.12); }
+
+/* drag bar icon */
+.icon-bars { display: flex; flex-direction: column; gap: 6rpx; }
+.bar { width: 36rpx; height: 5rpx; background: #C5A059; border-radius: 4rpx; }
+.bar.mid { width: 28rpx; }
+
+/* package box icon */
+.icon-pkg { position: relative; width: 40rpx; height: 40rpx; }
+.pkg-box {
+  width: 34rpx; height: 30rpx;
+  border: 4rpx solid #5AAB78;
+  border-radius: 6rpx;
+  position: absolute; bottom:0; left:0;
+}
+.pkg-star {
+  width: 14rpx; height: 14rpx;
+  background: #5AAB78;
+  border-radius: 50%;
+  position: absolute; top:0; right:0;
+}
+
+.func-card-text { flex: 1 }
+.func-title { font-size: 30rpx; font-weight: 700; color: #1C1C1C; display: block; }
+.func-sub   { font-size: 22rpx; color: #B0A99A; margin-top: 4rpx; display: block; }
+
+.func-card-arrow {
+  width: 14rpx; height: 14rpx;
+  border-right: 3rpx solid #C5C0B8;
+  border-top: 3rpx solid #C5C0B8;
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* ==== Category overview list ==== */
+.cat-list {
+  background: #FFF;
+  border-radius: 20rpx;
+  padding: 0 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(28,28,28,0.04);
+}
+.cat-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid rgba(28,28,28,0.05);
+  gap: 16rpx;
+}
+.cat-item:last-child { border-bottom: none; }
+.cat-dot {
+  width: 14rpx; height: 14rpx;
+  border-radius: 50%;
+  background: #C5A059;
+  flex-shrink: 0;
+}
+.cat-name { flex: 1; font-size: 28rpx; color: #1C1C1C; }
+.cat-count { font-size: 24rpx; color: #B0A99A; }
+
+.empty-hint {
+  text-align: center;
+  padding: 60rpx 0;
+  font-size: 26rpx;
+  color: #C0BBB4;
+}

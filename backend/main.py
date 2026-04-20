@@ -69,6 +69,10 @@ async def startup_event():
         db.execute_update("ALTER TABLE products CHANGE daily_rent price DECIMAL(10,2) NOT NULL")
     except Exception:
         pass
+    try:
+        db.execute_update("ALTER TABLE products ADD COLUMN sort_order INT DEFAULT 0")
+    except Exception:
+        pass  # 列已存在则忽略
 
 @app.get("/")
 async def root():

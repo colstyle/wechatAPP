@@ -1,0 +1,178 @@
+/* pages/admin/catalog/inventory/inventory.wxss */
+.page-root { height: 100vh; display: flex; flex-direction: column; background: #F7F5F1; }
+
+/* ==== Tab Bar ==== */
+.tab-bar {
+  display: flex;
+  background: #FFF;
+  border-bottom: 2rpx solid rgba(28,28,28,0.06);
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #8E877F;
+  font-weight: 500;
+  position: relative;
+}
+.tab.active {
+  color: #1C1C1C;
+  font-weight: 700;
+}
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  right: 25%;
+  height: 4rpx;
+  background: #C5A059;
+  border-radius: 4rpx 4rpx 0 0;
+}
+
+.tab-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ==== Toolbar ==== */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: #FFF;
+  border-bottom: 1rpx solid rgba(28,28,28,0.04);
+}
+.toolbar-search { gap: 16rpx; }
+.tip-text { font-size: 22rpx; color: #C0BBB4; }
+.btn-add {
+  background: #C5A059;
+  color: #FFF;
+  font-size: 24rpx;
+  padding: 12rpx 28rpx;
+  border-radius: 36rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.search-bar {
+  flex: 1;
+  background: #F3F1EE;
+  border-radius: 36rpx;
+  padding: 10rpx 24rpx;
+}
+.search-input { width: 100%; font-size: 26rpx; color: #1C1C1C; }
+
+/* ==== Category filter chips ==== */
+.cat-filter {
+  white-space: nowrap;
+  background: #FFF;
+  padding: 12rpx 20rpx;
+  border-bottom: 1rpx solid rgba(28,28,28,0.04);
+}
+.cat-chip {
+  display: inline-block;
+  padding: 10rpx 28rpx;
+  border-radius: 36rpx;
+  font-size: 24rpx;
+  color: #8E877F;
+  background: #F3F1EE;
+  margin-right: 16rpx;
+}
+.cat-chip.active {
+  background: rgba(197,160,89,0.15);
+  color: #C5A059;
+  font-weight: 700;
+}
+
+/* ==== Sortable List ==== */
+.sortable-list { flex: 1; }
+
+.sort-item {
+  display: flex;
+  align-items: center;
+  background: #FFF;
+  margin: 12rpx 20rpx;
+  border-radius: 16rpx;
+  padding: 24rpx 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(28,28,28,0.04);
+  transition: transform 0.15s, box-shadow 0.15s;
+  gap: 16rpx;
+}
+
+.item-drag {
+  transform: scale(1.02);
+  box-shadow: 0 12rpx 36rpx rgba(28,28,28,0.14);
+  z-index: 10;
+  opacity: 0.95;
+}
+.item-over {
+  border: 2rpx dashed #C5A059;
+}
+
+/* ==== Drag Handle (三道杠) ==== */
+.drag-handle {
+  padding: 8rpx 14rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 7rpx;
+  align-items: center;
+  flex-shrink: 0;
+}
+.handle-bar {
+  width: 34rpx;
+  height: 4rpx;
+  background: #D0CAC1;
+  border-radius: 4rpx;
+}
+
+.item-name { flex: 1; font-size: 28rpx; color: #1C1C1C; font-weight: 500; }
+.item-badge {
+  font-size: 22rpx;
+  color: #B0A99A;
+  background: #F3F1EE;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.item-actions { display: flex; gap: 10rpx; flex-shrink: 0; }
+
+.btn-sm {
+  font-size: 22rpx;
+  color: #555;
+  border: 1rpx solid #E8E4DE;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+}
+.btn-sm.danger { color: #D32F2F; border-color: #FECDD2; }
+
+/* ==== Product item specifics ==== */
+.product-item { padding: 18rpx 20rpx; }
+.prod-thumb {
+  width: 100rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  background: #F0EDE8;
+  flex-shrink: 0;
+}
+.prod-info { flex: 1; overflow: hidden; }
+.prod-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1C1C1C;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prod-meta { font-size: 22rpx; color: #B0A99A; margin-top: 6rpx; display: block; }
+
+/* ==== Loading / Empty ==== */
+.loading-state { display: flex; justify-content: center; padding: 30rpx; }
+.loading-dots { display: flex; align-items: center; gap: 12rpx; }
+.dot { width: 12rpx; height: 12rpx; background: #C5A059; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+.no-more { text-align: center; font-size: 24rpx; color: #C0BBB4; padding: 30rpx; }
+.list-bottom { height: 40rpx; }

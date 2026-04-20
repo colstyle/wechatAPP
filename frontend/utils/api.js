@@ -294,8 +294,8 @@ const adminApi = {
     return app.request(`/api/v1/product/products/${id}`, 'DELETE')
   }
   ,
-  getCategories: (parentId = 0) => {
-    return app.request(`/api/v1/admin/categories?parent_id=${parentId}`, 'GET')
+  getCategories: () => {
+    return app.request('/api/v1/admin/categories', 'GET')
   },
   createCategory: (data) => {
     return app.request('/api/v1/admin/categories', 'POST', data)
@@ -308,6 +308,9 @@ const adminApi = {
   },
   reorderCategories: (parentId, orderedIds) => {
     return app.request('/api/v1/admin/categories/reorder', 'POST', { parent_id: parentId, ordered_ids: orderedIds })
+  },
+  reorderProducts: (orderedIds) => {
+    return app.request('/api/v1/admin/products/reorder', 'POST', { ordered_ids: orderedIds })
   }
 }
 

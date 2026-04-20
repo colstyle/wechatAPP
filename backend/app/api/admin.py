@@ -55,13 +55,11 @@ class CategoryReorderRequest(BaseModel):
 
 @router.get("/categories")
 async def admin_get_categories(
-    parent_id: int = Query(0),
     authorization: Optional[str] = Header(None)
 ):
     require_admin(authorization)
     categories = db.execute_query(
-        "SELECT * FROM categories WHERE parent_id = %s ORDER BY sort_order ASC, id ASC",
-        (parent_id,)
+        "SELECT * FROM categories ORDER BY sort_order ASC, id ASC"
     )
     return {
         "code": 0,
@@ -70,9 +68,11 @@ async def admin_get_categories(
             {
                 "id": c["id"],
                 "name": c["name"],
-                "parent_id": c["parent_id"],
                 "icon": c.get("icon"),
                 "sort_order": c.get("sort_order", 0),
+                "product_count": db.execute_one(
+                    "SELECT COUNT(*) as cnt FROM products WHERE category_id=%s", (c["id"],)
+                ).get("cnt", 0) if c.get("id") else 0
             }
             for c in categories
         ],
@@ -90,13 +90,12 @@ async def admin_create_category(
         raise HTTPException(status_code=400, detail="分类名称不能为空")
 
     max_row = db.execute_one(
-        "SELECT COALESCE(MAX(sort_order), -1) as mx FROM categories WHERE parent_id = %s",
-        (request.parent_id,)
+        "SELECT COALESCE(MAX(sort_order), -1) as mx FROM categories"
     )
     next_sort = int((max_row or {}).get("mx", -1)) + 1
     new_id = db.execute_insert(
-        "INSERT INTO categories (name, parent_id, icon, sort_order, created_at) VALUES (%s, %s, %s, %s, NOW())",
-        (name, request.parent_id, request.icon, next_sort)
+        "INSERT INTO categories (name, icon, sort_order) VALUES (%s, %s, %s)",
+        (name, request.icon, next_sort)
     )
     return {"code": 0, "message": "创建成功", "data": {"id": new_id}}
 
@@ -148,7 +147,7 @@ async def admin_delete_category(
 
     prod = db.execute_one("SELECT id FROM products WHERE category_id = %s LIMIT 1", (category_id,))
     if prod:
-        raise HTTPException(status_code=400, detail="该分类下存在商品，无法删除")
+        raise HTTPException(status_code=400, detail="该分类下存在商品，请先删除商品")
 
     db.execute_update("DELETE FROM categories WHERE id = %s", (category_id,))
     return {"code": 0, "message": "删除成功"}
@@ -163,27 +162,46 @@ async def admin_reorder_categories(
     if not request.ordered_ids:
         return {"code": 0, "message": "更新成功"}
 
-    existing = db.execute_query(
-        f"SELECT id FROM categories WHERE parent_id = %s AND id IN ({','.join(['%s'] * len(request.ordered_ids))})",
-        tuple([request.parent_id] + request.ordered_ids)
-    )
-    existing_ids = {row["id"] for row in (existing or [])}
-    for cid in request.ordered_ids:
-        if cid not in existing_ids:
-            raise HTTPException(status_code=400, detail="包含无效分类ID")
-
     db.begin_transaction()
     try:
         for idx, cid in enumerate(request.ordered_ids):
             db.execute_update(
-                "UPDATE categories SET sort_order = %s WHERE id = %s AND parent_id = %s",
-                (idx, cid, request.parent_id)
+                "UPDATE categories SET sort_order = %s WHERE id = %s",
+                (idx, cid)
             )
         db.commit()
     except Exception:
         db.rollback()
         raise
 
+    return {"code": 0, "message": "更新成功"}
+
+
+class ProductReorderRequest(BaseModel):
+    ordered_ids: List[int]
+    category_id: Optional[int] = None
+
+
+@router.post("/products/reorder")
+async def admin_reorder_products(
+    request: ProductReorderRequest,
+    authorization: Optional[str] = Header(None)
+):
+    """Store owner drag-re-sort products within a category"""
+    require_admin(authorization)
+    if not request.ordered_ids:
+        return {"code": 0, "message": "更新成功"}
+    db.begin_transaction()
+    try:
+        for idx, pid in enumerate(request.ordered_ids):
+            db.execute_update(
+                "UPDATE products SET sort_order = %s WHERE id = %s",
+                (idx, pid)
+            )
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
     return {"code": 0, "message": "更新成功"}
 
 @router.get("/orders")

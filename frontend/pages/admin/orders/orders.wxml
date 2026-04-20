@@ -5,23 +5,13 @@
 
   <!-- 核心控制面板 -->
   <view class="dashboard-panel">
-    <view class="control-card" bindtap="goToInventoryManage">
+    <view class="control-card" bindtap="goToCatalog">
       <view class="card-icon-wrap">
         <view class="icon-stock"></view>
       </view>
       <view class="card-text">
-        <text class="card-title">库存总管</text>
-        <text class="card-sub">上下架及调价</text>
-      </view>
-      <view class="card-arrow"></view>
-    </view>
-    <view class="control-card" bindtap="goToPackageManage">
-      <view class="card-icon-wrap">
-        <view class="icon-pkg-large"></view>
-      </view>
-      <view class="card-text">
-        <text class="card-title">套餐入选池</text>
-        <text class="card-sub">配置营销商品</text>
+        <text class="card-title">分类管理</text>
+        <text class="card-sub">库存总管 · 套餐配置</text>
       </view>
       <view class="card-arrow"></view>
     </view>

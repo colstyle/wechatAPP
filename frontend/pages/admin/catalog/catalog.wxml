@@ -1,0 +1,52 @@
+<!-- pages/admin/catalog/catalog.wxml -->
+<view class="page-root">
+  <cp-nav-bar title="分类管理" show-back="{{true}}" bg="white"></cp-nav-bar>
+
+  <scroll-view class="body" scroll-y>
+    <!-- 功能入口卡片区 -->
+    <view class="section-title">管理功能</view>
+    <view class="card-grid">
+      <view class="func-card" bindtap="goToInventory">
+        <view class="func-card-icon inventory-icon">
+          <view class="icon-bars">
+            <view class="bar"></view>
+            <view class="bar mid"></view>
+            <view class="bar"></view>
+          </view>
+        </view>
+        <view class="func-card-text">
+          <text class="func-title">库存总管</text>
+          <text class="func-sub">增删商品 · 拖拽排序</text>
+        </view>
+        <view class="func-card-arrow"></view>
+      </view>
+
+      <view class="func-card" bindtap="goToPackage">
+        <view class="func-card-icon package-icon">
+          <view class="icon-pkg">
+            <view class="pkg-box"></view>
+            <view class="pkg-star"></view>
+          </view>
+        </view>
+        <view class="func-card-text">
+          <text class="func-title">套餐入选池</text>
+          <text class="func-sub">配置营销商品</text>
+        </view>
+        <view class="func-card-arrow"></view>
+      </view>
+    </view>
+
+    <!-- 分类概览区 -->
+    <view class="section-title" style="margin-top:40rpx;">分类概览</view>
+    <view class="cat-list" wx:if="{{categories.length > 0}}">
+      <view class="cat-item" wx:for="{{categories}}" wx:key="id">
+        <view class="cat-dot"></view>
+        <text class="cat-name">{{item.name}}</text>
+        <text class="cat-count">{{item.product_count}} 件</text>
+      </view>
+    </view>
+    <view class="empty-hint" wx:else>
+      <text>暂无分类数据，请在库存总管中添加</text>
+    </view>
+  </scroll-view>
+</view>
