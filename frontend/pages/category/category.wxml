@@ -7,6 +7,27 @@
   </view>
 
   <view wx:else style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+
+    <!-- 店主管理功能栏（仅管理员可见） -->
+    <view class="admin-toolbar" wx:if="{{isAdmin}}">
+      <view class="admin-tool-btn" bindtap="goToInventory">
+        <view class="tool-icon icon-stock">
+          <view class="stock-bar"></view>
+          <view class="stock-bar mid"></view>
+          <view class="stock-bar"></view>
+        </view>
+        <text class="tool-label">库存管理</text>
+      </view>
+      <view class="admin-tool-divider"></view>
+      <view class="admin-tool-btn" bindtap="goToPackage">
+        <view class="tool-icon icon-pkg">
+          <view class="pkg-box"></view>
+          <view class="pkg-dot"></view>
+        </view>
+        <text class="tool-label">套餐入选</text>
+      </view>
+    </view>
+
     <!-- 搜索栏 -->
     <view class="search-wrap">
       <view class="search-bar">

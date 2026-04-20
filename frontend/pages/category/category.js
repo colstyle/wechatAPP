@@ -18,6 +18,11 @@ Page({
   },
 
   onShow() {
+    // 每次页面展示时重新检测管理员身份（登录切换后生效）
+    const app = getApp()
+    const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo') || {}
+    const isAdmin = userInfo.role === 'admin' || userInfo.role === '2' || userInfo.role === 2
+    this.setData({ isAdmin })
     if (this.data.isSearching) {
       this.clearSearch()
     }
@@ -93,5 +98,13 @@ Page({
       this.setData({ activeCategoryId: firstCat })
       this.loadProducts(firstCat)
     }
+  },
+
+  goToInventory() {
+    wx.navigateTo({ url: '/pages/admin/catalog/inventory/inventory' })
+  },
+
+  goToPackage() {
+    wx.navigateTo({ url: '/pages/admin/package/package' })
   }
 })
