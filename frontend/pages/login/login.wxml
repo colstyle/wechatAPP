@@ -17,9 +17,20 @@
         <view class="arrow"></view>
       </button>
     </view>
-    <view class="form-item">
+    <view class="form-item border-bottom">
       <text class="label">昵称</text>
       <input type="nickname" class="nickname-input" placeholder="请输入你的昵称" bindinput="onInputNickname" value="{{nickname}}" />
+    </view>
+    <view class="form-item border-bottom">
+      <text class="label">身份</text>
+      <view class="role-selector">
+        <view class="role-opt {{role === '1' ? 'active' : ''}}" bindtap="onSelectRole" data-role="1">普通用户</view>
+        <view class="role-opt {{role === '2' ? 'active' : ''}}" bindtap="onSelectRole" data-role="2">店主</view>
+      </view>
+    </view>
+    <view class="form-item" wx:if="{{role === '2'}}">
+      <text class="label">授权码</text>
+      <input class="nickname-input" password placeholder="请输入店主授权码" bindinput="onInputAdminCode" value="{{adminCode}}" />
     </view>
   </view>
 

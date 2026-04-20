@@ -7,7 +7,7 @@
 
     <image
       class="img-cover {{loaded ? 'img-loaded' : ''}}"
-      src="{{product.cover_image}}"
+      src="{{product.main_image || product.cover_image}}"
       mode="aspectFill"
       lazy-load
       binderror="onImgError"
@@ -39,7 +39,7 @@
     <view class="price-row">
       <view class="price-main">
         <text class="price-unit">¥</text>
-        <text class="price-num">{{product.daily_rent}}</text>
+        <text class="price-num">{{product.price || product.daily_rent}}</text>
         <text class="price-day">/天</text>
       </view>
       <text class="price-deposit">押{{product.deposit}}</text>

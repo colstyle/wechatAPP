@@ -117,14 +117,15 @@ Page({
 
     if (rentalType === 1) {
       const days = rentalDays === 0 ? (parseInt(customDays) || 1) : rentalDays
-      rent = product.daily_rent * days
+      rent = (product.price || product.daily_rent || 0) * days
     } else {
-      rent = product.single_rent
+      // 如果没有单次计费字段，默认按3天打8折计算
+      rent = product.single_rent || (product.price || product.daily_rent || 0) * 3 * 0.8
     }
 
     this.setData({
       calculatedRent: rent.toFixed(2),
-      calculatedTotal: (rent + product.deposit).toFixed(2)
+      calculatedTotal: (rent + (product.deposit || 0)).toFixed(2)
     })
   },
 
@@ -141,13 +142,13 @@ Page({
     const orderData = {
       product_id: product.id,
       name: product.name,
-      image: product.cover_image,
+      image: product.main_image || product.cover_image,
       size: selectedSize,
       color: selectedColor,
       rental_type: rentalType,
       rental_days: days,
       rent: parseFloat(this.data.calculatedRent),
-      deposit: product.deposit
+      deposit: product.deposit || 0
     }
 
     // 存储到全局，跳转到确认订单页

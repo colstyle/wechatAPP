@@ -67,7 +67,7 @@
           <text class="p-label">日租</text>
           <view class="p-val-wrap">
             <text class="p-unit">¥</text>
-            <text class="p-num">{{product.daily_rent}}</text>
+            <text class="p-num">{{product.price || product.daily_rent}}</text>
             <text class="p-sub">/天</text>
           </view>
         </view>
@@ -187,7 +187,7 @@
         </view>
         <view class="rc-price">
           <text class="rc-unit">¥</text>
-          <text class="rc-num">{{product.daily_rent}}</text>
+          <text class="rc-num">{{product.price || product.daily_rent}}</text>
           <text class="rc-day">/天</text>
         </view>
         <view class="rc-check {{rentalType === 1 ? 'show' : ''}}"></view>
@@ -204,7 +204,7 @@
         </view>
         <view class="rc-price">
           <text class="rc-unit">¥</text>
-          <text class="rc-num">{{product.single_rent}}</text>
+          <text class="rc-num">{{product.single_rent || (product.price * 3 * 0.8)}}</text>
           <text class="rc-day">/次</text>
         </view>
         <view class="rc-check {{rentalType === 2 ? 'show' : ''}}"></view>

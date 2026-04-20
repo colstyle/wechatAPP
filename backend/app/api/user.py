@@ -30,6 +30,8 @@ class UpdateProfileRequest(BaseModel):
     nickname: Optional[str] = None
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
+    role: Optional[str] = None          # '1'-普通用户, '2'-店主
+    admin_code: Optional[str] = None    # 注册店主时需要的验证码
 
 
 
@@ -191,6 +193,18 @@ async def update_profile(request: UpdateProfileRequest, authorization: Optional[
     if request.phone is not None:
         update_fields.append("phone = %s")
         params.append(request.phone)
+        
+    if request.role is not None:
+        # 如果要升级为店主，简单验证一个邀请码 (此处硬编码为 8888)
+        if request.role == '2' or request.role == 'admin':
+            if request.admin_code == '8888':
+                update_fields.append("role = %s")
+                params.append('2')
+            else:
+                raise HTTPException(status_code=400, detail="店主授权码错误")
+        else:
+            update_fields.append("role = %s")
+            params.append('1')
     if update_fields:
         update_fields.append("updated_at = NOW()")
         params.append(user_id)

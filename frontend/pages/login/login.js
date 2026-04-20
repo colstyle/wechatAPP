@@ -5,6 +5,8 @@ Page({
     avatarUrl: '',
     defaultAvatar: 'https://fastly.jsdelivr.net/npm/@vant/assets/cat.jpeg',
     nickname: '',
+    role: '1', // '1'-用户, '2'-店主
+    adminCode: '',
     submitting: false,
     redirectUrl: ''
   },
@@ -41,6 +43,18 @@ Page({
     })
   },
 
+  onSelectRole(e) {
+    this.setData({
+      role: e.currentTarget.dataset.role
+    })
+  },
+
+  onInputAdminCode(e) {
+    this.setData({
+      adminCode: e.detail.value
+    })
+  },
+
   onSubmit() {
     const { avatarUrl, nickname } = this.data;
     if (!avatarUrl || avatarUrl === this.data.defaultAvatar) {
@@ -55,7 +69,9 @@ Page({
     this.setData({ submitting: true })
     app.request('/api/v1/user/profile', 'POST', {
       avatar_url: avatarUrl,
-      nickname: nickname
+      nickname: nickname,
+      role: this.data.role,
+      admin_code: this.data.adminCode
     }).then(res => {
       if (res.code === 0) {
         wx.showToast({ title: '授权成功', icon: 'success' })

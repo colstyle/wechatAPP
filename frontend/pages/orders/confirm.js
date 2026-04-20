@@ -112,9 +112,9 @@ Page({
     if (rentalType === 5) {
       rent = 69.90
     } else if (rentalType === 1) {
-      rent = parseFloat(first.daily_rent || 0) * (this.data.rentDays || 1)
+      rent = parseFloat(first.price || first.daily_rent || 0) * (this.data.rentDays || 1)
     } else if (rentalType === 2) {
-      rent = parseFloat(first.single_rent || 0)
+      rent = parseFloat(first.single_rent || (parseFloat(first.price || first.daily_rent || 0) * 3 * 0.8))
     } else if (rentalType === 3) {
       rent = parseFloat(first.month_card_rent || 0)
     }

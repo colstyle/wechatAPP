@@ -9,7 +9,7 @@
       <view class="sec-title">租赁明细</view>
       <view class="item-list">
         <view class="product-item" wx:for="{{displayItems}}" wx:key="index">
-          <image class="p-img" src="{{item.product.cover_image}}" mode="aspectFill"></image>
+          <image class="p-img" src="{{item.product.main_image || item.product.cover_image}}" mode="aspectFill"></image>
           <view class="p-info">
             <view class="p-name">{{item.product.name}}</view>
             <view class="p-spec">

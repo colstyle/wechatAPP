@@ -452,13 +452,13 @@ async def get_orders(
             items_map[order_id].append({
                 "id": item['id'],
                 "product_id": item['product_id'],
-                "product_name": item['product_name'],
-                "product_image": item['product_image'],
-                "size": item['size'],
-                "color": item['color'],
-                "price": float(item['price']),
-                "deposit": float(item['deposit']),
-                "quantity": item['quantity']
+                "product_name": item.get('product_name', '未知商品'),
+                "product_image": item.get('product_image'),
+                "size": item.get('size'),
+                "color": item.get('color'),
+                "price": float(item.get('price') or 0),
+                "deposit": float(item.get('deposit') or 0),
+                "quantity": item.get('quantity', 1)
             })
 
     status_text_map = {
@@ -479,27 +479,27 @@ async def get_orders(
             "list": [
                 {
                     "id": o['id'],
-                    "order_sn": o['order_sn'],
+                    "order_sn": o.get('order_sn') or o.get('order_no', ''),
                     "rental_type": o['rental_type'],
-                    "total_rent": float(o['total_rent']),
-                    "total_deposit": float(o['total_deposit']),
-                    "total_amount": float(o['total_amount']),
-                    "rent_days": o['rent_days'],
-                    "start_date": o['start_date'].isoformat() if o['start_date'] else None,
-                    "end_date": o['end_date'].isoformat() if o['end_date'] else None,
-                    "expected_return_time": o['expected_return_time'].isoformat() if o['expected_return_time'] else None,
-                    "door_lock_password": o['door_lock_password'],
-                    "overdue_duration": o['overdue_duration'],
+                    "total_rent": float(o.get('total_rent') or 0),
+                    "total_deposit": float(o.get('total_deposit') or 0),
+                    "total_amount": float(o.get('total_amount') or 0),
+                    "rent_days": o.get('rent_days'),
+                    "start_date": o['start_date'].isoformat() if o.get('start_date') else None,
+                    "end_date": o['end_date'].isoformat() if o.get('end_date') else None,
+                    "expected_return_time": o['expected_return_time'].isoformat() if o.get('expected_return_time') else None,
+                    "door_lock_password": o.get('door_lock_password'),
+                    "overdue_duration": o.get('overdue_duration'),
                     "status": o['status'],
                     "status_text": status_text_map.get(o['status'], '未知'),
                     "items": items_map.get(o['id'], []),
-                    "payment_time": o['payment_time'].isoformat() if o['payment_time'] else None,
-                    "ship_time": o['ship_time'].isoformat() if o['ship_time'] else None,
-                    "receive_time": o['receive_time'].isoformat() if o['receive_time'] else None,
-                    "return_time": o['return_time'].isoformat() if o['return_time'] else None,
-                    "refund_time": o['refund_time'].isoformat() if o['refund_time'] else None,
-                    "refund_amount": float(o['refund_amount']) if o['refund_amount'] else 0,
-                    "created_at": o['created_at'].isoformat() if o['created_at'] else None
+                    "payment_time": o['payment_time'].isoformat() if o.get('payment_time') else None,
+                    "ship_time": o['ship_time'].isoformat() if o.get('ship_time') else None,
+                    "receive_time": o['receive_time'].isoformat() if o.get('receive_time') else None,
+                    "return_time": o['return_time'].isoformat() if o.get('return_time') else None,
+                    "refund_time": o['refund_time'].isoformat() if o.get('refund_time') else None,
+                    "refund_amount": float(o.get('refund_amount') or 0),
+                    "created_at": o['created_at'].isoformat() if o.get('created_at') else None
                 }
                 for o in orders
             ],
